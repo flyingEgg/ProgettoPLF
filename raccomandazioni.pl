@@ -25,15 +25,18 @@ main :-
     write("Benvenuto al sistema di raccomandazione di canzoni!"), nl,
     write("Inserire il genere musicale preferito (es. Pop): "), nl,
     read(GenerePreferito),
-    raccomanda(GenerePreferito, ListaCanzoni),
-    write("Ecco le canzoni raccomandate per te:"), nl,
-    stampaLista(ListaCanzoni).
+    ( raccomanda(GenerePreferito, ListaCanzoni) ->
+        write("Ecco le canzoni raccomandate per te:"), nl,
+        stampaLista(ListaCanzoni)
+    ; write("Nessuna canzone trovata per il genere specificato."), nl
+    ).
 
 /* Predicato per raccomandare canzoni in base al genere preferito. */
 raccomanda(Genere, ListaOrdinata) :-
     findall([Titolo, Artista, Punteggio],
             canzone(Titolo, Artista, Genere, Punteggio),
             ListaNonOrdinata),
+    ListaNonOrdinata \= [],
     sort(3, @>=, ListaNonOrdinata, ListaOrdinata).
 
 /* Predicato per stampare una lista di canzoni in modo leggibile. */
