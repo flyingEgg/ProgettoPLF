@@ -1,18 +1,18 @@
 /* #########################################################
 # Corso di Programmazione Logica e Funzionale              #
 # Progetto di raccomandazione di canzoni                   #
-# Studente: [Il tuo Nome]                                  #
-# Matricola: [Il tuo Numero]                               #
+# Studenti: Giaconi Christian, Giacomo Rossi               #
+# Matricola: 314045, 314671                                #
 ######################################################### */
 
 /* Specifica:
-   Scrivere un programma Prolog per implementare un sistema di raccomandazione di canzoni.
-   Il sistema suggerisce canzoni basandosi sulle preferenze dell'utente (es. genere musicale)
-   e utilizza un punteggio di gradimento per ordinare le canzoni più popolari o rilevanti.
+    Scrivere un programma in Prolog per implementare un sistema di raccomandazione di canzoni. 
+    Il sistema suggerisce canzoni a un utente basandosi sulle sue preferenze musicali e utilizza 
+    un punteggio di gradimento per ordinare le canzoni più popolari o rilevanti.
 */
 
 /* Fatti: rappresentano le canzoni disponibili nel sistema.
-   canzone(Titolo, Artista, Genere, Punteggio).
+    canzone(Titolo, Artista, Genere, Punteggio).
 */
 canzone("Blinding Lights", "The Weeknd", "Pop", 9).
 canzone("Smells Like Teen Spirit", "Nirvana", "Rock", 8).
