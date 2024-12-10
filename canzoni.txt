@@ -1,0 +1,5 @@
+Shape of You,Ed Sheeran,Pop,9
+Blinding Lights,The Weeknd,Pop,8
+Back in Black,AC/DC,Rock,10
+Bohemian Rhapsody,Queen,Rock,9
+Take Five,Dave Brubeck,Jazz,8
