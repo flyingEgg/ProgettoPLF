@@ -18,7 +18,8 @@
 
 import Data.List (sortOn)
 import Data.Maybe (mapMaybe)
-import Data.Ord (Down (..))
+import Data.Ord (Down(..))
+import Data.Char (toLower)
 
 -- Definizione della struttura dati per rappresentare una canzone.
 data Canzone = Canzone
@@ -28,7 +29,7 @@ data Canzone = Canzone
     , punteggio :: Int     -- Punteggio di gradimento (1-10)
     } deriving (Show)
 
--- Funzione principale per il caricamento e la raccomandazione.
+-- Funzione per il caricamento e la raccomandazione.
 main :: IO ()
 main = do
     putStrLn "Benvenuto al sistema avanzato di raccomandazione di canzoni!"
@@ -48,7 +49,7 @@ main = do
             putStrLn "Quanto peso vuoi dare ai generi preferiti? (Es. 1.5):"
             pesoStr <- getLine
             let peso = read pesoStr :: Double
-            let raccomandate = raccomandaCanzoni generiPreferiti peso canzoni
+            raccomandate <- raccomandaCanzoni generiPreferiti peso canzoni
             if null raccomandate
                 then putStrLn "Nessuna canzone trovata per i generi specificati."
                 else do
@@ -61,8 +62,8 @@ parseCanzone riga =
     case split ',' riga of
         [titolo, artista, genere, punteggioStr]
             | "" `notElem` [titolo, artista, genere, punteggioStr],
-                all (`elem` "0123456789") punteggioStr ->
-                Just (Canzone titolo artista genere (read punteggioStr))
+                all (`elem` "0123456789") punteggioStr -> 
+                    Just (Canzone titolo artista genere (read punteggioStr))
         _ -> Nothing
 
 -- Funzione per dividere una stringa in base a un delimitatore.
@@ -78,15 +79,27 @@ split delim str =
 trim :: String -> String
 trim = unwords . words
 
--- Funzione per raccomandare canzoni in base ai generi e al punteggio ponderato.
-raccomandaCanzoni :: [String] -> Double -> [Canzone] -> [Canzone]
-raccomandaCanzoni generiPeso peso canzoni =
-    let conPeso c = if genere c `elem` generiPeso
-                    then fromIntegral (punteggio c) * peso
-                    else fromIntegral (punteggio c)
-        arricchite = map (\c -> (conPeso c, c)) canzoni
-        ordinate = sortOn (Down . fst) arricchite -- Utilizza Data.Ord.Down per ordinare decrescentemente
-    in map snd ordinate
+-- Funzione per raccomandare canzoni in base ai generi e al punteggio ponderato (case-insensitive).
+raccomandaCanzoni :: [String] -> Double -> [Canzone] -> IO [Canzone]
+raccomandaCanzoni generiPreferiti peso canzoni = do
+    let generiPreferitiLower = map (map toLower . trim) generiPreferiti  -- Converte tutti i generi preferiti in minuscolo e rimuove gli spazi
+        conPeso c = 
+            let genereLower = map toLower (genere c)
+                punteggioPonderato = if genereLower `elem` generiPreferitiLower
+                                     then fromIntegral (punteggio c) * peso  -- Applica il peso se il genere è preferito
+                                     else fromIntegral (punteggio c)        -- Altrimenti, lascia il punteggio invariato
+            in (punteggioPonderato, c)  -- Ritorna una tupla (punteggio ponderato, canzone)
+        arricchite = map conPeso canzoni
+        ordinate = sortOn (Down . fst) arricchite  -- Ordina le canzoni per punteggio ponderato (decrescente)
+    
+    -- Stampa dei dettagli delle canzoni (effetto collaterale IO)
+    mapM_ (\(punteggioPonderato, c) -> 
+        putStrLn $ "Canzone: " ++ titolo c ++ ", Genere: " ++ genere c ++ 
+                   ", Punteggio originale: " ++ show (punteggio c) ++ 
+                   ", Punteggio ponderato: " ++ show punteggioPonderato ) arricchite
+    
+    -- Restituisce la lista di canzoni ordinate
+    return (map snd ordinate)  -- Restituisci solo le canzoni ordinate, senza i punteggi
 
 -- Funzione per stampare una canzone in modo leggibile.
 stampaCanzone :: Canzone -> IO ()
