@@ -6,7 +6,7 @@
 -- #########################################################
 
 {- Specifica:
-    Scrivere un programma in Haskell per implementare un sistema avanzato di raccomandazione di canzoni. 
+    Scrivere un programma in Haskell per implementare un sistema avanzato di raccomandazione di canzoni.
     Il sistema suggerisce canzoni a un utente in base a:
     - Preferenze per uno o più generi musicali specificati.
     - Un sistema di punteggio ponderato per dare priorità a canzoni più rilevanti.
@@ -16,20 +16,36 @@
     Le canzoni saranno ordinate in base al punteggio ponderato e filtrate per genere.
 -}
 
+module Main where
+
 import Data.List (sortOn)
 import Data.Maybe (mapMaybe)
 import Data.Ord (Down(..))
 import Data.Char (toLower)
 
--- Definizione della struttura dati per rappresentare una canzone.
+-- #########################################################
+-- Definizioni dei tipi di dati
+-- #########################################################
+
+type GeneriPreferiti = [String]  -- Lista di generi musicali preferiti
+type ContenutoFile = String      -- Contenuto del file di input
+
+-- Rappresentazione di una canzone
+-- Titolo: Nome della canzone
+-- Artista: Nome dell'artista
+-- Genere: Genere musicale della canzone
+-- Punteggio: Gradimento (1-10)
 data Canzone = Canzone
-    { titolo    :: String  -- Titolo della canzone
-    , artista   :: String  -- Nome dell'artista
-    , genere    :: String  -- Genere musicale
-    , punteggio :: Int     -- Punteggio di gradimento (1-10)
+    { titolo    :: String
+    , artista   :: String
+    , genere    :: String
+    , punteggio :: Int
     } deriving (Show)
 
--- Funzione per il caricamento e la raccomandazione.
+-- #########################################################
+-- Funzione main
+-- #########################################################
+
 main :: IO ()
 main = do
     putStrLn "Benvenuto al sistema avanzato di raccomandazione di canzoni!"
@@ -39,69 +55,117 @@ main = do
     putStrLn "Es.: Shape of You,Ed Sheeran,Pop,9"
     nomeFile <- getLine
     contenuto <- readFile nomeFile
-    let canzoni = mapMaybe parseCanzone (lines contenuto)
+    let canzoni = mapMaybe analizzaCanzone (righe contenuto)
     if null canzoni
         then putStrLn "Errore: il file non contiene dati validi!"
         else do
             putStrLn "Inserire i generi musicali preferiti separati da una virgola (es. Pop,Rock):"
             inputGeneri <- getLine
-            let generiPreferiti = map trim (split ',' inputGeneri)
+            let generiPreferiti = mappaPulisci (dividi ',' inputGeneri)
             putStrLn "Quanto peso vuoi dare ai generi preferiti? (Es. 1.5):"
             pesoStr <- getLine
             let peso = read pesoStr :: Double
-            raccomandate <- raccomandaCanzoni generiPreferiti peso canzoni
+            let raccomandate = raccomanda generiPreferiti peso canzoni
             if null raccomandate
                 then putStrLn "Nessuna canzone trovata per i generi specificati."
                 else do
                     putStrLn "Ecco le canzoni raccomandate per te:"
-                    mapM_ stampaCanzone raccomandate
+                    mapM_ stampa raccomandate
 
--- Parsing di una riga dal file di testo in una struttura Canzone.
-parseCanzone :: String -> Maybe Canzone
-parseCanzone riga =
-    case split ',' riga of
+-- #########################################################
+-- Funzioni di utilità
+-- #########################################################
+
+{- Funzione che analizza e trasforma una riga in una struttura Canzone.
+    Argomento:
+        - riga: Una stringa formattata come "Titolo,Artista,Genere,Punteggio".
+    Restituisce:
+        - Una struttura Maybe Canzone o Nothing se la riga non è valida.
+-}
+analizzaCanzone :: String -> Maybe Canzone
+analizzaCanzone riga =
+    case dividi ',' riga of
         [titolo, artista, genere, punteggioStr]
             | "" `notElem` [titolo, artista, genere, punteggioStr],
-                all (`elem` "0123456789") punteggioStr -> 
+                all (`elem` "0123456789") punteggioStr ->
                     Just (Canzone titolo artista genere (read punteggioStr))
         _ -> Nothing
 
--- Funzione per dividere una stringa in base a un delimitatore.
-split :: Char -> String -> [String]
-split _ "" = []
-split delim str =
-    let (primo, resto) = break (== delim) str
-    in primo : case resto of
-        []     -> []
-        (_:xs) -> split delim xs
+{- Funzione per dividere una stringa in base a un delimitatore usando ricorsione.
+    Argomenti:
+        - delimitatore: Carattere delimitatore.
+        - stringa: Stringa da dividere.
+    Restituisce:
+        - Lista di sottostringhe separate dal delimitatore.
+-}
+dividi :: Char -> String -> [String]
+dividi _ "" = []
+dividi delimitatore stringa =
+    let (primo, resto) = break (== delimitatore) stringa
+    in primo : dividi delimitatore (drop 1 resto)
 
--- Funzione per rimuovere spazi bianchi attorno a una stringa.
-trim :: String -> String
-trim = unwords . words
+{- Funzione per rimuovere spazi bianchi attorno a una stringa.
+    Argomento:
+        - Una stringa qualsiasi.
+    Restituisce:
+        - La stringa senza spazi iniziali o finali.
+-}
+mappaPulisci :: [String] -> [String]
+mappaPulisci = map (unwords . words)
 
--- Funzione per raccomandare canzoni in base ai generi e al punteggio ponderato (case-insensitive).
-raccomandaCanzoni :: [String] -> Double -> [Canzone] -> IO [Canzone]
-raccomandaCanzoni generiPreferiti peso canzoni = do
-    let generiPreferitiLower = map (map toLower . trim) generiPreferiti  -- Converte tutti i generi preferiti in minuscolo e rimuove gli spazi
-        conPeso c = 
-            let genereLower = map toLower (genere c)
-                punteggioPonderato = if genereLower `elem` generiPreferitiLower
-                                     then fromIntegral (punteggio c) * peso  -- Applica il peso se il genere è preferito
-                                     else fromIntegral (punteggio c)        -- Altrimenti, lascia il punteggio invariato
-            in (punteggioPonderato, c)  -- Ritorna una tupla (punteggio ponderato, canzone)
-        arricchite = map conPeso canzoni
-        ordinate = sortOn (Down . fst) arricchite  -- Ordina le canzoni per punteggio ponderato (decrescente)
-    
-    -- Stampa dei dettagli delle canzoni (effetto collaterale IO)
-    mapM_ (\(punteggioPonderato, c) -> 
-        putStrLn $ "Canzone: " ++ titolo c ++ ", Genere: " ++ genere c ++ 
-                   ", Punteggio originale: " ++ show (punteggio c) ++ 
-                   ", Punteggio ponderato: " ++ show punteggioPonderato ) arricchite
-    
-    -- Restituisce la lista di canzoni ordinate
-    return (map snd ordinate)  -- Restituisci solo le canzoni ordinate, senza i punteggi
+{- Funzione che divide un testo in righe usando ricorsione.
+    Argomento:
+        - testo: Una stringa multilinea.
+    Restituisce:
+        - Lista di righe.
+-}
+righe :: String -> [String]
+righe "" = []
+righe testo =
+    let (prima, resto) = break (== '\n') testo
+    in prima : righe (drop 1 resto)
 
--- Funzione per stampare una canzone in modo leggibile.
-stampaCanzone :: Canzone -> IO ()
-stampaCanzone (Canzone titolo artista genere punteggio) =
+-- #########################################################
+-- Funzioni principali
+-- #########################################################
+
+{- Funzione che raccomanda canzoni basandosi sui generi preferiti e sul punteggio ponderato.
+    Argomenti:
+        - generiPreferiti: Lista dei generi preferiti.
+        - peso: Moltiplicatore del punteggio per i generi preferiti.
+        - canzoni: Lista delle canzoni disponibili.
+    Restituisce:
+        - Lista ordinata di canzoni raccomandate.
+-}
+raccomanda :: GeneriPreferiti -> Double -> [Canzone] -> [Canzone]
+raccomanda generiPreferiti peso canzoni =
+    let generiPreferitiMinuscoli = map (map toLower . unwords . words) generiPreferiti  -- Generi in minuscolo
+        arricchite = arricchisci generiPreferitiMinuscoli peso canzoni
+    in map snd $ sortOn (Down . fst) arricchite  -- Ordina e restituisce solo le canzoni
+
+{- Funzione per arricchire le canzoni con punteggi ponderati usando ricorsione.
+    Argomenti:
+        - generiPreferiti: Lista dei generi preferiti (in minuscolo).
+        - peso: Moltiplicatore per i generi preferiti.
+        - canzoni: Lista delle canzoni disponibili.
+    Restituisce:
+        - Lista di tuple (punteggio ponderato, canzone).
+-}
+arricchisci :: [String] -> Double -> [Canzone] -> [(Double, Canzone)]
+arricchisci _ _ [] = []
+arricchisci generiPreferiti peso (c:cs) =
+    let genereMinuscolo = map toLower (genere c)
+        punteggioPonderato = if genereMinuscolo `elem` generiPreferiti
+                             then fromIntegral (punteggio c) * peso
+                             else fromIntegral (punteggio c)
+    in (punteggioPonderato, c) : arricchisci generiPreferiti peso cs
+
+{- Funzione per stampare una canzone in modo leggibile.
+    Argomento:
+        - Una struttura Canzone.
+    Effetto collaterale:
+        - Stampa le informazioni della canzone in modo formattato.
+-}
+stampa :: Canzone -> IO ()
+stampa (Canzone titolo artista genere punteggio) =
     putStrLn $ titolo ++ " - " ++ artista ++ " (" ++ genere ++ "), Punteggio: " ++ show punteggio
