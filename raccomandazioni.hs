@@ -30,6 +30,10 @@ import Data.Char (toLower)
 type GeneriPreferiti = [String]  -- Lista di generi musicali preferiti
 type ContenutoFile = String      -- Contenuto del file di input
 
+-- #########################################################
+-- # Codice Funzionale                                    #
+-- #########################################################
+
 -- Rappresentazione di una canzone
 -- Titolo: Nome della canzone
 -- Artista: Nome dell'artista
