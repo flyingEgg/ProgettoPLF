@@ -1,5 +1,12 @@
-Shape of You,Ed Sheeran,Pop,9
-Blinding Lights,The Weeknd,Pop,8
-Back in Black,AC/DC,Rock,10
-Bohemian Rhapsody,Queen,Rock,9
-Take Five,Dave Brubeck,Jazz,8
+Despacito,Luis Fonsi,Reggaeton,9
+Danza Kuduro,Don Omar,Reggaeton,8
+Bachata Rosa,Juan Luis Guerra,Bachata,10
+Propuesta Indecente,Romeo Santos,Bachata,9
+Vivir Mi Vida,Marc Anthony,Salsa,10
+La Gota Fria,Carlos Vives,Vallenato,9
+A Dios Le Pido,Juanes,Rock Latino,8
+La Camisa Negra,Juanes,Rock Latino,9
+Mi Gente,J Balvin,Reggaeton,9
+El Cantante,Héctor Lavoe,Salsa,10
+Suavemente,Elvis Crespo,Merengue,10
+La Vaca,Los Toros Band,Merengue,9
