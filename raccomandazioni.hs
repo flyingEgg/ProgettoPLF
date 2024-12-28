@@ -54,9 +54,6 @@ main :: IO ()
 main = do
     putStrLn "Benvenuto al sistema avanzato di raccomandazione di canzoni!"
     putStrLn "Inserire il nome del file contenente l'elenco delle canzoni (es. canzoni.txt):"
-    putStrLn "Il file deve essere strutturato come segue (un esempio per riga):"
-    putStrLn "Titolo,Artista,Genere,Punteggio"
-    putStrLn "Es.: Shape of You,Ed Sheeran,Pop,9"
     nomeFile <- getLine
     contenuto <- readFile nomeFile
     let canzoni = mapMaybe analizzaCanzone (righe contenuto)
@@ -141,11 +138,11 @@ righe testo =
     Restituisce:
         - Lista ordinata di canzoni raccomandate.
 -}
-raccomanda :: GeneriPreferiti -> Double -> [Canzone] -> [Canzone]
+raccomanda :: GeneriPreferiti -> Double -> [Canzone] -> [(Double, Canzone)]
 raccomanda generiPreferiti peso canzoni =
     let generiPreferitiMinuscoli = map (map toLower . unwords . words) generiPreferiti  -- Generi in minuscolo
         arricchite = arricchisci generiPreferitiMinuscoli peso canzoni
-    in map snd $ sortOn (Down . fst) arricchite  -- Ordina e restituisce solo le canzoni
+    in sortOn (Down . fst) arricchite  -- Ordina e restituisce tuple (punteggio ponderato, canzone)
 
 {- Funzione per arricchire le canzoni con punteggi ponderati usando ricorsione.
     Argomenti:
@@ -170,6 +167,6 @@ arricchisci generiPreferiti peso (c:cs) =
     Effetto collaterale:
         - Stampa le informazioni della canzone in modo formattato.
 -}
-stampa :: Canzone -> IO ()
-stampa (Canzone titolo artista genere punteggio) =
-    putStrLn $ titolo ++ " - " ++ artista ++ " (" ++ genere ++ "), Punteggio: " ++ show punteggio
+stampa :: (Double, Canzone) -> IO ()
+stampa (punteggioPonderato, Canzone titolo artista genere _) =
+    putStrLn $ titolo ++ " - " ++ artista ++ " (" ++ genere ++ "), Punteggio ponderato: " ++ show punteggioPonderato
