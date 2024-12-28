@@ -47,34 +47,53 @@ data Canzone = Canzone
 
 main :: IO ()
 main = do
-    putStrLn "--- Benvenuto al sistema avanzato di raccomandazione di canzoni! ---"
+    -- Introduzione all'utente
+    putStrLn "--- Benvenuto nel sistema di raccomandazione musicale! ---"
     putStrLn "Per iniziare, assicurati di avere un file con l'elenco delle canzoni."
     putStrLn "Ogni riga del file deve essere strutturata come segue:"
     putStrLn "Titolo,Artista,Genere,Punteggio (dove il punteggio è un intero da 1 a 10)."
     putStrLn "Esempio: Despacito,Luis Fonsi,Reggaeton,9"
+    
+    -- Chiediamo all'utente il nome del file
     putStrLn "Inserisci il nome del file (es. canzoni.txt):"
     nomeFile <- getLine
     contenuto <- readFile nomeFile
+    
+    -- Analizziamo le canzoni nel file
     let canzoni = mapMaybe analizzaCanzone (righe contenuto)
     if null canzoni
-        then putStrLn "Errore: il file non contiene dati validi! Controlla la formattazione e riprova."
+        then do
+            putStrLn "Errore: il file non contiene dati validi! Controlla la formattazione e riprova."
+            main  -- Riproviamo se il file è errato
         else do
+            -- Mostriamo i generi musicali disponibili
             putStrLn "\n--- Generi musicali disponibili nel file ---"
             let generi = generiDisponibili canzoni
             putStrLn $ "Generi trovati: " ++ unwords generi
+            
+            -- Chiediamo all'utente di inserire i generi preferiti
             putStrLn "\nInserisci uno o più generi preferiti separati da una virgola (es. Salsa,Reggaeton):"
             inputGeneri <- getLine
             let generiPreferiti = mappaPulisci (dividi ',' inputGeneri)
+            
+            -- Chiediamo il peso per i generi preferiti
             putStrLn "Inserisci il peso da assegnare ai generi preferiti (es. 1.5):"
             pesoStr <- getLine
             let peso = read pesoStr :: Double
+            
+            -- Calcoliamo le canzoni raccomandate
             let raccomandate = raccomanda generiPreferiti peso canzoni
             if null raccomandate
                 then putStrLn "Nessuna canzone trovata per i generi specificati. Prova con altri generi."
                 else do
+                    -- Mostriamo la classifica delle canzoni raccomandate
                     putStrLn "\n--- Classifica delle canzoni raccomandate ---"
                     putStrLn "Le seguenti canzoni corrispondono alle tue preferenze, ordinate per punteggio:"
                     stampaClassifica raccomandate
+
+-- #########################################################
+-- Sezione funzionale
+-- #########################################################
 
 {- Funzione per stampare una classifica di canzoni numerata.
     Argomento:
@@ -84,18 +103,14 @@ main = do
 -}
 stampaClassifica :: [(Double, Canzone)] -> IO ()
 stampaClassifica raccomandate =
-    mapM_ stampaConPosizione (zip [1..] raccomandate)
-  where
-    stampaConPosizione (pos, (punteggioPonderato, Canzone titolo artista genere _)) = do
-        putStrLn $ "#" ++ show pos ++ " - " ++ titolo
-        putStrLn $ "   Artista: " ++ artista
-        putStrLn $ "   Genere: " ++ genere
-        putStrLn $ "   Punteggio ponderato: " ++ show punteggioPonderato
-        putStrLn "-------------------------------------------"
-
--- #########################################################
--- Sezione funzionale
--- #########################################################
+        mapM_ stampaConPosizione (zip [1..] raccomandate)
+    where
+        stampaConPosizione (pos, (punteggioPonderato, Canzone titolo artista genere _)) = do
+            putStrLn $ "#" ++ show pos ++ " - " ++ titolo
+            putStrLn $ "   Artista: " ++ artista
+            putStrLn $ "   Genere: " ++ genere
+            putStrLn $ "   Punteggio ponderato: " ++ show punteggioPonderato
+            putStrLn "-------------------------------------------"
 
 {- Funzione per analizzare una riga del file e trasformarla in una struttura Canzone.
     Argomento:
@@ -108,8 +123,7 @@ analizzaCanzone riga =
     case dividi ',' riga of
         [titolo, artista, genere, punteggioStr]
             | "" `notElem` [titolo, artista, genere, punteggioStr],
-                all (`elem` "0123456789") punteggioStr ->
-                    Just (Canzone titolo artista genere (read punteggioStr))
+                all (`elem` "0123456789") punteggioStr -> Just (Canzone titolo artista genere (read punteggioStr))
         _ -> Nothing
 
 {- Funzione per dividere una stringa in base a un delimitatore.
