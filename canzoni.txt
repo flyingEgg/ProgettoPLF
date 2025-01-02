@@ -1,12 +1,12 @@
-Despacito,Luis Fonsi,Reggaeton,9
-Danza Kuduro,Don Omar,Reggaeton,8
-Bachata Rosa,Juan Luis Guerra,Bachata,10
-Propuesta Indecente,Romeo Santos,Bachata,9
+Despacito,Luis Fonsi,Reggaeton,8
+Danza Kuduro,Don Omar,Reggaeton,9
+Bachata Rosa,Juan Luis Guerra,Bachata,9
+Propuesta Indecente,Romeo Santos,Bachata,10
 Vivir Mi Vida,Marc Anthony,Salsa,10
-La Gota Fria,Carlos Vives,Vallenato,9
-A Dios Le Pido,Juanes,Rock Latino,8
-La Camisa Negra,Juanes,Rock Latino,9
+La Gota Fria,Carlos Vives,Vallenato,7
+A Dios Le Pido,Juanes,Rock Latino,6
+La Camisa Negra,Juanes,Rock Latino,7
 Mi Gente,J Balvin,Reggaeton,9
-El Cantante,Hector Lavoe,Salsa,10
+El Cantante,Hector Lavoe,Salsa,9
 Suavemente,Elvis Crespo,Merengue,10
 La Vaca,Los Toros Band,Merengue,9

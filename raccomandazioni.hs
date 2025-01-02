@@ -18,7 +18,7 @@
 
 module Main where
 
-import Data.List (sortOn, nub, sort)
+import Data.List (sortOn, nub, sort, intercalate)
 import Data.Maybe (mapMaybe)
 import Data.Ord (Down(..))
 import Data.Char (toLower)
@@ -65,7 +65,7 @@ main = do
         else do
             putStrLn "\n--- Generi musicali disponibili nel file ---"
             let generi = generiDisponibili canzoni
-            putStrLn $ "Generi trovati: " ++ unwords generi
+            putStrLn $ "Generi trovati: " ++ intercalate ", " generi
             
             putStrLn "\nInserire uno o più generi preferiti separati da una virgola (es. Salsa,Reggaeton):"
             inputGeneri <- getLine
