@@ -47,48 +47,40 @@ data Canzone = Canzone
 
 main :: IO ()
 main = do
-    -- Introduzione all'utente
     putStrLn "--- Benvenuto nel sistema di raccomandazione musicale! ---"
-    putStrLn "Per iniziare, assicurati di avere un file con l'elenco delle canzoni."
+    putStrLn "Per iniziare, assicurarsi di avere un file con l'elenco delle canzoni."
     putStrLn "Ogni riga del file deve essere strutturata come segue:"
     putStrLn "Titolo,Artista,Genere,Punteggio (dove il punteggio è un intero da 1 a 10)."
     putStrLn "Esempio: Despacito,Luis Fonsi,Reggaeton,9"
     
-    -- Chiediamo all'utente il nome del file
-    putStrLn "Inserisci il nome del file (es. canzoni.txt):"
+    putStrLn "Inserire il nome del file (es. canzoni.txt):"
     nomeFile <- getLine
     contenuto <- readFile nomeFile
     
-    -- Analizziamo le canzoni nel file
     let canzoni = mapMaybe analizzaCanzone (righe contenuto)
     if null canzoni
         then do
-            putStrLn "Errore: il file non contiene dati validi! Controlla la formattazione e riprova."
-            main  -- Riproviamo se il file è errato
+            putStrLn "Errore: il file non contiene dati validi! Controllare la formattazione e riprovare."
+            main
         else do
-            -- Mostriamo i generi musicali disponibili
             putStrLn "\n--- Generi musicali disponibili nel file ---"
             let generi = generiDisponibili canzoni
             putStrLn $ "Generi trovati: " ++ unwords generi
             
-            -- Chiediamo all'utente di inserire i generi preferiti
-            putStrLn "\nInserisci uno o più generi preferiti separati da una virgola (es. Salsa,Reggaeton):"
+            putStrLn "\nInserire uno o più generi preferiti separati da una virgola (es. Salsa,Reggaeton):"
             inputGeneri <- getLine
             let generiPreferiti = mappaPulisci (dividi ',' inputGeneri)
             
-            -- Chiediamo il peso per i generi preferiti
-            putStrLn "Inserisci il peso da assegnare ai generi preferiti (es. 1.5):"
+            putStrLn "Inserire il peso da assegnare ai generi preferiti (es. 1.5):"
             pesoStr <- getLine
             let peso = read pesoStr :: Double
             
-            -- Calcoliamo le canzoni raccomandate
             let raccomandate = raccomanda generiPreferiti peso canzoni
             if null raccomandate
-                then putStrLn "Nessuna canzone trovata per i generi specificati. Prova con altri generi."
+                then putStrLn "Nessuna canzone trovata per i generi specificati. Provare con altri generi."
                 else do
-                    -- Mostriamo la classifica delle canzoni raccomandate
                     putStrLn "\n--- Classifica delle canzoni raccomandate ---"
-                    putStrLn "Le seguenti canzoni corrispondono alle tue preferenze, ordinate per punteggio:"
+                    putStrLn "Le seguenti canzoni corrispondono alle preferenze specificate, ordinate per punteggio:"
                     stampaClassifica raccomandate
 
 -- #########################################################

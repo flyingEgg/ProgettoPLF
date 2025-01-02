@@ -36,6 +36,7 @@ canzone('Shape of You', 'Ed Sheeran', 'Pop', 8).
 canzone('Blinding Lights', 'The Weeknd', 'Pop', 10).
 canzone('Taki Taki', 'DJ Snake', 'Reggaeton', 7).
 canzone('Billie Jean', 'Michael Jackson', 'Pop', 10).
+canzone('A Dios Le Pido','Juanes','Rock Latino',8).
 
 /* ================================================
    Regole e predicati per il calcolo dei punteggi ponderati
@@ -48,18 +49,21 @@ canzone('Billie Jean', 'Michael Jackson', 'Pop', 10).
 /* Calcola il punteggio ponderato di una canzone, basato sul genere preferito. */
 punteggio_ponderato(Titolo, PunteggioPonderato) :-
     canzone(Titolo, _, Genere, Punteggio),
-    genere_preferito(Genere, Peso),   /* Trova il peso del genere */
+    peso_genere(Genere, Peso),   /* Trova il peso del genere */
     PunteggioPonderato is Punteggio * Peso.    /* Calcola il punteggio ponderato */
 
-/* 
-2. I generi preferiti e i loro pesi sono definiti nei fatti successivi.
-   Se il genere è preferito, viene dato un peso maggiore, altrimenti il peso è 1.
-*/
+/* Gestione del peso per generi definiti e predefiniti */
+peso_genere(Genere, Peso) :-
+    genere_preferito(Genere, Peso), !.
+
+peso_genere(_, 1).  /* Peso predefinito */
+
+/* Dichiarazione dinamica del predicato genere_preferito */
+:- dynamic genere_preferito/2.
 
 /* Definisce i pesi per i generi musicali preferiti. */
-genere_preferito('Reggaeton', 1.5).   /* Peso maggiore per il Reggaeton */
+genere_preferito('Rock Latino', 1.7).   /* Peso maggiore per il Reggaeton */
 genere_preferito('Pop', 1.2).         /* Peso maggiore per il Pop */
-genere_preferito(_, 1).              /* Default: peso 1 per gli altri generi */
 
 /* ================================================
    Predicati per la gestione e ordinamento delle canzoni
@@ -73,16 +77,31 @@ classifica_ordinata(Ordinata) :-
     findall(Punteggio-Titolo, punteggio_ponderato(Titolo, Punteggio), Punteggi),
     sort(1, @>=, Punteggi, Ordinata).  /* Ordina in ordine decrescente */
 
-/* Funzione ausiliaria per stampare la lista delle canzoni ordinate. */
-stampa_classifica :-
+/* Funzione per stampare la classifica */
+stampa_classifica :- 
     classifica_ordinata(Ordinata),
-    stampa_lista(Ordinata).
+    stampa_canzoni(Ordinata, 1).  /* Passa la posizione iniziale 1 */
 
-/* Stampa la lista delle canzoni con i punteggi ponderati */
-stampa_lista([]).  /* Caso base: se la lista è vuota, non stampare nulla */
-stampa_lista([Punteggio-Titolo | Rest]) :-
-    format('Canzone: ~w, Punteggio ponderato: ~2f~n', [Titolo, Punteggio]), /* Stampa titolo e punteggio */
-    stampa_lista(Rest).  /* Ricorsione per stampare le canzoni rimanenti */
+/* Funzione per stampare la lista delle canzoni con i punteggi ponderati e la posizione */
+stampa_canzoni([], _).  /* Caso base: se la lista è vuota, non stampare nulla */
+stampa_canzoni([Punteggio-Titolo | Rest], Posizione) :-
+    format('~d# Canzone: ~w, Punteggio ponderato: ~2f~n', [Posizione, Titolo, Punteggio]), /* Stampa posizione, titolo e punteggio */
+    NuovaPosizione is Posizione + 1,  /* Incrementa la posizione */
+    stampa_canzoni(Rest, NuovaPosizione).  /* Ricorsione per stampare le canzoni rimanenti */
+
+/* Funzione per stampare la lista completa delle canzoni disponibili */
+stampa_canzoni_presenti :-
+    write('Lista completa di canzoni disponibili:'), nl,
+    findall((Titolo, Artista, Genere), canzone(Titolo, Artista, Genere, _), Canzoni),
+    forall(member((Titolo, Artista, Genere), Canzoni),
+           format('Titolo: ~w, Artista: ~w, Genere: ~w~n', [Titolo, Artista, Genere])).
+
+/* Funzione per stampare i generi preferiti e i loro pesi */
+stampa_generi_preferiti :-
+    write('Generi musicali preferiti e i loro pesi:'), nl,
+    findall((Genere, Peso), genere_preferito(Genere, Peso), Generi),
+    forall(member((Genere, Peso), Generi),
+           format('Genere: ~w, Peso: ~2f~n', [Genere, Peso])).
 
 /* ================================================
    Funzione per aggiungere o modificare un genere preferito
@@ -92,6 +111,7 @@ stampa_lista([Punteggio-Titolo | Rest]) :-
 */
 
 aggiungi_genere(Genere, Peso) :-
+    Peso > 0,   /* Valida che il peso sia positivo */
     retractall(genere_preferito(Genere, _)),  /* Rimuove eventuali definizioni precedenti */
     assertz(genere_preferito(Genere, Peso)).  /* Aggiungi o modifica il peso del genere */
 
@@ -101,11 +121,15 @@ resetta_genere(Genere) :-
 
 /* ================================================
    Predicati per aggiungere e rimuovere canzoni
-   ================================================ */
+   ============================================= */
 
 /* Funzione per aggiungere una canzone alla classifica */
 aggiungi_canzone(Titolo, Artista, Genere, Punteggio) :-
-    assertz(canzone(Titolo, Artista, Genere, Punteggio)).
+    Punteggio >= 1, Punteggio =< 10,  /* Valida che il punteggio sia tra 1 e 10 */
+    assertz(canzone(Titolo, Artista, Genere, Punteggio)),
+    (   \+ genere_preferito(Genere, _)  /* Se il genere non è presente */
+    ->  aggiungi_genere(Genere, 1)     /* Aggiungi il genere con peso predefinito */
+    ;   true).
 
 /* Funzione per rimuovere una canzone dalla classifica */
 rimuovi_canzone(Titolo) :-
@@ -114,39 +138,28 @@ rimuovi_canzone(Titolo) :-
 /* ================================================
    Funzione principale per avviare il programma
    ================================================
-   Questo predicato mostra le istruzioni all'utente e gestisce l'interazione.
+   Questo predicato mostra le istruzioni all'utente e stampa la classifica iniziale.
 */
 
 main :-
     nl,
     write('Benvenuto nel sistema di raccomandazione musicale!'), nl,
     write('============================================'), nl,
-    write('Istruzioni:'), nl,
-    write('1. Per visualizzare la classifica delle canzoni, scrivi: visualizza_classifica.'), nl,
-    write('2. Per aggiungere o modificare un genere preferito, scrivi: aggiungi_genere(Genere, Peso).'), nl,
-    write('3. Per resettare un genere preferito, scrivi: resetta_genere(Genere).'), nl,
-    write('4. Per aggiungere una canzone alla classifica, scrivi: aggiungi_canzone(Titolo, Artista, Genere, Punteggio).'), nl,
-    write('5. Per rimuovere una canzone dalla classifica, scrivi: rimuovi_canzone(Titolo).'), nl,
-    write('6. Per uscire, scrivi: halt.'), nl,
+    write('Comandi disponibili:'), nl,
+    write('1. Visualizza la classifica delle canzoni: visualizza_classifica.'), nl,
+    write('2. Aggiungi o modifica un genere preferito: aggiungi_genere(Genere, Peso).'), nl,
+    write('3. Resetta un genere preferito: resetta_genere(Genere).'), nl,
+    write('4. Aggiungi una nuova canzone: aggiungi_canzone(Titolo, Artista, Genere, Punteggio).'), nl,
+    write('5. Rimuovi una canzone: rimuovi_canzone(Titolo).'), nl,
     write('============================================'), nl,
-    write('Ora puoi iniziare a interagire con il programma.'), nl.
-
-% ================================================
-% Esempio di interazione:
-% 1. Per visualizzare la classifica delle canzoni:
-% ?- visualizza_classifica.
-
-% 2. Per aggiungere un nuovo genere preferito (ad esempio "Jazz" con peso 1.8):
-% ?- aggiungi_genere('Jazz', 1.8).
-
-% 3. Per resettare il genere "Pop":
-% ?- resetta_genere('Pop').
-
-% 4. Per aggiungere una nuova canzone alla classifica:
-% ?- aggiungi_canzone('New Song', 'Artist Name', 'Pop', 9).
-
-% 5. Per rimuovere una canzone dalla classifica:
-% ?- rimuovi_canzone('Shape of You').
-
-% 6. Per vedere di nuovo la classifica:
-% ?- visualizza_classifica.
+    write('Per utilizzare i comandi si devono inserire gli argomenti tra apici.'), nl,
+    write('============================================'), nl,
+    nl,
+    write('Ecco la classifica iniziale dei suggerimenti delle canzoni:'), nl,
+    stampa_classifica,
+    nl,
+    write('============================================'), nl,
+    stampa_canzoni_presenti,
+    nl,
+    write('============================================'), nl,
+    stampa_generi_preferiti.

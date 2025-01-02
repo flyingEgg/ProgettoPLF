@@ -1,0 +1,4 @@
+{
+    "prolog.linter.run": "onSave",
+    "prolog.linter.enableMsgInOutput": true
+}
