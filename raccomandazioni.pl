@@ -27,6 +27,27 @@
    ================================================ */
 
 /* ================================================
+   Caricamento dinamico delle canzoni da file
+   ================================================ */
+
+/* Funzione per leggere le canzoni da un file di testo */
+carica_canzoni(File) :-
+    open(File, read, Stream)
+    leggi_canzoni(Stream),
+    close(Stream)
+
+leggi_canzoni(Stream) :-
+    read_line_to_string(Stream, Riga),
+    (   Riga \= end_of_file
+    ->  split_string(Riga, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
+        number_string(Punteggio, PunteggioStr),
+        assertz(canzone(Titolo, Artista, Genere, Punteggio)),
+        leggi_canzoni(Stream)
+    ;   true
+    ).
+
+
+/* ================================================
    Dati di esempio: Le canzoni sono definite come fatti
    ================================================ */
 
