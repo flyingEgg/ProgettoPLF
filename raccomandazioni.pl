@@ -32,9 +32,9 @@
 
 /* Funzione per leggere le canzoni da un file di testo */
 carica_canzoni(File) :-
-    open(File, read, Stream)
+    open(File, read, Stream),
     leggi_canzoni(Stream),
-    close(Stream)
+    close(Stream).
 
 leggi_canzoni(Stream) :-
     read_line_to_string(Stream, Riga),
