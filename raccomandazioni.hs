@@ -22,6 +22,8 @@ import Data.List (sortOn, nub, sort, intercalate)
 import Data.Maybe (mapMaybe)
 import Data.Ord (Down(..))
 import Data.Char (toLower)
+import System.IO.Error(isDoesNotExistError)
+import Control.Exception (catch, IOException)
 
 -- #########################################################
 -- Definizioni dei tipi di dati
@@ -53,8 +55,8 @@ main = do
     putStrLn "Titolo,Artista,Genere,Punteggio (dove il punteggio è un intero da 1 a 10)."
     putStrLn "Esempio: Despacito,Luis Fonsi,Reggaeton,9"
     
-    putStrLn "Inserire il nome del file (es. canzoni.txt):"
-    nomeFile <- getLine
+
+    nomeFile <- chiediNomeFile
     contenuto <- readFile nomeFile
     
     let canzoni = mapMaybe analizzaCanzone (righe contenuto)
@@ -86,6 +88,37 @@ main = do
 -- #########################################################
 -- Sezione funzionale
 -- #########################################################
+
+
+{- Funzione per chiedere e validare il nome del file
+    Argomento:
+        - Il percorso del file fornito da IO
+-}
+chiediNomeFile :: IO FilePath
+chiediNomeFile = do
+    putStrLn "Inserire il nome del file ()"
+    nomeFile <- getLine
+    esito_lettura <- validaFile nomeFile
+    case esito_lettura of
+        Right _ -> return nomeFile
+        Left err -> do
+            putStrLn $ "Errore: " ++ err
+            chiediNomeFile
+
+{- Funzione per validare l'esistenza e la leggibilita del file
+    Argomento:
+        - Il percorso del file
+    Restituisce:
+        - Una richiesta di input se l'input precedente non e' andato a buon termine
+-}
+validaFile :: FilePath -> IO (Either String ())
+validaFile nomeFile = do
+    catch (do
+        contenuto <- readFile nomeFile
+        length contenuto `seq` return (Right()))
+        (\e -> if isDoesNotExistError e
+                then return $ Left "File non trovato!"
+                else return $ Left "Errore durante l'apertura del file.")
 
 {- Funzione per stampare una classifica di canzoni numerata.
     Argomento:
