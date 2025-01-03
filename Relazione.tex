@@ -15,7 +15,6 @@
 
 % Listing settings for code
 \lstset{
-    language=Haskell,
     basicstyle=\ttfamily\small,
     keywordstyle=\color{keywordblue},
     stringstyle=\color{stringgreen},
@@ -46,6 +45,7 @@ Le funzionalità principali includono:
     \item Specifica dei generi preferiti e di un peso numerico per valorizzarli.
     \item Calcolo dei punteggi ponderati delle canzoni.
     \item Generazione di una classifica ordinata in base ai punteggi calcolati.
+    \item Modifica dinamica dei pesi in Prolog.
 \end{itemize}
 
 \section{Analisi del problema}
@@ -79,7 +79,8 @@ Il programma produce:
 \subsection{Scelte di progetto}
 \begin{itemize}
     \item In Haskell, i dati delle canzoni sono rappresentati tramite un tipo di dato \texttt{Canzone} per migliorare leggibilità e modularità.
-    \item In Prolog, le canzoni sono definite come fatti dinamici per consentire la manipolazione dei dati durante l'esecuzione.
+    \item In Prolog, i generi preferiti sono definiti come predicati dinamici per consentire la modifica dei pesi durante l'esecuzione del programma.
+    \item Entrambi i linguaggi utilizzano algoritmi efficienti per il calcolo dei punteggi e l'ordinamento delle canzoni.
 \end{itemize}
 
 \subsection{Passi dell'algoritmo}
@@ -89,6 +90,7 @@ Il programma produce:
     \item Inserimento delle preferenze dell'utente.
     \item Calcolo dei punteggi ponderati.
     \item Ordinamento delle canzoni e generazione della classifica.
+    \item Modifica dinamica dei pesi (Prolog).
 \end{enumerate}
 
 \section{Implementazione dell'algoritmo}
@@ -97,7 +99,7 @@ Il programma produce:
 Il programma in Haskell utilizza funzioni pure per elaborare i dati e azioni IO per interagire con l'utente.
 
 Esempio di calcolo dei punteggi ponderati:
-\begin{lstlisting}[caption=Calcolo dei punteggi ponderati in Haskell]
+\begin{lstlisting}[language=Haskell,caption=Calcolo dei punteggi ponderati in Haskell]
 arricchisci :: [String] -> Double -> [Canzone] -> [(Double, Canzone)]
 arricchisci _ _ [] = []
 arricchisci generiPreferiti peso (c:cs) =
@@ -112,7 +114,7 @@ arricchisci generiPreferiti peso (c:cs) =
 Il programma in Prolog sfrutta predicati per rappresentare i dati e regole logiche per elaborarli.
 
 Esempio di ordinamento delle canzoni:
-\begin{lstlisting}[caption=Ordinamento delle canzoni in Prolog]
+\begin{lstlisting}[language=Prolog,caption=Ordinamento delle canzoni in Prolog]
 classifica_ordinata(Ordinata) :-
     findall(Punteggio-Titolo, punteggio_ponderato(Titolo, Punteggio), Punteggi),
     sort(1, @>=, Punteggi, Ordinata).
