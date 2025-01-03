@@ -30,7 +30,7 @@
    Caricamento dinamico delle canzoni da file
    ================================================ */
 
-/* Funzione per leggere le canzoni da un file di testo */
+/* Lettura delle canzoni da un file di testo */
 carica_canzoni(File) :-
     open(File, read, Stream),
     leggi_canzoni(Stream),
@@ -57,8 +57,8 @@ leggi_canzoni(Stream) :-
 /* Calcola il punteggio ponderato di una canzone, basato sul genere preferito. */
 punteggio_ponderato(Titolo, PunteggioPonderato) :-
     canzone(Titolo, _, Genere, Punteggio),
-    peso_genere(Genere, Peso),   /* Trova il peso del genere */
-    PunteggioPonderato is Punteggio * Peso.    /* Calcola il punteggio ponderato */
+    peso_genere(Genere, Peso),                  /* Trova il peso del genere */
+    PunteggioPonderato is Punteggio * Peso.     /* Calcola il punteggio ponderato */
 
 /* Gestione del peso per generi definiti e predefiniti */
 peso_genere(Genere, Peso) :-
@@ -70,8 +70,8 @@ peso_genere(_, 1).  /* Peso predefinito */
 :- dynamic genere_preferito/2.
 
 /* Definisce i pesi per i generi musicali preferiti. */
-genere_preferito('Bachata', 1.7).   /* Peso maggiore per il Reggaeton */
-genere_preferito('Merengue', 1.2).         /* Peso maggiore per il Pop */
+genere_preferito('Bachata', 1.7).       /* Peso maggiore per la Bachata */
+genere_preferito('Merengue', 1.2).      /* Peso maggiore per il Merengue */
 
 /* ================================================
    Predicati per la gestione e ordinamento delle canzoni
@@ -84,11 +84,20 @@ genere_preferito('Merengue', 1.2).         /* Peso maggiore per il Pop */
 stampa_classifica :-
     findall(Punteggio-Titolo, punteggio_ponderato(Titolo, Punteggio), Punteggi),
     sort(1, @>=, Punteggi, Ordinata),
-    stampa_canzoni(Ordinata, 1).
+    stampa_canzoni_ordinate(Ordinata, 1).
 
-/* Stampa le canzoni disponibili */
-stampa_canzoni([], _).
-stampa_canzoni([Punteggio-Titolo | Rest], Posizione) :-
+/* Stampa le canzoni ordinate in base al punteggio ponderato */
+stampa_canzoni_ordinate([], _).     /* Caso base: se la lista è vuota, termina la funzione */
+stampa_canzoni_ordinate([Punteggio-Titolo | Rest], Posizione) :- 
+    canzone(Titolo, Artista, Genere, _),
+    format('~d# Canzone: ~w~n   Artista: ~w~n   Genere: ~w~n   Punteggio ponderato: ~2f~n~n',
+           [Posizione, Titolo, Artista, Genere, Punteggio]),
+    NuovaPosizione is Posizione + 1,
+    stampa_canzoni_ordinate(Rest, NuovaPosizione).
+
+/* Stampa le canzoni ordinate come da file */
+stampa_canzoni_file([], _).     /* Caso base: se la lista è vuota, termina la funzione */
+stampa_canzoni_file([Punteggio-Titolo | Rest], Posizione) :-
     canzone(Titolo, Artista, Genere, _),
     format('~d# Canzone: ~w~n   Artista: ~w~n   Genere: ~w~n   Punteggio ponderato: ~2f~n~n',
            [Posizione, Titolo, Artista, Genere, Punteggio]),
@@ -102,15 +111,15 @@ stampa_generi_preferiti :-
     forall(member((Genere, Peso), Generi),
            format('Genere: ~w, Peso: ~2f~n', [Genere, Peso])).
 
-/* Stampa tutte le canzoni caricate */
-stampa_canzoni_presenti :-
+/* Stampa delle le canzoni disponibili */
+stampa_canzoni_disponibili :-
     write('Lista completa di canzoni disponibili:'), nl,
     findall((Titolo, Artista, Genere), canzone(Titolo, Artista, Genere, _), Canzoni),
     forall(member((Titolo, Artista, Genere), Canzoni),
            format('Titolo: ~w, Artista: ~w, Genere: ~w~n', [Titolo, Artista, Genere])).
 
 /* ================================================
-   Funzione per aggiungere o modificare un genere preferito
+   Aggiunta o rimozione di un genere preferito
    ================================================
    Questo predicato consente di aggiungere nuovi generi preferiti o modificare
    quelli esistenti nel database.
@@ -121,8 +130,8 @@ aggiungi_genere_preferito(Genere, Peso) :-
     retractall(genere_preferito(Genere, _)),  /* Rimuove eventuali definizioni precedenti */
     assertz(genere_preferito(Genere, Peso)).  /* Aggiungi o modifica il peso del genere */
 
-/* Funzione per resettare un genere preferito */
-resetta_genere_preferito(Genere) :-
+/* Funzione per rimuovere un genere preferito */
+rimuovi_genere_preferito(Genere) :-
     retractall(genere_preferito(Genere, _)).  /* Rimuove tutte le definizioni per quel genere */
 
 /* ================================================
@@ -144,7 +153,7 @@ main :-
     write('2. Visualizza le canzoni caricate: stampa_canzoni_presenti.'), nl,
     write('3. Visualizza i generi preferiti: stampa_generi_preferiti.'), nl,
     write('4. Aggiungi o modifica un genere preferito: aggiungi_genere_preferito(Genere, Peso).'), nl,
-    write('5. Resetta un genere preferito: resetta_genere_preferito(Genere).'), nl,
+    write('5. Rimuovi un genere preferito: rimuovi_genere_preferito(Genere).'), nl,
     write('============================================'), nl,
     stampa_generi_preferiti,
     write('============================================'), nl.
