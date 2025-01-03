@@ -105,7 +105,7 @@ chiediNomeFile = do
             putStrLn $ "Errore: " ++ err
             chiediNomeFile
 
-{- Funzione per validare l'esistenza e la leggibilita del file
+{- Funzione per validare l'esistenza e la leggibilita' del file
     Argomento:
         - Il percorso del file
     Restituisce:
