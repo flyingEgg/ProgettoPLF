@@ -1,0 +1,149 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+% Configurazione del pacchetto listings per il codice
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Relazione sul progetto di raccomandazione di canzoni}
+\author{Giaconi Christian, Giacomo Rossi \\\texttt{Matricola: 314045, 314671}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Specifica del problema}
+Il progetto consiste nello sviluppo di un sistema avanzato di raccomandazione di canzoni. Sono state create due implementazioni: una in Haskell e una in Prolog, rispettando i seguenti requisiti:
+\begin{itemize}
+    \item L'utente fornisce un file di testo contenente un elenco di canzoni nel formato:
+    \begin{quote}
+        \texttt{Titolo,Artista,Genere,Punteggio}
+    \end{quote}
+    dove \texttt{Punteggio} è un valore intero tra 1 e 10.
+    \item L'utente specifica i generi musicali preferiti e un peso associato per calcolare il punteggio ponderato delle canzoni.
+    \item Le canzoni vengono ordinate in base al punteggio ponderato e presentate come una classifica numerata.
+\end{itemize}
+
+\section{Analisi del problema}
+\subsection{Input}
+\begin{itemize}
+    \item Un file di testo contenente canzoni con titolo, artista, genere e punteggio.
+    \item Una lista di generi musicali preferiti.
+    \item Un peso per i generi preferiti.
+\end{itemize}
+
+\subsection{Output}
+\begin{itemize}
+    \item Una classifica di canzoni ordinate per punteggio ponderato.
+    \item Dettagli per ogni canzone nella classifica, inclusi titolo, artista, genere e punteggio ponderato.
+\end{itemize}
+
+\section{Progettazione dell'algoritmo}
+\subsection{Haskell}
+L'implementazione in Haskell è suddivisa in una sezione funzionale e una non funzionale:
+\begin{itemize}
+    \item \textbf{Sezione funzionale:} Contiene funzioni pure per la gestione e l'elaborazione dei dati (es. parsing del file, calcolo del punteggio ponderato, ordinamento delle canzoni).
+    \item \textbf{Sezione non funzionale:} Gestisce l'interazione con l'utente e le operazioni di input/output.
+\end{itemize}
+
+\subsection{Prolog}
+L'implementazione in Prolog utilizza fatti per rappresentare le canzoni e regole per calcolare il punteggio ponderato e ordinare le canzoni. Le funzionalità principali includono:
+\begin{itemize}
+    \item Caricamento dinamico delle canzoni da file.
+    \item Definizione e modifica dei generi preferiti con pesi associati.
+    \item Calcolo della classifica basata sui punteggi ponderati.
+\end{itemize}
+
+\section{Implementazione dell'algoritmo}
+\subsection{Codice Haskell}
+\begin{lstlisting}[language=Haskell, caption=Estratto del codice Haskell]
+-- Funzione per calcolare il punteggio ponderato
+arricchisci :: [String] -> Double -> [Canzone] -> [(Double, Canzone)]
+arricchisci _ _ [] = []
+arricchisci generiPreferiti peso (c:cs) =
+    let genereMinuscolo = map toLower (genere c)
+        punteggioPonderato = if genereMinuscolo `elem` generiPreferiti
+                             then fromIntegral (punteggio c) * peso
+                             else fromIntegral (punteggio c)
+    in (punteggioPonderato, c) : arricchisci generiPreferiti peso cs
+
+-- Funzione per stampare la classifica
+stampaClassifica :: [(Double, Canzone)] -> IO ()
+stampaClassifica raccomandate =
+    mapM_ stampaConPosizione (zip [1..] raccomandate)
+  where
+    stampaConPosizione (pos, (punteggioPonderato, Canzone titolo artista genere _)) = do
+        putStrLn $ "#" ++ show pos ++ " - " ++ titolo
+        putStrLn $ "   Artista: " ++ artista
+        putStrLn $ "   Genere: " ++ genere
+        putStrLn $ "   Punteggio ponderato: " ++ show punteggioPonderato
+\end{lstlisting}
+
+\subsection{Codice Prolog}
+\begin{lstlisting}[language=Prolog, caption=Estratto del codice Prolog]
+% Calcola il punteggio ponderato di una canzone
+punteggio_ponderato(Titolo, PunteggioPonderato) :-
+    canzone(Titolo, _, Genere, Punteggio),
+    peso_genere(Genere, Peso),
+    PunteggioPonderato is Punteggio * Peso.
+
+% Ottiene la classifica delle canzoni ordinata per punteggio ponderato
+classifica_ordinata(Ordinata) :-
+    findall(Punteggio-Titolo, punteggio_ponderato(Titolo, Punteggio), Punteggi),
+    sort(1, @>=, Punteggi, Ordinata).
+
+% Stampa la classifica delle canzoni
+stampa_classifica :- 
+    classifica_ordinata(Ordinata),
+    stampa_canzoni(Ordinata, 1).
+\end{lstlisting}
+
+\section{Testing}
+\subsection{Haskell}
+\begin{itemize}
+    \item \textbf{Input:} File \texttt{canzoni.txt} contenente canzoni e generi preferiti \texttt{Reggaeton, Salsa} con peso \texttt{1.5}.
+    \item \textbf{Output atteso:} Classifica numerata con canzoni di Reggaeton e Salsa in cima.
+\end{itemize}
+
+\subsection{Prolog}
+\begin{itemize}
+    \item \textbf{Input:} Fatti iniziali con generi preferiti definiti dinamicamente.
+    \item \textbf{Output atteso:} Classifica ordinata e corretta in base ai pesi e punteggi.
+\end{itemize}
+
+\section{Conclusione}
+Il progetto ha dimostrato l'uso di Haskell e Prolog per implementare sistemi di raccomandazione basati su logiche differenti. Entrambe le implementazioni soddisfano i requisiti e consentono estensioni future, come l'aggiunta di funzionalità o il miglioramento delle interfacce utente.
+
+\end{document}
