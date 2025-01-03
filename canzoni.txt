@@ -1,12 +1,17 @@
 Despacito,Luis Fonsi,Reggaeton,8
+All Eyez On Me,Tupac,HipHop,8
 Danza Kuduro,Don Omar,Reggaeton,9
+Song 2,Blur,Alternative/Indie,6
 Bachata Rosa,Juan Luis Guerra,Bachata,9
-Propuesta Indecente,Romeo Santos,Bachata,10
-Vivir Mi Vida,Marc Anthony,Salsa,10
+Notturno op 55 no 1,Chopin,Classica,6
+Free Bird,Lynyrd Skyryd,Rock,8
+Thunderstruck,AC/DC,Rock,7
+Come As You Are,Nirvana,Rock,8
 La Gota Fria,Carlos Vives,Vallenato,7
-A Dios Le Pido,Juanes,Rock Latino,6
-La Camisa Negra,Juanes,Rock Latino,7
-Mi Gente,J Balvin,Reggaeton,9
+Stronger,Kanye West,HipHop,9
+Californication,Red Hot Chili Peppers,Alternative/Indie,6
+Upper Echelon,Travis Scott,Trap,7
 El Cantante,Hector Lavoe,Salsa,9
 Suavemente,Elvis Crespo,Merengue,10
+Many Men (Wish Death),50 Cent,HipHop,10
 La Vaca,Los Toros Band,Merengue,9
