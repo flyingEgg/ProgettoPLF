@@ -96,7 +96,7 @@ main = do
 -}
 chiediNomeFile :: IO FilePath
 chiediNomeFile = do
-    putStrLn "Inserire il nome del file ()"
+    putStrLn "Inserire il nome del file: "
     nomeFile <- getLine
     esito_lettura <- validaFile nomeFile
     case esito_lettura of

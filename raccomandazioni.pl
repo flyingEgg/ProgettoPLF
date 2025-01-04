@@ -17,143 +17,164 @@
 */
 
 /* ================================================
-   Sistema di raccomandazione di canzoni in Prolog
-   ================================================
-   Questo programma consente di raccomandare canzoni in base a:
-   1. Generi musicali preferiti
-   2. Punteggi ponderati per dare priorità alle canzoni più rilevanti
-   L'utente può modificare i pesi dei generi e visualizzare le canzoni raccomandate
-   L'utente può aggiungere e rimuovere canzoni dalla classifica.
+   Dichiarazioni dinamiche dei predicati
    ================================================ */
+:- dynamic canzone/4.
+:- dynamic genere_preferito/2.
+:- dynamic punteggio_ponderato/2.
 
 /* ================================================
    Caricamento dinamico delle canzoni da file
    ================================================ */
 
-/* Lettura delle canzoni da un file di testo */
-carica_canzoni(File) :-
+/* Carica le canzoni da un file di testo evitando duplicati in base a Titolo, Artista e Genere */
+carica_canzoni(File) :- 
     open(File, read, Stream),
     leggi_canzoni(Stream),
     close(Stream).
 
-leggi_canzoni(Stream) :-
-    read_line_to_string(Stream, Riga),
+/* Legge il file riga per riga */
+leggi_canzoni(Stream) :- 
+    read_line_to_string(Stream, Riga), 
     (   Riga \= end_of_file
     ->  split_string(Riga, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
-        number_string(Punteggio, PunteggioStr),
-        assertz(canzone(Titolo, Artista, Genere, Punteggio)),
+        (   number_string(Punteggio, PunteggioStr)
+        ->  (   \+ canzone(Titolo, Artista, Genere, _)  % Controlla se la canzone non esiste già (ignorando il punteggio)
+            ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
+            ;   format('La canzone ~w di ~w del genere ~w e\' gia\' presente nel database.~n', [Titolo, Artista, Genere])
+            )
+        ;   format('Errore nel formato della riga: ~w. Riga ignorata.~n', [Riga])
+        ),
         leggi_canzoni(Stream)
     ;   true
     ).
 
 /* ================================================
-   Regole e predicati per il calcolo dei punteggi ponderati
-   ================================================
-   1. Il punteggio ponderato di una canzone dipende dal suo genere e dal punteggio
-      assegnato. Se il genere della canzone è tra quelli preferiti, il punteggio viene
-      moltiplicato per un fattore di ponderazione maggiore.
-*/
+   Calcolo dei punteggi ponderati
+   ================================================ */
 
 /* Calcola il punteggio ponderato di una canzone, basato sul genere preferito. */
-punteggio_ponderato(Titolo, PunteggioPonderato) :-
+calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :-
     canzone(Titolo, _, Genere, Punteggio),
-    peso_genere(Genere, Peso),                  /* Trova il peso del genere */
-    PunteggioPonderato is Punteggio * Peso.     /* Calcola il punteggio ponderato */
+    peso_genere(Genere, Peso),
+    PunteggioPonderato is Punteggio * Peso.
 
 /* Gestione del peso per generi definiti e predefiniti */
 peso_genere(Genere, Peso) :-
     genere_preferito(Genere, Peso), !.
-
 peso_genere(_, 1).  /* Peso predefinito */
-
-/* Dichiarazione dinamica del predicato genere_preferito */
-:- dynamic genere_preferito/2.
 
 /* Definisce i pesi per i generi musicali preferiti. */
 genere_preferito('Bachata', 1.7).       /* Peso maggiore per la Bachata */
 genere_preferito('Merengue', 1.2).      /* Peso maggiore per il Merengue */
 
 /* ================================================
+   Aggiornamento dei punteggi ponderati
+   ================================================ */
+
+/* Aggiorna tutti i punteggi ponderati delle canzoni */
+aggiorna_punteggi :- 
+    retractall(punteggio_ponderato(_, _)),  % Rimuove tutti i vecchi punteggi ponderati
+    forall(canzone(Titolo, _, Genere, Punteggio), 
+           (peso_genere(Genere, Peso), 
+            PunteggioPonderato is Punteggio * Peso, 
+            assertz(punteggio_ponderato(Titolo, PunteggioPonderato)),
+            format('Canzone: ~w, Punteggio ponderato aggiornato: ~2f~n', [Titolo, PunteggioPonderato]))).  % Debug: Stampa il punteggio aggiornato
+
+
+/* ================================================
    Predicati per la gestione e ordinamento delle canzoni
-   ================================================
-   1. Calcola e ordina tutte le canzoni in base al punteggio ponderato.
-   2. Stampa la classifica in ordine decrescente di punteggio.
-*/
+   ================================================ */
 
 /* Stampa la classifica ordinata */
-stampa_classifica :-
-    findall(Punteggio-Titolo, punteggio_ponderato(Titolo, Punteggio), Punteggi),
-    sort(1, @>=, Punteggi, Ordinata),
+stampa_classifica :- 
+    aggiorna_punteggi,  % Aggiorna i punteggi ponderati
+    findall(PunteggioPonderato-Titolo, 
+            punteggio_ponderato(Titolo, PunteggioPonderato), 
+            Punteggi),
+    sort(1, @>=, Punteggi, Ordinata),  % Ordina per punteggio ponderato decrescente
     stampa_canzoni_ordinate(Ordinata, 1).
 
 /* Stampa le canzoni ordinate in base al punteggio ponderato */
-stampa_canzoni_ordinate([], _).     /* Caso base: se la lista è vuota, termina la funzione */
-stampa_canzoni_ordinate([Punteggio-Titolo | Rest], Posizione) :- 
-    canzone(Titolo, Artista, Genere, _),
+stampa_canzoni_ordinate([], _).
+stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :-
+    canzone(Titolo, Artista, Genere, _),  % Recupera le altre informazioni dalla base di dati
     format('~d# Canzone: ~w~n   Artista: ~w~n   Genere: ~w~n   Punteggio ponderato: ~2f~n~n',
-           [Posizione, Titolo, Artista, Genere, Punteggio]),
+           [Posizione, Titolo, Artista, Genere, PunteggioPonderato]),
     NuovaPosizione is Posizione + 1,
     stampa_canzoni_ordinate(Rest, NuovaPosizione).
 
-/* Stampa le canzoni ordinate come da file */
-stampa_canzoni_file([], _).     /* Caso base: se la lista è vuota, termina la funzione */
-stampa_canzoni_file([Punteggio-Titolo | Rest], Posizione) :-
-    canzone(Titolo, Artista, Genere, _),
-    format('~d# Canzone: ~w~n   Artista: ~w~n   Genere: ~w~n   Punteggio ponderato: ~2f~n~n',
-           [Posizione, Titolo, Artista, Genere, Punteggio]),
-    NuovaPosizione is Posizione + 1,
-    stampa_canzoni(Rest, NuovaPosizione).
+/* Classifica filtrata per genere */
+classifica_per_genere(Genere) :-
+    % Seleziona le canzoni del genere richiesto
+    findall(Titolo, canzone(Titolo, _, Genere, _), CanzoniFiltrate),
+    % Calcola i punteggi per le canzoni filtrate
+    findall(PunteggioPonderato-Titolo, 
+            (member(Titolo, CanzoniFiltrate), 
+             calcola_punteggio_ponderato(Titolo, PunteggioPonderato)), 
+            Punteggi),
+    % Ordina per punteggio ponderato decrescente
+    sort(1, @>=, Punteggi, Ordinata),
+    % Stampa le canzoni ordinate
+    stampa_canzoni_ordinate(Ordinata, 1).
+
+mostra_canzoni_genere(Genere) :-
+    findall(Titolo, canzone(Titolo, _, Genere, _), CanzoniFiltrate),
+    format('Canzoni di genere ~w: ~w~n', [Genere, CanzoniFiltrate]).
 
 /* Stampa i generi preferiti */
 stampa_generi_preferiti :-
     write('Generi musicali preferiti e i loro pesi:'), nl,
-    findall((Genere, Peso), genere_preferito(Genere, Peso), Generi),
+    findall((Genere, Peso), 
+            genere_preferito(Genere, Peso), 
+            Generi),
     forall(member((Genere, Peso), Generi),
            format('Genere: ~w, Peso: ~2f~n', [Genere, Peso])).
 
-/* Stampa delle le canzoni disponibili */
-stampa_canzoni_disponibili :-
-    write('Lista completa di canzoni disponibili:'), nl,
-    findall((Titolo, Artista, Genere), canzone(Titolo, Artista, Genere, _), Canzoni),
-    forall(member((Titolo, Artista, Genere), Canzoni),
-           format('Titolo: ~w, Artista: ~w, Genere: ~w~n', [Titolo, Artista, Genere])).
+/* Salva la classifica ordinata su file */
+salva_classifica(File) :-
+    aggiorna_punteggi,
+    findall(Punteggio-Titolo, 
+            punteggio_ponderato(Titolo, Punteggio), 
+            Punteggi),
+    sort(1, @>=, Punteggi, Ordinata),
+    open(File, write, Stream),
+    forall(member(Punteggio-Titolo, Ordinata),
+           (canzone(Titolo, Artista, Genere, _),
+            format(Stream, '~w, ~w, ~w, ~2f~n', [Titolo, Artista, Genere, Punteggio]))),
+    close(Stream).
 
 /* ================================================
    Aggiunta o rimozione di un genere preferito
-   ================================================
-   Questo predicato consente di aggiungere nuovi generi preferiti o modificare
-   quelli esistenti nel database.
-*/
+   ================================================ */
 
 aggiungi_genere_preferito(Genere, Peso) :-
-    Peso > 0,   /* Valida che il peso sia positivo */
-    retractall(genere_preferito(Genere, _)),  /* Rimuove eventuali definizioni precedenti */
-    assertz(genere_preferito(Genere, Peso)).  /* Aggiungi o modifica il peso del genere */
+    Peso > 0,
+    retractall(genere_preferito(Genere, _)),
+    assertz(genere_preferito(Genere, Peso)),
+    aggiorna_punteggi.
 
-/* Funzione per rimuovere un genere preferito */
 rimuovi_genere_preferito(Genere) :-
-    retractall(genere_preferito(Genere, _)).  /* Rimuove tutte le definizioni per quel genere */
+    retractall(genere_preferito(Genere, _)),
+    aggiorna_punteggi.
 
 /* ================================================
    Funzione principale per avviare il programma
-   ================================================
-   Questo predicato mostra le istruzioni all'utente e stampa la classifica iniziale.
-*/
+   ================================================ */
 
 main :-
     nl,
     write('Benvenuto nel sistema di raccomandazione musicale!'), nl,
     write('============================================'), nl,
-    write('Per iniziare, carica un file di canzoni con il comando seguente:'), nl,
-    write('  carica_canzoni(nomefile.txt).'), nl,
-    write('IMPORTANTE: PER UTILIZZARE I COMANDI SI DEVONO INSERIRE GLI ARGOMENTI TRA APICI'), nl,
-    write('============================================'), nl,
     write('Comandi disponibili:'), nl,
-    write('1. Visualizza la classifica delle canzoni: stampa_classifica.'), nl,
-    write('2. Visualizza le canzoni caricate: stampa_canzoni_presenti.'), nl,
-    write('3. Visualizza i generi preferiti: stampa_generi_preferiti.'), nl,
-    write('4. Aggiungi o modifica un genere preferito: aggiungi_genere_preferito(Genere, Peso).'), nl,
-    write('5. Rimuovi un genere preferito: rimuovi_genere_preferito(Genere).'), nl,
+    write('IMPORTANTE: PER UTILIZZARE I COMANDI SI DEVONO INSERIRE GLI ARGOMENTI TRA APICI'), nl,
+    write('1. Carica canzoni: carica_canzoni(nomefile.txt).'), nl,
+    write('2. Visualizza la classifica: stampa_classifica.'), nl,
+    write('3. Filtra classifica per genere: classifica_per_genere(Genere).'), nl,
+    write('4. Salva classifica su file: salva_classifica(output.txt).'), nl,
+    write('5. Visualizza generi preferiti: stampa_generi_preferiti.'), nl,
+    write('6. Aggiungi genere preferito: aggiungi_genere_preferito(Genere, Peso).'), nl,
+    write('7. Rimuovi genere preferito: rimuovi_genere_preferito(Genere).'), nl,
     write('============================================'), nl,
     stampa_generi_preferiti,
     write('============================================'), nl.
