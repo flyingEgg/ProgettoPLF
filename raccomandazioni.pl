@@ -19,7 +19,7 @@
 /* ================================================
    Dichiarazioni dinamiche dei predicati
    ================================================ */
-:- dynamic canzone/4.
+   :- dynamic canzone/4.
 :- dynamic genere_preferito/2.
 :- dynamic punteggio_ponderato/2.
 
@@ -56,13 +56,18 @@ leggi_canzoni(Stream) :-
 /* Calcola il punteggio ponderato di una canzone, basato sul genere preferito. */
 calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :-
     canzone(Titolo, _, Genere, Punteggio),
-    peso_genere(Genere, Peso),
-    PunteggioPonderato is Punteggio * Peso.
+    peso_genere(Genere, Peso),  % Recupera il peso associato al genere
+    PunteggioPonderato is Punteggio * Peso,
+    format('DEBUG: Canzone ~w, Genere ~w, Punteggio ~w, Peso ~2f, Punteggio ponderato ~2f~n',
+           [Titolo, Genere, Punteggio, Peso, PunteggioPonderato]).
 
 /* Gestione del peso per generi definiti e predefiniti */
 peso_genere(Genere, Peso) :-
-    genere_preferito(Genere, Peso), !.
-peso_genere(_, 1).  /* Peso predefinito */
+    (genere_preferito(Genere, Peso)
+    ->  format('DEBUG: Genero preferito ~w trovato con peso ~2f~n', [Genere, Peso])
+    ;   Peso = 1,  % Se il genere non è preferito, assegna peso 1
+        format('DEBUG: Genero ~w non trovato, peso predefinito 1~n', [Genere])).
+
 
 /* Definisce i pesi per i generi musicali preferiti. */
 genere_preferito('Bachata', 1.7).       /* Peso maggiore per la Bachata */
@@ -72,15 +77,15 @@ genere_preferito('Merengue', 1.2).      /* Peso maggiore per il Merengue */
    Aggiornamento dei punteggi ponderati
    ================================================ */
 
-/* Aggiorna tutti i punteggi ponderati delle canzoni */
 aggiorna_punteggi :- 
     retractall(punteggio_ponderato(_, _)),  % Rimuove tutti i vecchi punteggi ponderati
     forall(canzone(Titolo, _, Genere, Punteggio), 
            (peso_genere(Genere, Peso), 
-            PunteggioPonderato is Punteggio * Peso, 
+            PunteggioPonderato is Punteggio * Peso,
+            format('DEBUG: Canzone ~w, Genere ~w, Punteggio ~w, Peso ~w, Punteggio ponderato ~2f~n',
+                   [Titolo, Genere, Punteggio, Peso, PunteggioPonderato]),
             assertz(punteggio_ponderato(Titolo, PunteggioPonderato)),
-            format('Canzone: ~w, Punteggio ponderato aggiornato: ~2f~n', [Titolo, PunteggioPonderato]))).  % Debug: Stampa il punteggio aggiornato
-
+            format('Canzone: ~w, Punteggio ponderato aggiornato: ~2f~n', [Titolo, PunteggioPonderato]))).
 
 /* ================================================
    Predicati per la gestione e ordinamento delle canzoni
