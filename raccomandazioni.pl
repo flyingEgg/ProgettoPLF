@@ -19,7 +19,7 @@
 /* ================================================
    Dichiarazioni dinamiche dei predicati
    ================================================ */
-   :- dynamic canzone/4.
+:- dynamic canzone/4.
 :- dynamic genere_preferito/2.
 :- dynamic punteggio_ponderato/2.
 
@@ -41,7 +41,7 @@ leggi_canzoni(Stream) :-
         (   number_string(Punteggio, PunteggioStr)
         ->  (   \+ canzone(Titolo, Artista, Genere, _)  % Controlla se la canzone non esiste già (ignorando il punteggio)
             ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
-            ;   format('La canzone ~w di ~w del genere ~w e\' gia\' presente nel database.~n', [Titolo, Artista, Genere])
+            ;   format('La canzone ~w di ~w del genere ~w e' gia' presente nel database.~n', [Titolo, Artista, Genere])
             )
         ;   format('Errore nel formato della riga: ~w. Riga ignorata.~n', [Riga])
         ),
@@ -64,11 +64,11 @@ calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :-
 /* Gestione del peso per generi definiti e predefiniti */
 peso_genere(Genere, Peso) :-
     (genere_preferito(Genere, Peso)
-    ->  format('DEBUG: Genero preferito ~w trovato con peso ~2f~n', [Genere, Peso])
+    ->  format('DEBUG: Genere preferito ~w trovato con peso ~2f~n', [Genere, Peso])
     ;   Peso = 1,  % Se il genere non è preferito, assegna peso 1
-        format('DEBUG: Genero ~w non trovato, peso predefinito 1~n', [Genere])).
+        format('DEBUG: Genere ~w non trovato, peso predefinito 1~n', [Genere])).
 
-
+  
 /* Definisce i pesi per i generi musicali preferiti. */
 genere_preferito('Bachata', 1.7).       /* Peso maggiore per la Bachata */
 genere_preferito('Merengue', 1.2).      /* Peso maggiore per il Merengue */
@@ -167,19 +167,25 @@ rimuovi_genere_preferito(Genere) :-
    Funzione principale per avviare il programma
    ================================================ */
 
-main :-
-    nl,
-    write('Benvenuto nel sistema di raccomandazione musicale!'), nl,
-    write('============================================'), nl,
-    write('Comandi disponibili:'), nl,
-    write('IMPORTANTE: PER UTILIZZARE I COMANDI SI DEVONO INSERIRE GLI ARGOMENTI TRA APICI'), nl,
-    write('1. Carica canzoni: carica_canzoni(nomefile.txt).'), nl,
-    write('2. Visualizza la classifica: stampa_classifica.'), nl,
-    write('3. Filtra classifica per genere: classifica_per_genere(Genere).'), nl,
-    write('4. Salva classifica su file: salva_classifica(output.txt).'), nl,
-    write('5. Visualizza generi preferiti: stampa_generi_preferiti.'), nl,
-    write('6. Aggiungi genere preferito: aggiungi_genere_preferito(Genere, Peso).'), nl,
-    write('7. Rimuovi genere preferito: rimuovi_genere_preferito(Genere).'), nl,
-    write('============================================'), nl,
-    stampa_generi_preferiti,
-    write('============================================'), nl.
+/* Main per interazione con l'utente */
+main :- 
+    write('Benvenuto nel sistema di raccomandazione musicale!~n'),
+    write('Per favore, carica il file delle canzoni.~n'),
+    read(File),  % L'utente inserisce il nome del file
+    carica_canzoni(File),
+    write('Inserisci i tuoi generi musicali preferiti e il loro peso.~n'),
+    chiedi_preferenze,  % Funzione per chiedere i generi e i pesi
+    write('Classifica delle canzoni ordinata per punteggio ponderato:~n'),
+    stampa_classifica.  % Stampa la classifica ordinata
+
+/* Funzione per chiedere i generi musicali preferiti e il loro peso */
+chiedi_preferenze :-
+    write('Inserisci un genere preferito (oppure fine per terminare): '),
+    read(Genere),
+    (   Genere \= fine
+    ->  write('Inserisci il peso per il genere ~w: ', [Genere]),
+        read(Peso),
+        aggiungi_genere_preferito(Genere, Peso),
+        chiedi_preferenze  % Chiede per altri generi
+    ;   true  % Termina quando l'utente inserisce "fine"
+    ).
