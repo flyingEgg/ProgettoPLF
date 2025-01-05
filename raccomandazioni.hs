@@ -22,6 +22,8 @@ import Data.List (sortOn, nub, intercalate)
 import Data.Maybe (mapMaybe)
 import Data.Ord (Down(..))
 import qualified Data.Map as Map
+import System.IO.Error(isDoesNotExistError)
+import Control.Exception (catch, IOException)
 
 -- #########################################################
 -- Definizioni dei tipi di dati
@@ -91,8 +93,7 @@ menuLoop maybeCanzoni pesi = do
 -- Il file deve avere un formato valido: Titolo,Artista,Genere,Punteggio.
 caricaCanzoni :: IO [Canzone]
 caricaCanzoni = do
-    putStrLn "Inserire il nome del file:"
-    nomeFile <- getLine
+    nomeFile <- chiediNomeFile
     contenuto <- readFile nomeFile
     let canzoni = mapMaybe analizzaCanzone (lines contenuto)
     if null canzoni
@@ -102,6 +103,27 @@ caricaCanzoni = do
         else do
             putStrLn "File caricato con successo!"
             return canzoni
+
+chiediNomeFile :: IO FilePath
+chiediNomeFile = do
+    putStrLn "Inserire il nome del file"
+    nomeFile <- getLine
+    esito_lettura <- validaFile nomeFile
+    case esito_lettura of
+        Right _ -> return nomeFile
+        Left err -> do
+            putStrLn $ "Errore: " ++ err
+            chiediNomeFile
+
+
+validaFile :: FilePath -> IO (Either String ())
+validaFile nomeFile = do
+    catch (do
+        contenuto <- readFile nomeFile
+        length contenuto `seq` return (Right()))
+        (\e -> if isDoesNotExistError e
+                then return $ Left "File non trovato!"
+                else return $ Left "Errore durante l'apertura del file.")
 
 -- | 'selezionaGeneriPreferitiEImpostaPesi' permette all'utente di scegliere
 -- i generi preferiti e assegnare un peso a ciascuno di essi.
