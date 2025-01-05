@@ -104,6 +104,8 @@ caricaCanzoni = do
             putStrLn "File caricato con successo!"
             return canzoni
 
+-- | 'chiediNomeFile' richiede all'utente di inserire il nome del file con le canzoni
+-- e ne effettua una validazione dell'input tramite la funzione validaFile.
 chiediNomeFile :: IO FilePath
 chiediNomeFile = do
     putStrLn "Inserire il nome del file"
@@ -115,7 +117,8 @@ chiediNomeFile = do
             putStrLn $ "Errore: " ++ err
             chiediNomeFile
 
-
+-- | 'validaFile' funge come tramite per controllare se il nome del file e' espresso
+-- correttamente e se tale file specificato esista. 
 validaFile :: FilePath -> IO (Either String ())
 validaFile nomeFile = do
     catch (do
