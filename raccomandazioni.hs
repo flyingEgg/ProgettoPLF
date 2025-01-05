@@ -24,6 +24,7 @@ import Data.Ord (Down(..))
 import qualified Data.Map as Map
 import System.IO.Error(isDoesNotExistError)
 import Control.Exception (catch, IOException)
+import Text.Read (readMaybe)
 
 -- #########################################################
 -- Definizioni dei tipi di dati
@@ -174,7 +175,7 @@ aggiornaPesi (g:gs) pesi = do
     if risposta == "s"
         then do
             putStrLn $ "Inserisci il nuovo peso per il genere '" ++ g ++ "':"
-            nuovoPeso <- readLn :: IO Double
+            nuovoPeso <- leggiPesoValido
             aggiornaPesi gs (Map.insert g nuovoPeso pesi)
         else do
             putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
@@ -202,18 +203,39 @@ raccomandaCanzoni (Just canzoni) pesi = do
 -- Restituisce 'Nothing' se la riga non è formattata correttamente.
 analizzaCanzone :: String -> Maybe Canzone
 analizzaCanzone riga =
-    case split ',' riga of
+    case splitAndTrim ',' riga of
         [titolo, artista, genere, punteggioStr]
-            | all (/= "") [titolo, artista, genere, punteggioStr] &&
-              all (`elem` "0123456789") punteggioStr -> Just (Canzone titolo artista genere (read punteggioStr))
-        _ -> Nothing
+            | all (/= "") [titolo, artista, genere, punteggioStr]  -- Controlla che tutte le parti siano non vuote
+            , Just punteggio <- readMaybe punteggioStr  -- Prova a leggere il punteggio
+            , punteggio >= 1 && punteggio <= 10 -> Just (Canzone titolo artista genere punteggio)  -- Verifica che il punteggio sia valido
+        _ -> Nothing  -- Restituisce Nothing se la riga non è valida
 
 -- | 'split' divide una stringa in una lista di stringhe, usando un delimitatore.
 split :: Char -> String -> [String]
 split _ "" = []
 split delimiter string =
     let (primo, resto) = break (== delimiter) string
-    in primo : split delimiter (drop 1 resto)
+    in primo : case resto of
+        [] -> []
+        x -> split delimiter (dropWhile (== delimiter) (tail x)) 
+
+-- | 'splitAndTrim' pulisce gli spazi dai campi separati
+splitAndTrim :: Char -> String -> [String]
+splitAndTrim delimiter string = map (filter (/= ' ')) (split delimiter string)
+
+leggiPesoValido :: IO Double
+leggiPesoValido = do
+    input <- getLine
+    case readMaybe input :: Maybe Double of
+            Just peso
+                | peso >= 0 && peso <= 10 -> return peso
+            Just _ -> do
+                putStrLn "Il peso deve essere compreso tra o e 10, riprova."
+                leggiPesoValido
+            Nothing -> do
+                putStrLn "Peso non valido, riprova."
+                leggiPesoValido
+            
 
 -- | 'raccomanda' calcola il punteggio ponderato per ogni canzone e le ordina.
 raccomanda :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
