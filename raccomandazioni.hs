@@ -60,7 +60,8 @@ menuLoop maybeCanzoni pesi = do
     putStrLn "1. Carica un file con le canzoni"
     putStrLn "2. Gestisci i generi preferiti (aggiungi o modifica)"
     putStrLn "3. Stampa la classifica delle canzoni"
-    putStrLn "4. Esci"
+    putStrLn "4. Stampa i generi preferiti con il relativo punteggio"
+    putStrLn "5. Esci"
     putStrLn "Seleziona un'opzione:"
     scelta <- getLine
     case scelta of
@@ -73,7 +74,10 @@ menuLoop maybeCanzoni pesi = do
         "3" -> do
             raccomandaCanzoni maybeCanzoni pesi
             menuLoop maybeCanzoni pesi
-        "4" -> putStrLn "Grazie per aver usato il sistema di raccomandazione. Arrivederci!"
+        "4" -> do
+            visualizzaGeneriPreferiti pesi
+            menuLoop maybeCanzoni pesi
+        "5" -> putStrLn "Grazie per aver usato il sistema di raccomandazione. Arrivederci!"
         _   -> do
             putStrLn "Opzione non valida. Riprova."
             menuLoop maybeCanzoni pesi
@@ -208,3 +212,15 @@ stampaClassifica raccomandate =
             putStrLn $ "   Genere: " ++ genere
             putStrLn $ "   Punteggio ponderato: " ++ show punteggioPonderato
             putStrLn "-------------------------------------------"
+
+-- Effettua una vista dei generi preferiti in memoria
+visualizzaGeneriPreferiti :: PesiGeneri -> IO ()
+visualizzaGeneriPreferiti pesi
+    | Map.null pesi = putStrLn "Nessun genere ancora definito."
+    | otherwise = do
+        putStrLn "I tuoi generi preferiti e pesi associati sono:"
+        mapM_ stampaGenere (Map.toList pesi)
+
+-- Stampa il genere, concatenato al peso suo relativo
+stampaGenere :: (String, Double) -> IO ()
+stampaGenere (genere, peso) = putStrLn $ genere ++ ": " ++ show peso
