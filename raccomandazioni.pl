@@ -201,3 +201,21 @@ rimuovi_spazi_codici([32], []).
 rimuovi_spazi_codici([H|T], [H|CodiciRimossi]) :- 
     H \= 32,
     rimuovi_spazi_codici(T, CodiciRimossi).
+
+
+/* Predicato che mostra i generi preferiti associati
+   con il rispettivo peso. */
+mostra_generi_preferiti :-
+    findall(Genere-Peso, genere_preferito(Genere, Peso), Generi),
+    (   Generi == []
+    ->  write('Non e ancora stato definito alcun genere preferito.\n')
+    ;   write('I tuoi generi preferiti ed il loro punteggio associato sono:\n'),
+        stampa_generi_preferiti(Generi)
+    ).
+
+/* Predicato che stampa la lista dei generi preferiti. */
+stampa_generi_preferiti([]).
+stampa_generi_preferiti([Genere-Peso | Rest]) :-
+    format('~w: ~w\n', [Genere, Peso]),
+    stampa_generi_preferiti(Rest).
+
