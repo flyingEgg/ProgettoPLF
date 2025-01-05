@@ -38,7 +38,8 @@ loop_menu :-
     write('1. Carica un file con le canzoni\n'),
     write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
     write('3. Stampa la classifica delle canzoni\n'),
-    write('4. Esci\n'),
+    write('4. Stampa la lista dei generi preferiti\n'),
+    write('5. Esci\n'),
     read(Scelta),
     (   Scelta = 1 -> carica_canzoni_interattivo,
         loop_menu
@@ -46,7 +47,9 @@ loop_menu :-
         loop_menu
     ;   Scelta = 3 -> stampa_classifica,
         loop_menu
-    ;   Scelta = 4 -> write('Arrivederci!\n'), halt
+    ;   Scelta = 4 -> mostra_generi_preferiti,
+        loop_menu
+    ;   Scelta = 5 -> write('Arrivederci!\n'), halt
     ;   write('Scelta non valida. Riprova.\n'),
         loop_menu).
 
