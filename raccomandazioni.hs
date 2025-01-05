@@ -18,24 +18,20 @@
 
 module Main where
 
-import Data.List (sortOn, nub, sort, intercalate)
+import Data.List (sortOn, nub, intercalate)
 import Data.Maybe (mapMaybe)
 import Data.Ord (Down(..))
-import Data.Char (toLower)
-import System.IO.Error(isDoesNotExistError)
-import Control.Exception (catch, IOException)
+import qualified Data.Map as Map
 
 -- #########################################################
 -- Definizioni dei tipi di dati
 -- #########################################################
 
-{- Struttura dati per rappresentare una canzone.
-    Campi:
-        - titolo: Nome della canzone.
-        - artista: Nome dell'artista.
-        - genere: Genere musicale della canzone.
-        - punteggio: Gradimento (1-10).
--}
+-- | La struttura 'Canzone' rappresenta una canzone con:
+-- - titolo: il titolo della canzone.
+-- - artista: l'artista che la interpreta.
+-- - genere: il genere musicale della canzone.
+-- - punteggio: un punteggio assegnato (da 1 a 10).
 data Canzone = Canzone
     { titolo    :: String
     , artista   :: String
@@ -43,92 +39,168 @@ data Canzone = Canzone
     , punteggio :: Int
     } deriving (Show, Eq)
 
+-- | 'PesiGeneri' è una mappa che associa un genere musicale a un peso
+-- che influenza la priorità delle raccomandazioni.
+type PesiGeneri = Map.Map String Double
+
 -- #########################################################
--- Sezione non funzionale
+-- Main: Menu interattivo
 -- #########################################################
 
+-- | Funzione principale che avvia il menu interattivo.
 main :: IO ()
-main = do
-    putStrLn "--- Benvenuto nel sistema di raccomandazione musicale! ---"
-    putStrLn "Per iniziare, assicurarsi di avere un file con l'elenco delle canzoni."
-    putStrLn "Ogni riga del file deve essere strutturata come segue:"
-    putStrLn "Titolo,Artista,Genere,Punteggio (dove il punteggio è un intero da 1 a 10)."
-    putStrLn "Esempio: Despacito,Luis Fonsi,Reggaeton,9"
-    
+main = menuLoop Nothing Map.empty
 
-    nomeFile <- chiediNomeFile
+-- | 'menuLoop' gestisce il menu principale, mantenendo lo stato del sistema:
+-- - maybeCanzoni: un elenco opzionale delle canzoni caricate.
+-- - pesi: i pesi dei generi preferiti, gestiti dall'utente.
+menuLoop :: Maybe [Canzone] -> PesiGeneri -> IO ()
+menuLoop maybeCanzoni pesi = do
+    putStrLn "\n--- Sistema di Raccomandazione Musicale ---"
+    putStrLn "1. Carica un file con le canzoni"
+    putStrLn "2. Gestisci i generi preferiti (aggiungi o modifica)"
+    putStrLn "3. Stampa la classifica delle canzoni"
+    putStrLn "4. Esci"
+    putStrLn "Seleziona un'opzione:"
+    scelta <- getLine
+    case scelta of
+        "1" -> do
+            canzoni <- caricaCanzoni
+            menuLoop (Just canzoni) pesi
+        "2" -> do
+            nuoviPesi <- selezionaGeneriPreferitiEImpostaPesi maybeCanzoni pesi
+            menuLoop maybeCanzoni nuoviPesi
+        "3" -> do
+            raccomandaCanzoni maybeCanzoni pesi
+            menuLoop maybeCanzoni pesi
+        "4" -> putStrLn "Grazie per aver usato il sistema di raccomandazione. Arrivederci!"
+        _   -> do
+            putStrLn "Opzione non valida. Riprova."
+            menuLoop maybeCanzoni pesi
+
+-- #########################################################
+-- Funzioni di caricamento e gestione dei dati
+-- #########################################################
+
+-- | 'caricaCanzoni' legge un file di testo, carica i dati delle canzoni e li
+-- trasforma in una lista di 'Canzone'.
+-- Il file deve avere un formato valido: Titolo,Artista,Genere,Punteggio.
+caricaCanzoni :: IO [Canzone]
+caricaCanzoni = do
+    putStrLn "Inserire il nome del file:"
+    nomeFile <- getLine
     contenuto <- readFile nomeFile
-    
-    let canzoni = mapMaybe analizzaCanzone (righe contenuto)
+    let canzoni = mapMaybe analizzaCanzone (lines contenuto)
     if null canzoni
         then do
             putStrLn "Errore: il file non contiene dati validi! Controllare la formattazione e riprovare."
-            main
+            caricaCanzoni
         else do
-            putStrLn "\n--- Generi musicali disponibili nel file ---"
-            let generi = generiDisponibili canzoni
-            putStrLn $ "Generi trovati: " ++ intercalate ", " generi
-            
-            putStrLn "\nInserire uno o più generi preferiti separati da una virgola (es. Salsa,Reggaeton):"
-            inputGeneri <- getLine
-            let generiPreferiti = mappaPulisci (dividi ',' inputGeneri)
-            
-            putStrLn "Inserire il peso da assegnare ai generi preferiti (es. 1.5):"
-            pesoStr <- getLine
-            let peso = read pesoStr :: Double
-            
-            let raccomandate = raccomanda generiPreferiti peso canzoni
-            if null raccomandate
-                then putStrLn "Nessuna canzone trovata per i generi specificati. Provare con altri generi."
-                else do
-                    putStrLn "\n--- Classifica delle canzoni raccomandate ---"
-                    putStrLn "Le seguenti canzoni corrispondono alle preferenze specificate, ordinate per punteggio:"
-                    stampaClassifica raccomandate
+            putStrLn "File caricato con successo!"
+            return canzoni
+
+-- | 'selezionaGeneriPreferitiEImpostaPesi' permette all'utente di scegliere
+-- i generi preferiti e assegnare un peso a ciascuno di essi.
+selezionaGeneriPreferitiEImpostaPesi :: Maybe [Canzone] -> PesiGeneri -> IO PesiGeneri
+selezionaGeneriPreferitiEImpostaPesi Nothing pesi = do
+    putStrLn "Errore: nessun file caricato. Carica un file prima di continuare."
+    return pesi
+selezionaGeneriPreferitiEImpostaPesi (Just canzoni) pesi = do
+    let generiDisponibili = nub $ map genere canzoni
+    putStrLn $ "Generi disponibili: " ++ intercalate ", " generiDisponibili
+    generiSelezionati <- raccogliGeneriPreferiti generiDisponibili
+    aggiornaPesi generiSelezionati pesi
+
+-- | 'raccogliGeneriPreferiti' consente all'utente di inserire i generi
+-- preferiti uno alla volta, terminando con "fine".
+raccogliGeneriPreferiti :: [String] -> IO [String]
+raccogliGeneriPreferiti generiDisponibili = do
+    putStrLn "Inserisci i generi preferiti uno alla volta. Scrivi 'fine' per terminare."
+    raccogliGeneri [] generiDisponibili
+
+-- | 'raccogliGeneri' gestisce il processo iterativo di raccolta dei generi.
+raccogliGeneri :: [String] -> [String] -> IO [String]
+raccogliGeneri acc generiDisponibili = do
+    putStrLn "Inserisci un genere preferito:"
+    input <- getLine
+    if input == "fine"
+        then return (nub acc)
+        else if input `elem` generiDisponibili
+            then do
+                putStrLn $ "Genere '" ++ input ++ "' aggiunto ai preferiti."
+                raccogliGeneri (input : acc) generiDisponibili
+            else do
+                putStrLn "Genere non valido. Riprova."
+                raccogliGeneri acc generiDisponibili
+
+-- | 'aggiornaPesi' consente all'utente di modificare i pesi dei generi preferiti.
+-- Se il genere ha già un peso, l'utente può scegliere di mantenerlo o aggiornarlo.
+aggiornaPesi :: [String] -> PesiGeneri -> IO PesiGeneri
+aggiornaPesi [] pesi = return pesi
+aggiornaPesi (g:gs) pesi = do
+    let pesoCorrente = Map.findWithDefault 1.0 g pesi
+    putStrLn $ "Peso corrente per il genere '" ++ g ++ "': " ++ show pesoCorrente
+    putStrLn "Vuoi aggiornare il peso? (s/n)"
+    risposta <- getLine
+    if risposta == "s"
+        then do
+            putStrLn $ "Inserisci il nuovo peso per il genere '" ++ g ++ "':"
+            nuovoPeso <- readLn :: IO Double
+            aggiornaPesi gs (Map.insert g nuovoPeso pesi)
+        else do
+            putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
+            aggiornaPesi gs pesi
 
 -- #########################################################
--- Sezione funzionale
+-- Raccomandazioni
 -- #########################################################
 
+-- | 'raccomandaCanzoni' genera e stampa una lista di canzoni consigliate
+-- basandosi sui pesi dei generi e sui punteggi delle canzoni.
+raccomandaCanzoni :: Maybe [Canzone] -> PesiGeneri -> IO ()
+raccomandaCanzoni Nothing _ = putStrLn "Errore: nessun file caricato. Carica un file prima di continuare."
+raccomandaCanzoni (Just canzoni) pesi = do
+    let raccomandate = raccomanda pesi canzoni
+    if null raccomandate
+        then putStrLn "Nessuna canzone trovata con i pesi attuali."
+        else stampaClassifica raccomandate
 
-{- Funzione per chiedere e validare il nome del file
-    Argomento:
-        - Il percorso del file fornito da IO
--}
-chiediNomeFile :: IO FilePath
-chiediNomeFile = do
-    putStrLn "Inserire il nome del file: "
-    nomeFile <- getLine
-    esito_lettura <- validaFile nomeFile
-    case esito_lettura of
-        Right _ -> return nomeFile
-        Left err -> do
-            putStrLn $ "Errore: " ++ err
-            chiediNomeFile
+-- #########################################################
+-- Funzioni ausiliarie
+-- #########################################################
 
-{- Funzione per validare l'esistenza e la leggibilita' del file
-    Argomento:
-        - Il percorso del file
-    Restituisce:
-        - Una richiesta di input se l'input precedente non e' andato a buon termine
--}
-validaFile :: FilePath -> IO (Either String ())
-validaFile nomeFile = do
-    catch (do
-        contenuto <- readFile nomeFile
-        length contenuto `seq` return (Right()))
-        (\e -> if isDoesNotExistError e
-                then return $ Left "File non trovato!"
-                else return $ Left "Errore durante l'apertura del file.")
+-- | 'analizzaCanzone' converte una riga di testo in un oggetto 'Canzone'.
+-- Restituisce 'Nothing' se la riga non è formattata correttamente.
+analizzaCanzone :: String -> Maybe Canzone
+analizzaCanzone riga =
+    case split ',' riga of
+        [titolo, artista, genere, punteggioStr]
+            | all (/= "") [titolo, artista, genere, punteggioStr] &&
+              all (`elem` "0123456789") punteggioStr -> Just (Canzone titolo artista genere (read punteggioStr))
+        _ -> Nothing
 
-{- Funzione per stampare una classifica di canzoni numerata.
-    Argomento:
-        - Lista di tuple contenenti il punteggio ponderato e una struttura Canzone.
-    Effetto collaterale:
-        - Stampa ogni canzone con la sua posizione nella classifica.
--}
+-- | 'split' divide una stringa in una lista di stringhe, usando un delimitatore.
+split :: Char -> String -> [String]
+split _ "" = []
+split delimiter string =
+    let (primo, resto) = break (== delimiter) string
+    in primo : split delimiter (drop 1 resto)
+
+-- | 'raccomanda' calcola il punteggio ponderato per ogni canzone e le ordina.
+raccomanda :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
+raccomanda pesi canzoni =
+    let arricchite = arricchisci pesi canzoni
+    in sortOn (Down . fst) arricchite
+
+-- | 'arricchisci' calcola il punteggio ponderato per ogni canzone.
+arricchisci :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
+arricchisci pesi canzoni =
+    [ (fromIntegral (punteggio c) * Map.findWithDefault 1.0 (genere c) pesi, c) | c <- canzoni ]
+
+-- | 'stampaClassifica' stampa le canzoni ordinate con il loro punteggio ponderato.
 stampaClassifica :: [(Double, Canzone)] -> IO ()
 stampaClassifica raccomandate =
-        mapM_ stampaConPosizione (zip [1..] raccomandate)
+    mapM_ stampaConPosizione (zip [1..] raccomandate)
     where
         stampaConPosizione (pos, (punteggioPonderato, Canzone titolo artista genere _)) = do
             putStrLn $ "#" ++ show pos ++ " - " ++ titolo
@@ -136,91 +208,3 @@ stampaClassifica raccomandate =
             putStrLn $ "   Genere: " ++ genere
             putStrLn $ "   Punteggio ponderato: " ++ show punteggioPonderato
             putStrLn "-------------------------------------------"
-
-{- Funzione per analizzare una riga del file e trasformarla in una struttura Canzone.
-    Argomento:
-        - riga: Una stringa formattata come "Titolo,Artista,Genere,Punteggio".
-    Restituisce:
-        - Una struttura Maybe Canzone o Nothing se la riga non è valida.
--}
-analizzaCanzone :: String -> Maybe Canzone
-analizzaCanzone riga =
-    case dividi ',' riga of
-        [titolo, artista, genere, punteggioStr]
-            | "" `notElem` [titolo, artista, genere, punteggioStr],
-                all (`elem` "0123456789") punteggioStr -> Just (Canzone titolo artista genere (read punteggioStr))
-        _ -> Nothing
-
-{- Funzione per dividere una stringa in base a un delimitatore.
-    Argomenti:
-        - delimitatore: Carattere delimitatore.
-        - stringa: Stringa da dividere.
-    Restituisce:
-        - Lista di sottostringhe separate dal delimitatore.
--}
-dividi :: Char -> String -> [String]
-dividi _ "" = []
-dividi delimitatore stringa =
-    let (primo, resto) = break (== delimitatore) stringa
-    in primo : dividi delimitatore (drop 1 resto)
-
-{- Funzione per rimuovere spazi bianchi attorno a una lista di stringhe.
-    Argomento:
-        - Una lista di stringhe.
-    Restituisce:
-        - La lista di stringhe senza spazi iniziali o finali.
--}
-mappaPulisci :: [String] -> [String]
-mappaPulisci = map (unwords . words)
-
-{- Funzione per dividere un testo in righe usando ricorsione.
-    Argomento:
-        - testo: Una stringa multilinea.
-    Restituisce:
-        - Lista di righe.
--}
-righe :: String -> [String]
-righe "" = []
-righe testo =
-    let (prima, resto) = break (== '\n') testo
-    in prima : righe (drop 1 resto)
-
-{- Funzione per ottenere una lista di generi musicali unici ordinati alfabeticamente.
-    Argomento:
-        - Una lista di canzoni.
-    Restituisce:
-        - Una lista di generi unici in ordine alfabetico.
--}
-generiDisponibili :: [Canzone] -> [String]
-generiDisponibili = nub . sort . map genere
-
-{- Funzione che calcola la lista ordinata di raccomandazioni basata sui generi preferiti.
-    Argomenti:
-        - generiPreferiti: Lista dei generi preferiti.
-        - peso: Moltiplicatore del punteggio per i generi preferiti.
-        - canzoni: Lista delle canzoni disponibili.
-    Restituisce:
-        - Lista ordinata di tuple (punteggio ponderato, canzone).
--}
-raccomanda :: [String] -> Double -> [Canzone] -> [(Double, Canzone)]
-raccomanda generiPreferiti peso canzoni =
-    let generiPreferitiMinuscoli = map (map toLower . unwords . words) generiPreferiti
-        arricchite = arricchisci generiPreferitiMinuscoli peso canzoni
-    in sortOn (Down . fst) arricchite
-
-{- Funzione per arricchire le canzoni con punteggi ponderati usando ricorsione.
-    Argomenti:
-        - generiPreferiti: Lista dei generi preferiti (in minuscolo).
-        - peso: Moltiplicatore per i generi preferiti.
-        - canzoni: Lista delle canzoni disponibili.
-    Restituisce:
-        - Lista di tuple (punteggio ponderato, canzone).
--}
-arricchisci :: [String] -> Double -> [Canzone] -> [(Double, Canzone)]
-arricchisci _ _ [] = []
-arricchisci generiPreferiti peso (c:cs) =
-    let genereMinuscolo = map toLower (genere c)
-        punteggioPonderato = if genereMinuscolo `elem` generiPreferiti
-                             then fromIntegral (punteggio c) * peso
-                             else fromIntegral (punteggio c)
-    in (punteggioPonderato, c) : arricchisci generiPreferiti peso cs

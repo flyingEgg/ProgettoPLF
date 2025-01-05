@@ -19,7 +19,7 @@ main :-
 /* Ciclo che gestisce la selezione delle azioni */
 loop_menu :- 
     write('Scegli un\'azione:\n'),
-    write('1. Carica le canzoni da un file\n'),
+    write('1. Carica un file con le canzoni\n'),
     write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
     write('3. Stampa la classifica delle canzoni\n'),
     write('4. Esci\n'),
