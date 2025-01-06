@@ -6,6 +6,7 @@
 \usepackage{color}
 \usepackage{hyperref}
 \usepackage{geometry}
+\usepackage{graphicx}
 \geometry{a4paper, margin=1in}
 
 % Colors for code listings
@@ -102,7 +103,7 @@ arricchisci generiPreferiti peso (c:cs) =
 \end{lstlisting}
 
 \subsection{Implementazione in Prolog}
-Il file \texttt{raccomandazioni.pl} implementa l'algoritmo in Prolog. Esempio di ordinamento:
+Il file \texttt{raccomandazioni.pl} implementa l'algoritmo in Prolog. ???????????? Esempio di ordinamento:
 \begin{lstlisting}[language=Prolog,caption=Ordinamento delle canzoni]
 classifica_ordinata(Ordinata) :-
     findall(Punteggio-Titolo, punteggio_ponderato(Titolo, Punteggio), Punteggi),
@@ -112,31 +113,79 @@ classifica_ordinata(Ordinata) :-
 
 \newpage
 \section{Testing}
-\subsection{Esempi di input e output}
-Input di esempio:
-\begin{verbatim}
-Despacito,Luis Fonsi,Reggaeton,8
-Shape of You,Ed Sheeran,Pop,9
-Havana,Camila Cabello,Pop,10
-\end{verbatim}
-Preferenze utente:
-\begin{itemize}
-    \item Generi preferiti: Pop.
-    \item Peso assegnato: 1.5.
-\end{itemize}
-Output:
-\begin{verbatim}
-1. Havana (Punteggio ponderato: 15.0)
-2. Shape of You (Punteggio ponderato: 13.5)
-3. Despacito (Punteggio ponderato: 8.0)
-\end{verbatim}
+\subsection{Testing del programma in Haskell}
+\begin{center}
+    \textbf{Test 1}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest1}
+\end{center}
+\begin{center}
+    \textbf{Test 2}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest2}
+\end{center}
+\begin{center}
+    \textbf{Test 3}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest3}
+\end{center}
 
-\subsection{Conclusioni}
-Entrambi i programmi raggiungono l'obiettivo, ma differiscono per efficienza e flessibilità:
-\begin{itemize}
-    \item Haskell offre un'elaborazione dati chiara e performante.
-    \item Prolog consente una gestione dinamica dei pesi durante l'esecuzione.
-\end{itemize}
-Estensioni future potrebbero includere l'integrazione con database musicali e filtri avanzati.
+\newpage
+\begin{center}
+    \textbf{Test 4}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest4}
+\end{center}
+\begin{center}
+    \textbf{Test 5}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest5}
+    \includegraphics[width=0.5\textwidth]{htest10}
+\end{center}
+
+\newpage
+\begin{center}
+    \textbf{Test 6}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest6}
+\end{center}
+
+\newpage
+\begin{center}
+    \textbf{Test 7}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest7}
+\end{center}
+\begin{center}
+    \textbf{Test 8}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest8}
+\end{center}
+
+\newpage
+\begin{center}
+    \textbf{Test 9}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest9}
+\end{center}
+\begin{center}
+    \textbf{Test 10}
+    \par
+    \vspace{0.5cm}
+    \includegraphics[width=0.5\textwidth]{htest10}
+\end{center}
+\vspace{1cm}
+
+\newpage
+\subsection{Testing del programma in Prolog}
 
 \end{document}

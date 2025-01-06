@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.1.3)  6 JAN 2025 17:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.1.3)  6 JAN 2025 22:11
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -281,33 +281,46 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layouthoffset=\dimen165
 \Gm@layoutvoffset=\dimen166
 \Gm@dimlist=\toks26
- (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg)) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
+ (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg)) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+ (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
+ (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 107.
+)
+\Gin@req@height=\dimen167
+\Gin@req@width=\dimen168
+) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count301
 \l__pdf_internal_box=\box55
 ) (Relazione.aux)
 \openout1 = `Relazione.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Info: Redefining \it@ocap on input line 35.
-LaTeX Info: Redefining \it@ccap on input line 35.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Info: Redefining \it@ocap on input line 36.
+LaTeX Info: Redefining \it@ccap on input line 36.
 
 
 File italian.ldf warning: 
@@ -315,24 +328,29 @@ italian.ldf    With OT1 encoding guillemets are poorly faked
 italian.ldf    Use T1 encoding
 italian.ldf    or specify a font with command \CaporaliFrom
 italian.ldf    See the documentation concerning the babel-italian typesetting
-italian.ldf    on input line 35.
+italian.ldf    on input line 36.
 
 \c@lstlisting=\count302
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count303
-\scratchdimen=\dimen167
+\scratchdimen=\dimen169
 \scratchbox=\box56
 \nofMPsegments=\count304
 \nofMParguments=\count305
 \everyMPshowfont=\toks27
 \MPscratchCnt=\count306
-\MPscratchDim=\dimen168
+\MPscratchDim=\dimen170
 \MPnumerator=\count307
 \makeMPintoPDFobject=\count308
 \everyMPtoPDFconversion=\toks28
-)
-Package hyperref Info: Link coloring OFF on input line 35.
+) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
+ (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
+))
+Package hyperref Info: Link coloring OFF on input line 36.
  (Relazione.out) (Relazione.out)
 \@outlinefile=\write3
 \openout3 = `Relazione.out'.
@@ -372,11 +390,11 @@ Package hyperref Info: Link coloring OFF on input line 35.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 38.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 39.
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 38.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 39.
  (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
@@ -390,31 +408,90 @@ File: lstlang1.sty 2023/02/27 1.9 listings language file
 ) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
 File: lstlang2.sty 2023/02/27 1.9 listings language file
 )
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 93.
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 94.
  (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2023/02/27 1.9 listings language file
 ) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
 File: lstlang2.sty 2023/02/27 1.9 listings language file
-) [6] [7] (Relazione.aux)
+) [6]
+<htest1.png, id=128, 295.1025pt x 134.75343pt>
+File: htest1.png Graphic file (type png)
+<use htest1.png>
+Package pdftex.def Info: htest1.png  used on input line 121.
+(pdftex.def)             Requested size: 226.48395pt x 103.42119pt.
+<htest2.png, id=130, 292.09125pt x 144.54pt>
+File: htest2.png Graphic file (type png)
+<use htest2.png>
+Package pdftex.def Info: htest2.png  used on input line 127.
+(pdftex.def)             Requested size: 226.48395pt x 112.07907pt.
+<htest3.png, id=131, 294.34969pt x 155.07938pt>
+File: htest3.png Graphic file (type png)
+<use htest3.png>
+Package pdftex.def Info: htest3.png  used on input line 133.
+(pdftex.def)             Requested size: 226.48395pt x 119.32391pt.
+ [7 <./htest1.png> <./htest2.png> <./htest3.png>]
+<htest4.png, id=141, 613.54219pt x 378.66469pt>
+File: htest4.png Graphic file (type png)
+<use htest4.png>
+Package pdftex.def Info: htest4.png  used on input line 141.
+(pdftex.def)             Requested size: 226.48395pt x 139.78017pt.
+<htest5.png, id=142, 300.3722pt x 140.77594pt>
+File: htest5.png Graphic file (type png)
+<use htest5.png>
+Package pdftex.def Info: htest5.png  used on input line 147.
+(pdftex.def)             Requested size: 226.48395pt x 106.14876pt.
+<htest10.png, id=143, 347.79938pt x 115.93312pt>
+File: htest10.png Graphic file (type png)
+<use htest10.png>
+Package pdftex.def Info: htest10.png  used on input line 148.
+(pdftex.def)             Requested size: 226.48395pt x 75.4936pt.
+ [8 <./htest4.png> <./htest5.png> <./htest10.png>]
+<htest6.png, id=151, 310.15875pt x 712.16063pt>
+File: htest6.png Graphic file (type png)
+<use htest6.png>
+Package pdftex.def Info: htest6.png  used on input line 156.
+(pdftex.def)             Requested size: 226.48395pt x 520.03593pt.
+ [9 <./htest6.png>]
+<htest7.png, id=157, 612.78937pt x 509.65407pt>
+File: htest7.png Graphic file (type png)
+<use htest7.png>
+Package pdftex.def Info: htest7.png  used on input line 164.
+(pdftex.def)             Requested size: 226.48395pt x 188.36685pt.
+<htest8.png, id=158, 292.09125pt x 161.85469pt>
+File: htest8.png Graphic file (type png)
+<use htest8.png>
+Package pdftex.def Info: htest8.png  used on input line 170.
+(pdftex.def)             Requested size: 226.48395pt x 125.50522pt.
+ [10 <./htest7.png> <./htest8.png>]
+<htest9.png, id=165, 315.42844pt x 703.12688pt>
+File: htest9.png Graphic file (type png)
+<use htest9.png>
+Package pdftex.def Info: htest9.png  used on input line 178.
+(pdftex.def)             Requested size: 226.48395pt x 504.86694pt.
+File: htest10.png Graphic file (type png)
+<use htest10.png>
+Package pdftex.def Info: htest10.png  used on input line 184.
+(pdftex.def)             Requested size: 226.48395pt x 75.4936pt.
+ [11 <./htest9.png>] [12] (Relazione.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
 Package rerunfilecheck Info: File `Relazione.out' has not changed.
-(rerunfilecheck)             Checksum: 94282C4C32787AA1806081EA09593F47;2210.
+(rerunfilecheck)             Checksum: DBF1668F00FE4F27790BF92C7B18C465;2362.
  ) 
 Here is how much of TeX's memory you used:
- 13254 strings out of 474486
- 202658 string characters out of 5743756
+ 13706 strings out of 474486
+ 210451 string characters out of 5743756
  2034542 words of memory out of 5000000
- 35346 multiletter control sequences out of 15000+600000
- 567980 words of font info for 73 fonts, out of 8000000 for 9000
+ 35772 multiletter control sequences out of 15000+600000
+ 568339 words of font info for 74 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,6n,79p,576b,1679s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\chris\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.pk><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmitt10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on Relazione.pdf (7 pages, 162253 bytes).
+ <C:\Users\chris\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.pk><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbxti10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmitt10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on Relazione.pdf (12 pages, 287529 bytes).
 PDF statistics:
- 191 PDF objects out of 1000 (max. 8388607)
- 41 named destinations out of 1000 (max. 500000)
- 113 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 238 PDF objects out of 1000 (max. 8388607)
+ 46 named destinations out of 1000 (max. 500000)
+ 163 words of extra memory for PDF output out of 10000 (max. 10000000)
 
