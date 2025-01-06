@@ -36,8 +36,10 @@
 
 \maketitle
 
+\newpage
 \tableofcontents
 
+\newpage
 \section{Specifica del problema}
 Il progetto consiste nell'implementazione di un sistema di raccomandazione musicale in Haskell e Prolog. Obiettivo principale è suggerire all'utente una classifica di canzoni in base alle sue preferenze di genere musicale e pesi assegnati. I passi principali includono:
 \begin{itemize}
@@ -47,6 +49,7 @@ Il progetto consiste nell'implementazione di un sistema di raccomandazione music
     \item Modifica dinamica dei pesi in Prolog.
 \end{itemize}
 
+\newpage
 \section{Analisi del problema}
 \subsection{Dati in ingresso}
 \begin{itemize}
@@ -71,6 +74,7 @@ Punteggio\ Ponderato = Punteggio \times Peso\_{Genere}
 \]
 se il genere della canzone appartiene ai generi preferiti, altrimenti è uguale al punteggio originale.
 
+\newpage
 \section{Progettazione dell'algoritmo}
 \subsection{Scelte di progetto}
 \begin{itemize}
@@ -87,6 +91,7 @@ se il genere della canzone appartiene ai generi preferiti, altrimenti è uguale 
     \item Stampare la classifica.
 \end{enumerate}
 
+\newpage
 \section{Implementazione dell'algoritmo}
 \subsection{Implementazione in Haskell}
 Il file \texttt{raccomandazioni.hs} implementa l'algoritmo in Haskell. Un esempio di calcolo dei punteggi ponderati:
@@ -109,6 +114,8 @@ classifica_ordinata(Ordinata) :-
     sort(1, @>=, Punteggi, Ordinata).
 \end{lstlisting}
 
+
+\newpage
 \section{Testing}
 \subsection{Esempi di input e output}
 Input di esempio:
