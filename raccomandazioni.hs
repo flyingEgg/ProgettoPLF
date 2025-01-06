@@ -181,6 +181,17 @@ aggiornaPesi (g:gs) pesi = do
             putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
             aggiornaPesi gs pesi
 
+-- | 'validaPeso' richiede all'utente di inserire un valore numerico valido per il peso.
+validaPeso :: String -> IO Double
+validaPeso genere = do
+    putStrLn $ "Inserisci il nuovo peso per il genere '" ++ genere ++ "' (valore positivo):"
+    input <- getLine
+    case reads input :: [(Double, String)] of
+        [(valore, "")] | valore > 0 -> return valore
+        _ -> do
+            putStrLn "Errore: devi inserire un numero positivo. Riprova."
+            validaPeso genere
+
 -- #########################################################
 -- Raccomandazioni
 -- #########################################################
@@ -214,10 +225,9 @@ analizzaCanzone riga =
 separa :: Char -> String -> [String]
 separa _ "" = []
 separa delimiter string =
-    let (primo, resto) = break (== delimiter) string
-    in primo : case resto of
-        [] -> []
-        x -> separa delimiter (dropWhile (== delimiter) (tail x)) 
+            | notElem "" [titolo, artista, genere, punteggioStr] &&
+              all (`elem` "0123456789") punteggioStr -> Just (Canzone titolo artista genere (read punteggioStr))
+        _ -> Nothing
 
 -- | 'separaTaglia' pulisce gli spazi dai campi separati
 separaTaglia :: Char -> String -> [String]
