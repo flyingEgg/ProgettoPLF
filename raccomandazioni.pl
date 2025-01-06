@@ -41,17 +41,14 @@ loop_menu :-
     write('4. Stampa la lista dei generi preferiti\n'),
     write('5. Esci\n'),
     read(Scelta),
-    (   Scelta = 1 -> carica_canzoni_interattivo,
-        loop_menu
-    ;   Scelta = 2 -> gestisci_generi_preferiti,
-        loop_menu
-    ;   Scelta = 3 -> stampa_classifica,
-        loop_menu
-    ;   Scelta = 4 -> mostra_generi_preferiti,
-        loop_menu
+    (   Scelta = 1 -> carica_canzoni_interattivo
+    ;   Scelta = 2 -> gestisci_generi_preferiti
+    ;   Scelta = 3 -> stampa_classifica
+    ;   Scelta = 4 -> mostra_generi_preferiti
     ;   Scelta = 5 -> write('Arrivederci!\n'), halt
-    ;   write('Scelta non valida. Riprova.\n'),
-        loop_menu).
+    ;   write('Scelta non valida. Riprova.\n')
+    ),
+    loop_menu.
 
 /* ================================================
    Predicati di caricamento delle canzoni
@@ -64,11 +61,9 @@ carica_canzoni_interattivo :-
     write('Inserire tra apici il nome del file contenente le canzoni: '), nl,
     read(File),
     (   catch(carica_canzoni(File), _, fail)
-    ->  write('Canzoni caricate con successo!\n'), nl,
-        trova_generi_disponibili(Generi),
-        format('Generi disponibili nel file: ~w\n', [Generi]), nl
-    ;   write('\nErrore nel caricamento del file. Riprova.\n'),
-        loop_menu
+    ->  write('Canzoni caricate con successo!\n'),
+        mostra_generi_disponibili
+    ;   write('\nErrore nel caricamento del file. Riprova.\n')
     ).
 
 /* Predicato che apre il file specificato e legge le canzoni
@@ -87,10 +82,7 @@ leggi_canzoni(Stream) :-
     ->  string_codes(Linia, Codici),
         split_string(Linia, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
         number_string(Punteggio, PunteggioStr),
-        (   \+ canzone(Titolo, Artista, Genere, Punteggio)
-        ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
-        ;   true
-        ),
+        assertz(canzone(Titolo, Artista, Genere, Punteggio)),
         leggi_canzoni(Stream)
     ;   true ).
 
@@ -101,9 +93,8 @@ leggi_canzoni(Stream) :-
 /* Predicato che permette all'utente di selezionare 
    e gestire i generi musicali preferiti. */
 gestisci_generi_preferiti :- 
-    trova_generi_disponibili(Generi),
-    format('Generi disponibili: ~w\n', [Generi]), nl,
-    write('Inserisci i tuoi generi preferiti, uno per volta. Inserisci "fine" per terminare: '), nl,
+    mostra_generi_disponibili,
+    write('Inserisci i tuoi generi preferiti, uno per volta. Scrivi "fine" per terminare.\n'),
     chiedi_generi_preferiti([]).
 
 /* Predicato che raccoglie i generi preferiti inseriti
@@ -111,11 +102,10 @@ gestisci_generi_preferiti :-
 chiedi_generi_preferiti(GeneriPreferiti) :- 
     write('Inserisci un genere preferito: '),
     read(Genere),
-    normalizza_genere(Genere, GenereNormalizzato),
     (   Genere == fine
-    ->  format('Generi preferiti separati: ~w\n', [GeneriPreferiti]),
-        chiedi_peso_generi(GeneriPreferiti)
-    ;   append(GeneriPreferiti, [GenereNormalizzato], NuoviGeneri),
+    ->  chiedi_peso_generi(GeneriPreferiti)
+    ;   normalizza_genere(Genere, GenereNormalizzato),
+        append(GeneriPreferiti, [GenereNormalizzato], NuoviGeneri),
         chiedi_generi_preferiti(NuoviGeneri) ).
 
 /* Predicato che chiede all'utente di inserire
@@ -125,18 +115,10 @@ chiedi_peso_generi([Genere | Altri]) :-
     format('Inserisci il peso per il genere ~w: ', [Genere]),
     read(Peso),
     (   number(Peso), Peso > 0
-    ->  (   retractall(genere_preferito(Genere, _)),
-            assertz(genere_preferito(Genere, Peso))
-        ),
+    ->  assertz(genere_preferito(Genere, Peso)),
         chiedi_peso_generi(Altri)
     ;   write('Peso non valido. Riprova.\n'),
         chiedi_peso_generi([Genere | Altri]) ).
-
-/* Predicato che restituisce una lista dei generi musicali 
-   univoci presenti nel database delle canzoni. */
-trova_generi_disponibili(Generi) :- 
-    findall(Genere, canzone(_, _, Genere, _), GeneriDuplicati),
-    sort(GeneriDuplicati, Generi).
 
 /* ================================================
    Predicati per la raccomandazione e la classifica
@@ -146,7 +128,6 @@ trova_generi_disponibili(Generi) :-
    in base al suo genere e al suo punteggio originale.
    Poi stampa la classifica ordinata delle canzoni. */
 stampa_classifica :- 
-    write('Classifica delle canzoni in base al punteggio ponderato:\n'),
     findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),
     (   Punteggi == []
     ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
@@ -171,25 +152,45 @@ stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :-
     canzone(Titolo, Artista, Genere, _),
     format('~d# ~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n', 
            [Posizione, Titolo, Artista, Genere, PunteggioPonderato]),
-    NuovaPosizione is Posizione + 1,
-    stampa_canzoni_ordinate(Rest, NuovaPosizione).
+    stampa_canzoni_ordinate(Rest, Posizione + 1).
 
 /* ================================================
    Predicati ausiliari
    ================================================ */
 
+/* Predicato che mostra i generi preferiti associati
+   con il rispettivo peso. */
+mostra_generi_preferiti :- 
+    findall(Genere-Peso, genere_preferito(Genere, Peso), Generi),
+    (   Generi == []
+    ->  write('Non è stato definito alcun genere preferito.\n')
+    ;   write('I tuoi generi preferiti e i loro pesi:\n'),
+        stampa_generi(Generi)
+    )
+
+/* Predicato che restituisce una lista dei generi musicali 
+   univoci presenti nel database delle canzoni. */
+mostra_generi_disponibili :- 
+    findall(Genere, canzone(_, _, Genere, _), Generi),
+    sort(Generi, GeneriUnici),
+    format('Generi disponibili: ~w\n', [GeneriUnici]).
+
+/* Predicato che stampa la lista dei generi preferiti. */
+stampa_generi([]).
+stampa_generi([Genere-Peso | Rest]) :- 
+    format('~w: ~w\n', [Genere, Peso]),
+    stampa_generi(Rest).
+
 /* Predicato che normalizza il genere, 
    trasformandolo in minuscolo e rimuovendo eventuali spazi. */
 normalizza_genere(Genere, GenereNormalizzato) :- 
     string_lower(Genere, GenereMinuscolo),
-    rimuovi_spazi(GenereMinuscolo, GenereNormalizzato).
+    normalize_space(atom(GenereNormalizzato), GenereMinuscolo).
 
 /* Predicato che 'peso_genere' restituisce il peso di un genere.
    Se non è specificato, viene utilizzato un peso di 1. */
 peso_genere(Genere, Peso) :- 
-    (   genere_preferito(Genere, Peso)
-    ->  true
-    ;   Peso = 1 ).
+    (   genere_preferito(Genere, Peso) -> true ; Peso = 1 ).
 
 /* Predicato che rimuove gli spazi da una stringa. */
 rimuovi_spazi(Stringa, StringaRimossa) :- 
@@ -206,21 +207,3 @@ rimuovi_spazi_codici([32], []).
 rimuovi_spazi_codici([H|T], [H|CodiciRimossi]) :- 
     H \= 32,
     rimuovi_spazi_codici(T, CodiciRimossi).
-
-
-/* Predicato che mostra i generi preferiti associati
-   con il rispettivo peso. */
-mostra_generi_preferiti :-
-    findall(Genere-Peso, genere_preferito(Genere, Peso), Generi),
-    (   Generi == []
-    ->  write('Non e ancora stato definito alcun genere preferito.\n')
-    ;   write('I tuoi generi preferiti ed il loro punteggio associato sono:\n'),
-        stampa_generi_preferiti(Generi)
-    ).
-
-/* Predicato che stampa la lista dei generi preferiti. */
-stampa_generi_preferiti([]).
-stampa_generi_preferiti([Genere-Peso | Rest]) :-
-    format('~w: ~w\n', [Genere, Peso]),
-    stampa_generi_preferiti(Rest).
-
