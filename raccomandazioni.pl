@@ -9,6 +9,7 @@
    Predicati dinamici
    ================================================ */
 
+
 /* Predicato che 'canzone/4' memorizza informazioni relative
    alle canzoni caricate dal file. Ogni canzone è rappresentata 
    dai seguenti argomenti: Titolo, Artista, Genere e Punteggio. */
@@ -77,14 +78,18 @@ carica_canzoni(File) :-
    titolo, l'artista, il genere e il punteggio della canzone.
    Le informazioni vengono memorizzate nel database. */
 leggi_canzoni(Stream) :- 
-    read_line_to_string(Stream, Line),
+    repeat,
+    read_line(Stream, Line),
     (   Line \= end_of_file
-    ->  write('Linea letta: '), write(Line), nl,
-        split_string(Line, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
-        number_string(Punteggio, PunteggioStr),
+    ->  !  
+    ;   atom_codes(LineAtom, Line),
+        split_string(LineAtom, ",", [Titolo, Artista, Genere, PunteggioStr]),
+        atom_number(PunteggioStr, Punteggio),
         assertz(canzone(Titolo, Artista, Genere, Punteggio)),
-        leggi_canzoni(Stream)
-    ;   true ).
+        fail
+    ).
+
+
 
 /* ================================================
    Predicati per la gestione dei generi preferiti
@@ -124,6 +129,16 @@ chiedi_peso_generi([Genere | Altri]) :-
    Predicati per la raccomandazione e la classifica
    ================================================ */
 
+/* Predicato che stampa le canzoni ordinate in base al punteggio
+   ponderato, elencandole con la posizione, il titolo,
+   l'artista e il punteggio ponderato. */
+stampa_canzoni_ordinate([], _).
+stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :- 
+    canzone(Titolo, Artista, Genere, _),
+    format('~d# ~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n', 
+           [Posizione, Titolo, Artista, Genere, PunteggioPonderato]),
+    stampa_canzoni_ordinate(Rest, Posizione + 1).
+
 /* Predicato che calcola il punteggio ponderato per ogni canzone 
    in base al suo genere e al suo punteggio originale.
    Poi stampa la classifica ordinata delle canzoni. */
@@ -131,7 +146,9 @@ stampa_classifica :-
     findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),
     (   Punteggi == []
     ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
-    ;   sort(1, @>=, Punteggi, Ordinata),
+    ;   maplist(invert_punteggio, Punteggi, InvertedPunteggi),
+        keysort(InvertedPunteggi, SortedInverted),
+        maplist(invert_punteggio, SortedInverted, Ordinata),
         stampa_canzoni_ordinate(Ordinata, 1)
     ).
 
@@ -144,19 +161,50 @@ calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :-
     peso_genere(GenereNormalizzato, Peso),
     PunteggioPonderato is Punteggio * Peso.
 
-/* Predicato che stampa le canzoni ordinate in base al punteggio
-   ponderato, elencandole con la posizione, il titolo,
-   l'artista e il punteggio ponderato. */
-stampa_canzoni_ordinate([], _).
-stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :- 
-    canzone(Titolo, Artista, Genere, _),
-    format('~d# ~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n', 
-           [Posizione, Titolo, Artista, Genere, PunteggioPonderato]),
-    stampa_canzoni_ordinate(Rest, Posizione + 1).
-
 /* ================================================
    Predicati ausiliari
    ================================================ */
+
+   atom_number(Atom, Number) :-
+    atom_codes(Atom, Codes),
+    number_codes(Number, Codes).
+
+
+read_line(Stream, Line) :-
+    leggi_riga_acc(Stream, [], Line).
+
+leggi_riga_acc(Stream, Acc, Line) :-
+    get_char(Stream, Char),
+    (   Char == end_of_file
+    ->  Line = end_of_file
+    ;   Char == '\n'
+    ->  reverse(Acc, Line)
+    ;   leggi_riga_acc(Stream, [Char | Acc], Line)
+    ).
+
+read_chars(Stream, Char, Line) :-
+    (   Char == '\n'
+    ->  Line = []
+    ;   get_char(Stream, NextChar),
+        read_chars(Stream, NextChar, Rest),
+        Line = [Char | Rest]
+    ).
+
+split_string(Input, Sep, Parts) :-
+    atom_codes(Input, Codes),
+    atom_codes(Sep, [SepCode]),
+    split_codes(Codes, SepCode, [], Parts).
+    
+
+    split_codes([], _, Acc, [Part]) :-
+        atom_codes(Part, Acc).
+    split_codes([Sep|Rest], Sep, Acc, [Part|Parts]) :-
+        atom_codes(Part, Acc),
+        split_codes(Rest, Sep, [], Parts).
+    split_codes([C|Rest], Sep, Acc, Parts) :-
+        C \= Sep,
+        append(Acc, [C], NewAcc),
+        split_codes(Rest, Sep, NewAcc, Parts).
 
 /* Predicato che mostra i generi preferiti associati
    con il rispettivo peso. */
@@ -172,8 +220,35 @@ mostra_generi_preferiti :-
    univoci presenti nel database delle canzoni. */
 mostra_generi_disponibili :- 
     findall(Genere, canzone(_, _, Genere, _), Generi),
-    sort(Generi, GeneriUnici),
-    format('Generi disponibili: ~w\n', [GeneriUnici]).
+    rimuovi_duplicati(Generi, GeneriSenzaDuplicati),
+    ordina_generi(GeneriSenzaDuplicati, GeneriOrdinati),
+    format('Generi disponibili: ~w\n', [GeneriOrdinati]).
+
+/* Predicato che rimuove i duplicati da una lista */
+rimuovi_duplicati([], []).
+rimuovi_duplicati([H|T], [H|Rest]) :-
+    \+ member(H, T),
+    rimuovi_duplicati(T, Rest).
+rimuovi_duplicati([H|T], Rest) :-
+    member(H, T),
+    rimuovi_duplicati(T, Rest).
+
+/* Ordina i generi */
+ordina_generi([], []).
+ordina_generi([Genere], [Genere]).
+ordina_generi([Genere1, Genere2 | Rest], [Genere1 | RestOrdinato]) :-
+    ordina_generi([Genere2 | Rest], RestOrdinato),
+    ordina_lista(Genere1, RestOrdinato).
+
+/* Predicato ausiliario per ordinare un genere */
+ordina_lista([], []).
+ordina_lista([H|T], [H|SortedT]) :-
+    ordina_lista(T, SortedT),
+    H @=< SortedT.
+ordina_lista([H|T], [SortedH|SortedT]) :-
+    ordina_lista(T, SortedT),
+    H @> SortedH.
+
 
 /* Predicato che stampa la lista dei generi preferiti. */
 stampa_generi([]).
@@ -189,6 +264,32 @@ normalizza_genere(Genere, GenereNormalizzato) :-
     rimuovi_spazi(Codici, CodiciNormalizzati),
     atom_codes(GenereNormalizzato, CodiciNormalizzati).
 
+downcase_atom(Atom, LowercaseAtom) :-
+    atom_codes(Atom, Codes),
+    maplist(to_lower, Codes, LowercaseCodes),
+    atom_codes(LowercaseAtom, LowercaseCodes).
+    
+to_lower(Code, LowerCode) :-
+    Code >= 65, Code =< 90,
+    LowerCode is Code + 32.
+to_lower(Code, Code).
+
+sort_descending(List, Sorted) :-
+    maplist(invert_punteggio, List, InvertedList),
+    keysort(InvertedList, SortedInverted),
+    maplist(invert_punteggio, SortedInverted, Sorted).
+
+invert_punteggio(-Punteggio, Titolo, Punteggio-Titolo) :- !.
+invert_punteggio(Punteggio, Titolo, -Punteggio-Titolo).
+
+compare_descending(Delta, X, Y) :-
+    compare(DeltaReverse, X, Y),
+    reverse_compare(DeltaReverse, Delta).
+
+reverse_compare(<, >).
+reverse_compare(=, =).
+reverse_compare(>, <).
+
 /* Predicato che 'peso_genere' restituisce il peso di un genere.
    Se non è specificato, viene utilizzato un peso di 1. */
 peso_genere(Genere, Peso) :- 
@@ -196,9 +297,9 @@ peso_genere(Genere, Peso) :-
 
 /* Predicato che rimuove gli spazi da una stringa. */
 rimuovi_spazi(Stringa, StringaRimossa) :- 
-    string_codes(Stringa, Codici),
+    atom_codes(Stringa, Codici),
     rimuovi_spazi_codici(Codici, CodiciRimossi),
-    string_codes(StringaRimossa, CodiciRimossi).
+    atom_codes(StringaRimossa, CodiciRimossi).
 
 /* Predicato che rimuove gli spazi dalla lista
    di codici ASCII di una stringa. */
