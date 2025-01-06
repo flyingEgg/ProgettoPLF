@@ -144,12 +144,22 @@ aggiornaPesi (g:gs) pesi = do
     risposta <- getLine
     if risposta == "s"
         then do
-            putStrLn $ "Inserisci il nuovo peso per il genere '" ++ g ++ "':"
-            nuovoPeso <- readLn :: IO Double
+            nuovoPeso <- validaPeso g
             aggiornaPesi gs (Map.insert g nuovoPeso pesi)
         else do
             putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
             aggiornaPesi gs pesi
+
+-- | 'validaPeso' richiede all'utente di inserire un valore numerico valido per il peso.
+validaPeso :: String -> IO Double
+validaPeso genere = do
+    putStrLn $ "Inserisci il nuovo peso per il genere '" ++ genere ++ "' (valore positivo):"
+    input <- getLine
+    case reads input :: [(Double, String)] of
+        [(valore, "")] | valore > 0 -> return valore
+        _ -> do
+            putStrLn "Errore: devi inserire un numero positivo. Riprova."
+            validaPeso genere
 
 -- #########################################################
 -- Raccomandazioni
@@ -175,7 +185,7 @@ analizzaCanzone :: String -> Maybe Canzone
 analizzaCanzone riga =
     case split ',' riga of
         [titolo, artista, genere, punteggioStr]
-            | all (/= "") [titolo, artista, genere, punteggioStr] &&
+            | notElem "" [titolo, artista, genere, punteggioStr] &&
               all (`elem` "0123456789") punteggioStr -> Just (Canzone titolo artista genere (read punteggioStr))
         _ -> Nothing
 
