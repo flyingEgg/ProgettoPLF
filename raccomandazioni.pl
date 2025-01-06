@@ -12,12 +12,12 @@
 /* Predicato che 'canzone/4' memorizza informazioni relative
    alle canzoni caricate dal file. Ogni canzone è rappresentata 
    dai seguenti argomenti: Titolo, Artista, Genere e Punteggio. */
-:- dynamic canzone/4.
+:- dynamic(canzone/4).
 
 /* Predicato che 'genere_preferito/2' associa un peso preferito
    a ciascun genere musicale. Il primo argomento è il Genere,
    il secondo è il Peso associato a quel genere. */
-:- dynamic genere_preferito/2.
+:- dynamic(genere_preferito/2).
 
 /* ================================================
    Predicati principali
@@ -77,10 +77,10 @@ carica_canzoni(File) :-
    titolo, l'artista, il genere e il punteggio della canzone.
    Le informazioni vengono memorizzate nel database. */
 leggi_canzoni(Stream) :- 
-    read_line_to_codes(Stream, Codici),
-    (   Codici \= end_of_file
-    ->  string_codes(Linia, Codici),
-        split_string(Linia, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
+    read_line_to_string(Stream, Line),
+    (   Line \= end_of_file
+    ->  write('Linea letta: '), write(Line), nl,
+        split_string(Line, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
         number_string(Punteggio, PunteggioStr),
         assertz(canzone(Titolo, Artista, Genere, Punteggio)),
         leggi_canzoni(Stream)
@@ -166,7 +166,7 @@ mostra_generi_preferiti :-
     ->  write('Non è stato definito alcun genere preferito.\n')
     ;   write('I tuoi generi preferiti e i loro pesi:\n'),
         stampa_generi(Generi)
-    )
+    ).
 
 /* Predicato che restituisce una lista dei generi musicali 
    univoci presenti nel database delle canzoni. */
@@ -184,8 +184,10 @@ stampa_generi([Genere-Peso | Rest]) :-
 /* Predicato che normalizza il genere, 
    trasformandolo in minuscolo e rimuovendo eventuali spazi. */
 normalizza_genere(Genere, GenereNormalizzato) :- 
-    string_lower(Genere, GenereMinuscolo),
-    normalize_space(atom(GenereNormalizzato), GenereMinuscolo).
+    downcase_atom(Genere, GenereLower),
+    atom_codes(GenereLower, Codici),
+    rimuovi_spazi(Codici, CodiciNormalizzati),
+    atom_codes(GenereNormalizzato, CodiciNormalizzati).
 
 /* Predicato che 'peso_genere' restituisce il peso di un genere.
    Se non è specificato, viene utilizzato un peso di 1. */
@@ -201,9 +203,5 @@ rimuovi_spazi(Stringa, StringaRimossa) :-
 /* Predicato che rimuove gli spazi dalla lista
    di codici ASCII di una stringa. */
 rimuovi_spazi_codici([], []).
-rimuovi_spazi_codici([32|T], CodiciRimossi) :- 
-    rimuovi_spazi_codici(T, CodiciRimossi).
-rimuovi_spazi_codici([32], []).
-rimuovi_spazi_codici([H|T], [H|CodiciRimossi]) :- 
-    H \= 32,
-    rimuovi_spazi_codici(T, CodiciRimossi).
+rimuovi_spazi_codici([32|T], R) :- rimuovi_spazi_codici(T, R).
+rimuovi_spazi_codici([H|T], [H|R]) :- H \= 32, rimuovi_spazi_codici(T, R).
