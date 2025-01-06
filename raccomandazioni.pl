@@ -85,8 +85,8 @@ chiedi_generi_preferiti(GeneriPreferiti) :-
     read(Genere),
     (   Genere == fine
     ->  chiedi_peso_generi(GeneriPreferiti)
-    ;   mostra_generi_disponibili,  % Stampa i generi disponibili
-        findall(GenereDisponibile, canzone(_, _, GenereDisponibile, _), GeneriDisponibili), % Ottieni i generi disponibili
+    ;   mostra_generi_disponibili,  
+        findall(GenereDisponibile, canzone(_, _, GenereDisponibile, _), GeneriDisponibili), 
         (   membro(Genere, GeneriDisponibili)
         ->  append(GeneriPreferiti, [Genere], NuoviGeneri),
             chiedi_generi_preferiti(NuoviGeneri)
@@ -112,17 +112,6 @@ chiedi_peso_generi([Genere | Altri]) :-
    Predicati per la raccomandazione e la classifica
    ================================================ */
 
-/* Predicato che stampa le canzoni ordinate in base al punteggio
-   ponderato, elencandole con la posizione, il titolo,
-   l'artista e il punteggio ponderato. */
-stampa_canzoni_ordinate([], _).
-stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :- 
-    canzone(Titolo, Artista, Genere, _),
-    format('~d# ~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n', 
-           [Posizione, Titolo, Artista, Genere, PunteggioPonderato]),
-    Posizione1 is Posizione + 1,
-    stampa_canzoni_ordinate(Rest, Posizione1).
-
 /* Predicato che calcola il punteggio ponderato per ogni canzone 
    in base al suo genere e al suo punteggio originale.
    Poi stampa la classifica ordinata delle canzoni. */
@@ -133,6 +122,17 @@ stampa_classifica :-
     ;   ordina_lista(Punteggi, PunteggiOrdinati),
         stampa_canzoni_ordinate(PunteggiOrdinati, 1)
     ).
+
+/* Predicato che stampa le canzoni ordinate in base al punteggio
+   ponderato, elencandole con la posizione, il titolo,
+   l'artista e il punteggio ponderato. */
+stampa_canzoni_ordinate([], _).
+stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :- 
+    canzone(Titolo, Artista, Genere, _),
+    format('~d# ~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n', 
+           [Posizione, Titolo, Artista, Genere, PunteggioPonderato]),
+    Posizione1 is Posizione + 1,
+    stampa_canzoni_ordinate(Rest, Posizione1).
 
 /* Predicato che calcola il punteggio ponderato
    di una canzone in base al suo genere (e al peso preferito associato)
