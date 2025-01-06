@@ -28,22 +28,7 @@
    per l'utente. */
 main :- 
     write('Benvenuto nel sistema di raccomandazione musicale!'),
-    assertz(canzone('Despacito', 'Luis Fonsi', 'Reggaeton', 8)).
-    assertz(canzone('All Eyez On Me', 'Tupac', 'HipHop', 8)).
-    assertz(canzone('Danza Kuduro', 'Don Omar', 'Reggaeton', 9)).
-    assertz(canzone('Song 2', 'Blur', 'Alternative/Indie', 6)).
-    assertz(canzone('Bachata Rosa', 'Juan Luis Guerra', 'Bachata', 9)).
-    assertz(canzone('Notturno op 55 no 1', 'Chopin', 'Classica', 6)).
-    assertz(canzone('Free Bird', 'Lynyrd Skynyrd', 'Rock', 8)).
-    assertz(canzone('Thunderstruck', 'AC/DC', 'Rock', 7)).
-    assertz(canzone('Come As You Are', 'Nirvana', 'Rock', 8)).
-    assertz(canzone('La Gota Fria', 'Carlos Vives', 'Vallenato', 7)).
-    assertz(canzone('Stronger', 'Kanye West', 'HipHop', 9)).
-    assertz(canzone('Californication', 'Red Hot Chili Peppers', 'Alternative/Indie', 6)).
-    assertz(canzone('Upper Echelon', 'Travis Scott', 'Trap', 7)).
-    assertz(canzone('El Cantante', 'Hector Lavoe', 'Salsa', 9)).
-    assertz(canzone('Suavemente', 'Elvis Crespo', 'Merengue', 10)).
-    assertz(canzone('La Vaca', 'Los Toros Band', 'Merengue', 9)).
+    carica_canzoni,
     loop_menu.
 
 /* Predicato che 'loop_menu' gestisce la selezione delle azioni
@@ -63,6 +48,24 @@ loop_menu :-
     ;   write('Scelta non valida. Riprova.\n')
     ),
     loop_menu.
+
+carica_canzoni :-
+    assertz(canzone('Despacito', 'Luis Fonsi', 'Reggaeton', 8)).
+    assertz(canzone('All Eyez On Me', 'Tupac', 'HipHop', 8)).
+    assertz(canzone('Danza Kuduro', 'Don Omar', 'Reggaeton', 9)).
+    assertz(canzone('Song 2', 'Blur', 'Alternative/Indie', 6)).
+    assertz(canzone('Bachata Rosa', 'Juan Luis Guerra', 'Bachata', 9)).
+    assertz(canzone('Notturno op 55 no 1', 'Chopin', 'Classica', 6)).
+    assertz(canzone('Free Bird', 'Lynyrd Skynyrd', 'Rock', 8)).
+    assertz(canzone('Thunderstruck', 'AC/DC', 'Rock', 7)).
+    assertz(canzone('Come As You Are', 'Nirvana', 'Rock', 8)).
+    assertz(canzone('La Gota Fria', 'Carlos Vives', 'Vallenato', 7)).
+    assertz(canzone('Stronger', 'Kanye West', 'HipHop', 9)).
+    assertz(canzone('Californication', 'Red Hot Chili Peppers', 'Alternative/Indie', 6)).
+    assertz(canzone('Upper Echelon', 'Travis Scott', 'Trap', 7)).
+    assertz(canzone('El Cantante', 'Hector Lavoe', 'Salsa', 9)).
+    assertz(canzone('Suavemente', 'Elvis Crespo', 'Merengue', 10)).
+    assertz(canzone('La Vaca', 'Los Toros Band', 'Merengue', 9)).
 
 /* ================================================
    Predicati per la gestione dei generi preferiti
