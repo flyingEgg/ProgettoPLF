@@ -85,7 +85,8 @@ chiedi_generi_preferiti(GeneriPreferiti) :-
     read(Genere),
     (   Genere == fine
     ->  chiedi_peso_generi(GeneriPreferiti)
-    ;   mostra_generi_disponibili,
+    ;   mostra_generi_disponibili,  % Stampa i generi disponibili
+        findall(GenereDisponibile, canzone(_, _, GenereDisponibile, _), GeneriDisponibili), % Ottieni i generi disponibili
         (   membro(Genere, GeneriDisponibili)
         ->  append(GeneriPreferiti, [Genere], NuoviGeneri),
             chiedi_generi_preferiti(NuoviGeneri)
@@ -93,6 +94,7 @@ chiedi_generi_preferiti(GeneriPreferiti) :-
             chiedi_generi_preferiti(GeneriPreferiti) 
         )
     ).
+
 
 /* Predicato che chiede all'utente di inserire
    un peso per ciascun genere musicale preferito. */
