@@ -28,22 +28,22 @@
    per l'utente. */
 main :- 
     write('Benvenuto nel sistema di raccomandazione musicale!'),
-    (canzone('Despacito', 'Luis Fonsi', 'Reggaeton', 8)).
-    (canzone('All Eyez On Me', 'Tupac', 'HipHop', 8)).
-    (canzone('Danza Kuduro', 'Don Omar', 'Reggaeton', 9)).
-    (canzone('Song 2', 'Blur', 'Alternative/Indie', 6)).
-    (canzone('Bachata Rosa', 'Juan Luis Guerra', 'Bachata', 9)).
-    (canzone('Notturno op 55 no 1', 'Chopin', 'Classica', 6)).
-    (canzone('Free Bird', 'Lynyrd Skynyrd', 'Rock', 8)).
-    (canzone('Thunderstruck', 'AC/DC', 'Rock', 7)).
-    (canzone('Come As You Are', 'Nirvana', 'Rock', 8)).
-    (canzone('La Gota Fria', 'Carlos Vives', 'Vallenato', 7)).
-    (canzone('Stronger', 'Kanye West', 'HipHop', 9)).
-    (canzone('Californication', 'Red Hot Chili Peppers', 'Alternative/Indie', 6)).
-    (canzone('Upper Echelon', 'Travis Scott', 'Trap', 7)).
-    (canzone('El Cantante', 'Hector Lavoe', 'Salsa', 9)).
-    (canzone('Suavemente', 'Elvis Crespo', 'Merengue', 10)).
-    (canzone('La Vaca', 'Los Toros Band', 'Merengue', 9)).
+    assertz(canzone('Despacito', 'Luis Fonsi', 'Reggaeton', 8)).
+    assertz(canzone('All Eyez On Me', 'Tupac', 'HipHop', 8)).
+    assertz(canzone('Danza Kuduro', 'Don Omar', 'Reggaeton', 9)).
+    assertz(canzone('Song 2', 'Blur', 'Alternative/Indie', 6)).
+    assertz(canzone('Bachata Rosa', 'Juan Luis Guerra', 'Bachata', 9)).
+    assertz(canzone('Notturno op 55 no 1', 'Chopin', 'Classica', 6)).
+    assertz(canzone('Free Bird', 'Lynyrd Skynyrd', 'Rock', 8)).
+    assertz(canzone('Thunderstruck', 'AC/DC', 'Rock', 7)).
+    assertz(canzone('Come As You Are', 'Nirvana', 'Rock', 8)).
+    assertz(canzone('La Gota Fria', 'Carlos Vives', 'Vallenato', 7)).
+    assertz(canzone('Stronger', 'Kanye West', 'HipHop', 9)).
+    assertz(canzone('Californication', 'Red Hot Chili Peppers', 'Alternative/Indie', 6)).
+    assertz(canzone('Upper Echelon', 'Travis Scott', 'Trap', 7)).
+    assertz(canzone('El Cantante', 'Hector Lavoe', 'Salsa', 9)).
+    assertz(canzone('Suavemente', 'Elvis Crespo', 'Merengue', 10)).
+    assertz(canzone('La Vaca', 'Los Toros Band', 'Merengue', 9)).
     loop_menu.
 
 /* Predicato che 'loop_menu' gestisce la selezione delle azioni
