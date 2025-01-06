@@ -1,0 +1,140 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+% Colors for code listings
+\definecolor{commentgray}{gray}{0.5}
+\definecolor{stringgreen}{rgb}{0,0.6,0}
+\definecolor{keywordblue}{rgb}{0,0,0.6}
+
+% Listing settings for code
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{keywordblue},
+    stringstyle=\color{stringgreen},
+    commentstyle=\color{commentgray}\itshape,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    tabsize=2,
+    showstringspaces=false,
+    captionpos=b
+}
+
+\title{\textbf{Relazione del Progetto di Raccomandazione Musicale}}
+\author{Giaconi Christian, Giacomo Rossi\\Matricola: 314045, 314671}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Specifica del problema}
+Il progetto consiste nell'implementazione di un sistema di raccomandazione musicale in Haskell e Prolog. Obiettivo principale è suggerire all'utente una classifica di canzoni in base alle sue preferenze di genere musicale e pesi assegnati. I passi principali includono:
+\begin{itemize}
+    \item Caricamento delle canzoni da un file di testo strutturato.
+    \item Specifica delle preferenze dell'utente per i generi musicali.
+    \item Calcolo dei punteggi ponderati e ordinamento delle canzoni.
+    \item Modifica dinamica dei pesi in Prolog.
+\end{itemize}
+
+\section{Analisi del problema}
+\subsection{Dati in ingresso}
+\begin{itemize}
+    \item Un file contenente le canzoni nel formato:
+    \begin{verbatim}
+    Titolo,Artista,Genere,Punteggio
+    \end{verbatim}
+    \item Una lista di generi preferiti.
+    \item Pesi numerici assegnati ai generi preferiti.
+\end{itemize}
+
+\subsection{Dati in uscita}
+\begin{itemize}
+    \item Una classifica ordinata di canzoni basata sui punteggi ponderati.
+    \item Eventuali messaggi di errore o conferma nelle interazioni utente.
+\end{itemize}
+
+\subsection{Relazioni tra i dati}
+Ogni canzone è caratterizzata da un titolo, un artista, un genere, e un punteggio. Il punteggio ponderato è calcolato come:
+\[
+Punteggio\ Ponderato = Punteggio \times Peso\_{Genere}
+\]
+se il genere della canzone appartiene ai generi preferiti, altrimenti è uguale al punteggio originale.
+
+\section{Progettazione dell'algoritmo}
+\subsection{Scelte di progetto}
+\begin{itemize}
+    \item In Haskell, le canzoni sono modellate come tipi di dati strutturati per una manipolazione chiara e leggibile.
+    \item In Prolog, si utilizzano predicati dinamici per rappresentare canzoni, generi preferiti e pesi.
+\end{itemize}
+
+\subsection{Passi dell'algoritmo}
+\begin{enumerate}
+    \item Caricare le canzoni da un file.
+    \item Inserire le preferenze dell'utente per i generi e i pesi.
+    \item Calcolare i punteggi ponderati.
+    \item Ordinare le canzoni per punteggio ponderato.
+    \item Stampare la classifica.
+\end{enumerate}
+
+\section{Implementazione dell'algoritmo}
+\subsection{Implementazione in Haskell}
+Il file \texttt{raccomandazioni.hs} implementa l'algoritmo in Haskell. Un esempio di calcolo dei punteggi ponderati:
+\begin{lstlisting}[language=Haskell,caption=Calcolo dei punteggi ponderati]
+arricchisci :: [String] -> Double -> [Canzone] -> [(Double, Canzone)]
+arricchisci _ _ [] = []
+arricchisci generiPreferiti peso (c:cs) =
+    let genereMinuscolo = map toLower (genere c)
+        punteggioPonderato = if genereMinuscolo `elem` generiPreferiti
+                             then fromIntegral (punteggio c) * peso
+                             else fromIntegral (punteggio c)
+    in (punteggioPonderato, c) : arricchisci generiPreferiti peso cs
+\end{lstlisting}
+
+\subsection{Implementazione in Prolog}
+Il file \texttt{raccomandazioni.pl} implementa l'algoritmo in Prolog. Esempio di ordinamento:
+\begin{lstlisting}[language=Prolog,caption=Ordinamento delle canzoni]
+classifica_ordinata(Ordinata) :-
+    findall(Punteggio-Titolo, punteggio_ponderato(Titolo, Punteggio), Punteggi),
+    sort(1, @>=, Punteggi, Ordinata).
+\end{lstlisting}
+
+\section{Testing}
+\subsection{Esempi di input e output}
+Input di esempio:
+\begin{verbatim}
+Despacito,Luis Fonsi,Reggaeton,8
+Shape of You,Ed Sheeran,Pop,9
+Havana,Camila Cabello,Pop,10
+\end{verbatim}
+Preferenze utente:
+\begin{itemize}
+    \item Generi preferiti: Pop.
+    \item Peso assegnato: 1.5.
+\end{itemize}
+Output:
+\begin{verbatim}
+1. Havana (Punteggio ponderato: 15.0)
+2. Shape of You (Punteggio ponderato: 13.5)
+3. Despacito (Punteggio ponderato: 8.0)
+\end{verbatim}
+
+\subsection{Conclusioni}
+Entrambi i programmi raggiungono l'obiettivo, ma differiscono per efficienza e flessibilità:
+\begin{itemize}
+    \item Haskell offre un'elaborazione dati chiara e performante.
+    \item Prolog consente una gestione dinamica dei pesi durante l'esecuzione.
+\end{itemize}
+Estensioni future potrebbero includere l'integrazione con database musicali e filtri avanzati.
+
+\end{document}

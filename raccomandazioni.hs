@@ -124,7 +124,7 @@ validaFile :: FilePath -> IO (Either String ())
 validaFile nomeFile = do
     catch (do
         contenuto <- readFile nomeFile
-        length contenuto `seq` return (Right()))
+        length contenuto `seq` return (Right ()))
         (\e -> if isDoesNotExistError e
                 then return $ Left "File non trovato!"
                 else return $ Left "Errore durante l'apertura del file.")
@@ -181,17 +181,6 @@ aggiornaPesi (g:gs) pesi = do
             putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
             aggiornaPesi gs pesi
 
--- | 'validaPeso' richiede all'utente di inserire un valore numerico valido per il peso.
-validaPeso :: String -> IO Double
-validaPeso genere = do
-    putStrLn $ "Inserisci il nuovo peso per il genere '" ++ genere ++ "' (valore positivo):"
-    input <- getLine
-    case reads input :: [(Double, String)] of
-        [(valore, "")] | valore > 0 -> return valore
-        _ -> do
-            putStrLn "Errore: devi inserire un numero positivo. Riprova."
-            validaPeso genere
-
 -- #########################################################
 -- Raccomandazioni
 -- #########################################################
@@ -216,7 +205,7 @@ analizzaCanzone :: String -> Maybe Canzone
 analizzaCanzone riga =
     case separaTaglia ',' riga of
         [titolo, artista, genere, punteggioStr]
-            | all (/= "") [titolo, artista, genere, punteggioStr]  -- Controlla che tutte le parti siano non vuote
+            | "" `notElem` [titolo, artista, genere, punteggioStr]  -- Controlla che tutte le parti siano non vuote
             , Just punteggio <- readMaybe punteggioStr  -- Prova a leggere il punteggio
             , punteggio >= 1 && punteggio <= 10 -> Just (Canzone titolo artista genere punteggio)  -- Verifica che il punteggio sia valido
         _ -> Nothing  -- Restituisce Nothing se la riga non è valida
@@ -225,9 +214,10 @@ analizzaCanzone riga =
 separa :: Char -> String -> [String]
 separa _ "" = []
 separa delimiter string =
-            | notElem "" [titolo, artista, genere, punteggioStr] &&
-              all (`elem` "0123456789") punteggioStr -> Just (Canzone titolo artista genere (read punteggioStr))
-        _ -> Nothing
+    let (primo, resto) = break (== delimiter) string
+    in primo : case resto of
+        [] -> []
+        x -> separa delimiter (dropWhile (== delimiter) (tail x))
 
 -- | 'separaTaglia' pulisce gli spazi dai campi separati
 separaTaglia :: Char -> String -> [String]
@@ -245,7 +235,7 @@ leggiPesoValido = do
             Nothing -> do
                 putStrLn "Peso non valido, riprova."
                 leggiPesoValido
-            
+
 
 -- | 'raccomanda' calcola il punteggio ponderato per ogni canzone e le ordina.
 raccomanda :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
