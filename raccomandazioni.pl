@@ -166,7 +166,7 @@ mostra_generi_preferiti :-
     ->  write('Non è stato definito alcun genere preferito.\n')
     ;   write('I tuoi generi preferiti e i loro pesi:\n'),
         stampa_generi(Generi)
-    )
+    ).
 
 /* Predicato che restituisce una lista dei generi musicali 
    univoci presenti nel database delle canzoni. */
