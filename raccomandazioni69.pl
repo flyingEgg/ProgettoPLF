@@ -49,7 +49,7 @@ loop_menu :-
     ),
     loop_menu.
 
-carica_canzoni :-
+carica_canzoni :- 
     assertz(canzone('Despacito', 'Luis Fonsi', 'Reggaeton', 8)),
     assertz(canzone('All Eyez On Me', 'Tupac', 'HipHop', 8)),
     assertz(canzone('Danza Kuduro', 'Don Omar', 'Reggaeton', 9)),
@@ -85,8 +85,7 @@ chiedi_generi_preferiti(GeneriPreferiti) :-
     read(Genere),
     (   Genere == fine
     ->  chiedi_peso_generi(GeneriPreferiti)
-    ;   normalizza_genere(Genere, GenereNormalizzato),
-        append(GeneriPreferiti, [GenereNormalizzato], NuoviGeneri),
+    ;   append(GeneriPreferiti, [Genere], NuoviGeneri),
         chiedi_generi_preferiti(NuoviGeneri) ).
 
 /* Predicato che chiede all'utente di inserire
@@ -123,7 +122,7 @@ stampa_classifica :-
     findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),
     (   Punteggi == []
     ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
-    ;   keysort(Punteggi, Ordinata),
+    ;   sort(Punteggi, Ordinata),
         reverse(Ordinata, OrdinataDesc),
         stampa_canzoni_ordinate(OrdinataDesc, 1)
     ).
@@ -133,8 +132,7 @@ stampa_classifica :-
    moltiplicato per il punteggio originale della canzone. */
 calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :- 
     canzone(Titolo, _, Genere, Punteggio),
-    normalizza_genere(Genere, GenereNormalizzato),
-    peso_genere(GenereNormalizzato, Peso),
+    peso_genere(Genere, Peso),
     PunteggioPonderato is Punteggio * Peso.
 
 /* ================================================
@@ -152,16 +150,25 @@ mostra_generi_preferiti :-
     ).
 
 /* Predicato che restituisce una lista dei generi musicali 
-   univoci presenti nel database delle canzoni. */
+   presenti nel database delle canzoni, evitando duplicati. */
 mostra_generi_disponibili :- 
     findall(Genere, canzone(_, _, Genere, _), Generi),
-    list_to_set(Generi, GeneriUnici),
+    elimina_duplicati(Generi, GeneriUnici),
     write('Generi disponibili:\n'),
     scrivi_lista(GeneriUnici).
 
+/* Predicato che elimina duplicati da una lista. */
+elimina_duplicati([], []).
+elimina_duplicati([H|T], [H|T1]) :- 
+    not(member(H, T)),
+    elimina_duplicati(T, T1).
+elimina_duplicati([H|T], T1) :- 
+    member(H, T),
+    elimina_duplicati(T, T1).
+
 /* Scrive una lista elemento per elemento */
 scrivi_lista([]).
-scrivi_lista([H|T]) :-
+scrivi_lista([H|T]) :- 
     write('- '), write(H), nl,
     scrivi_lista(T).
 
@@ -171,20 +178,7 @@ stampa_generi([Genere-Peso | Rest]) :-
     format('~w: ~w\n', [Genere, Peso]),
     stampa_generi(Rest).
 
-/* Predicato che normalizza il genere, 
-   trasformandolo in minuscolo e rimuovendo eventuali spazi. */
-normalizza_genere(Genere, GenereNormalizzato) :- 
-    downcase_atom(Genere, GenereLower),
-    atom_codes(GenereLower, Codici),
-    rimuovi_spazi(Codici, CodiciNormalizzati),
-    atom_codes(GenereNormalizzato, CodiciNormalizzati).
-
 /* Predicato che 'peso_genere' restituisce il peso di un genere.
    Se non è specificato, viene utilizzato un peso di 1. */
 peso_genere(Genere, Peso) :- 
     (   genere_preferito(Genere, Peso) -> true ; Peso = 1 ).
-
-/* Predicato che rimuove gli spazi da una lista di codici ASCII. */
-rimuovi_spazi([], []).
-rimuovi_spazi([32|T], R) :- rimuovi_spazi(T, R).
-rimuovi_spazi([H|T], [H|R]) :- H \= 32, rimuovi_spazi(T, R).
