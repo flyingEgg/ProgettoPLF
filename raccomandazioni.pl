@@ -34,7 +34,7 @@ main :-
    da parte dell'utente nel menu principale. Ogni opzione del menu
    chiama un predicato specifico per eseguire l'azione corrispondente. */
 loop_menu :- 
-    write('Scegli un\'azione:\n'),
+    write('\nScegli un\'azione:\n'),
     write('1. Carica un file con le canzoni\n'),
     write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
     write('3. Stampa la classifica delle canzoni\n'),
@@ -61,13 +61,15 @@ loop_menu :-
    file che contiene le canzoni.
    Se il caricamento ha successo, stampa un messaggio di conferma. */
 carica_canzoni_interattivo :- 
-    write('Inserisci il nome del file contenente le canzoni: '), nl,
+    write('Inserire tra apici il nome del file contenente le canzoni: '), nl,
     read(File),
-    (   carica_canzoni(File)
+    (   catch(carica_canzoni(File), _, fail)
     ->  write('Canzoni caricate con successo!\n'), nl,
         trova_generi_disponibili(Generi),
         format('Generi disponibili nel file: ~w\n', [Generi]), nl
-    ;   write('Errore nel caricamento del file. Riprova.\n') ).
+    ;   write('\nErrore nel caricamento del file. Riprova.\n'),
+        loop_menu
+    ).
 
 /* Predicato che apre il file specificato e legge le canzoni
    riga per riga, aggiungendole al database. */
