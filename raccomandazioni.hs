@@ -22,6 +22,9 @@ import Data.List (sortOn, nub, intercalate)
 import Data.Maybe (mapMaybe)
 import Data.Ord (Down(..))
 import qualified Data.Map as Map
+import System.IO.Error(isDoesNotExistError)
+import Control.Exception (catch, IOException)
+import Text.Read (readMaybe)
 
 -- #########################################################
 -- Definizioni dei tipi di dati
@@ -60,7 +63,8 @@ menuLoop maybeCanzoni pesi = do
     putStrLn "1. Carica un file con le canzoni"
     putStrLn "2. Gestisci i generi preferiti (aggiungi o modifica)"
     putStrLn "3. Stampa la classifica delle canzoni"
-    putStrLn "4. Esci"
+    putStrLn "4. Stampa i generi preferiti con il relativo punteggio"
+    putStrLn "5. Esci"
     putStrLn "Seleziona un'opzione:"
     scelta <- getLine
     case scelta of
@@ -73,7 +77,10 @@ menuLoop maybeCanzoni pesi = do
         "3" -> do
             raccomandaCanzoni maybeCanzoni pesi
             menuLoop maybeCanzoni pesi
-        "4" -> putStrLn "Grazie per aver usato il sistema di raccomandazione. Arrivederci!"
+        "4" -> do
+            visualizzaGeneriPreferiti pesi
+            menuLoop maybeCanzoni pesi
+        "5" -> putStrLn "Grazie per aver usato il sistema di raccomandazione. Arrivederci!"
         _   -> do
             putStrLn "Opzione non valida. Riprova."
             menuLoop maybeCanzoni pesi
@@ -87,8 +94,7 @@ menuLoop maybeCanzoni pesi = do
 -- Il file deve avere un formato valido: Titolo,Artista,Genere,Punteggio.
 caricaCanzoni :: IO [Canzone]
 caricaCanzoni = do
-    putStrLn "Inserire il nome del file:"
-    nomeFile <- getLine
+    nomeFile <- chiediNomeFile
     contenuto <- readFile nomeFile
     let canzoni = mapMaybe analizzaCanzone (lines contenuto)
     if null canzoni
@@ -98,6 +104,30 @@ caricaCanzoni = do
         else do
             putStrLn "File caricato con successo!"
             return canzoni
+
+-- | 'chiediNomeFile' richiede all'utente di inserire il nome del file con le canzoni
+-- e ne effettua una validazione dell'input tramite la funzione validaFile.
+chiediNomeFile :: IO FilePath
+chiediNomeFile = do
+    putStrLn "Inserire il nome del file"
+    nomeFile <- getLine
+    esito_lettura <- validaFile nomeFile
+    case esito_lettura of
+        Right _ -> return nomeFile
+        Left err -> do
+            putStrLn $ "Errore: " ++ err
+            chiediNomeFile
+
+-- | 'validaFile' funge come tramite per controllare se il nome del file e' espresso
+-- correttamente e se tale file specificato esista. 
+validaFile :: FilePath -> IO (Either String ())
+validaFile nomeFile = do
+    catch (do
+        contenuto <- readFile nomeFile
+        length contenuto `seq` return (Right()))
+        (\e -> if isDoesNotExistError e
+                then return $ Left "File non trovato!"
+                else return $ Left "Errore durante l'apertura del file.")
 
 -- | 'selezionaGeneriPreferitiEImpostaPesi' permette all'utente di scegliere
 -- i generi preferiti e assegnare un peso a ciascuno di essi.
@@ -144,7 +174,8 @@ aggiornaPesi (g:gs) pesi = do
     risposta <- getLine
     if risposta == "s"
         then do
-            nuovoPeso <- validaPeso g
+            putStrLn $ "Inserisci il nuovo peso per il genere '" ++ g ++ "':"
+            nuovoPeso <- leggiPesoValido
             aggiornaPesi gs (Map.insert g nuovoPeso pesi)
         else do
             putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
@@ -183,18 +214,38 @@ raccomandaCanzoni (Just canzoni) pesi = do
 -- Restituisce 'Nothing' se la riga non è formattata correttamente.
 analizzaCanzone :: String -> Maybe Canzone
 analizzaCanzone riga =
-    case split ',' riga of
+    case separaTaglia ',' riga of
         [titolo, artista, genere, punteggioStr]
+            | all (/= "") [titolo, artista, genere, punteggioStr]  -- Controlla che tutte le parti siano non vuote
+            , Just punteggio <- readMaybe punteggioStr  -- Prova a leggere il punteggio
+            , punteggio >= 1 && punteggio <= 10 -> Just (Canzone titolo artista genere punteggio)  -- Verifica che il punteggio sia valido
+        _ -> Nothing  -- Restituisce Nothing se la riga non è valida
+
+-- | 'separa' divide una stringa in una lista di stringhe, usando un delimitatore.
+separa :: Char -> String -> [String]
+separa _ "" = []
+separa delimiter string =
             | notElem "" [titolo, artista, genere, punteggioStr] &&
               all (`elem` "0123456789") punteggioStr -> Just (Canzone titolo artista genere (read punteggioStr))
         _ -> Nothing
 
--- | 'split' divide una stringa in una lista di stringhe, usando un delimitatore.
-split :: Char -> String -> [String]
-split _ "" = []
-split delimiter string =
-    let (primo, resto) = break (== delimiter) string
-    in primo : split delimiter (drop 1 resto)
+-- | 'separaTaglia' pulisce gli spazi dai campi separati
+separaTaglia :: Char -> String -> [String]
+separaTaglia delimiter string = map (filter (/= ' ')) (separa delimiter string)
+
+leggiPesoValido :: IO Double
+leggiPesoValido = do
+    input <- getLine
+    case readMaybe input :: Maybe Double of
+            Just peso
+                | peso >= 0 && peso <= 10 -> return peso
+            Just _ -> do
+                putStrLn "Il peso deve essere compreso tra o e 10, riprova."
+                leggiPesoValido
+            Nothing -> do
+                putStrLn "Peso non valido, riprova."
+                leggiPesoValido
+            
 
 -- | 'raccomanda' calcola il punteggio ponderato per ogni canzone e le ordina.
 raccomanda :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
@@ -218,3 +269,15 @@ stampaClassifica raccomandate =
             putStrLn $ "   Genere: " ++ genere
             putStrLn $ "   Punteggio ponderato: " ++ show punteggioPonderato
             putStrLn "-------------------------------------------"
+
+-- Effettua una vista dei generi preferiti in memoria
+visualizzaGeneriPreferiti :: PesiGeneri -> IO ()
+visualizzaGeneriPreferiti pesi
+    | Map.null pesi = putStrLn "Nessun genere ancora definito."
+    | otherwise = do
+        putStrLn "I tuoi generi preferiti e pesi associati sono:"
+        mapM_ stampaGenere (Map.toList pesi)
+
+-- Stampa il genere, concatenato al peso suo relativo
+stampaGenere :: (String, Double) -> IO ()
+stampaGenere (genere, peso) = putStrLn $ genere ++ ": " ++ show peso

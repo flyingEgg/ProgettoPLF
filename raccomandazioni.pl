@@ -38,7 +38,8 @@ loop_menu :-
     write('1. Carica un file con le canzoni\n'),
     write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
     write('3. Stampa la classifica delle canzoni\n'),
-    write('4. Esci\n'),
+    write('4. Stampa la lista dei generi preferiti\n'),
+    write('5. Esci\n'),
     read(Scelta),
     (   Scelta = 1 -> carica_canzoni_interattivo,
         loop_menu
@@ -46,7 +47,9 @@ loop_menu :-
         loop_menu
     ;   Scelta = 3 -> stampa_classifica,
         loop_menu
-    ;   Scelta = 4 -> write('Arrivederci!\n'), halt
+    ;   Scelta = 4 -> mostra_generi_preferiti,
+        loop_menu
+    ;   Scelta = 5 -> write('Arrivederci!\n'), halt
     ;   write('Scelta non valida. Riprova.\n'),
         loop_menu).
 
@@ -201,3 +204,21 @@ rimuovi_spazi_codici([32], []).
 rimuovi_spazi_codici([H|T], [H|CodiciRimossi]) :- 
     H \= 32,
     rimuovi_spazi_codici(T, CodiciRimossi).
+
+
+/* Predicato che mostra i generi preferiti associati
+   con il rispettivo peso. */
+mostra_generi_preferiti :-
+    findall(Genere-Peso, genere_preferito(Genere, Peso), Generi),
+    (   Generi == []
+    ->  write('Non e ancora stato definito alcun genere preferito.\n')
+    ;   write('I tuoi generi preferiti ed il loro punteggio associato sono:\n'),
+        stampa_generi_preferiti(Generi)
+    ).
+
+/* Predicato che stampa la lista dei generi preferiti. */
+stampa_generi_preferiti([]).
+stampa_generi_preferiti([Genere-Peso | Rest]) :-
+    format('~w: ~w\n', [Genere, Peso]),
+    stampa_generi_preferiti(Rest).
+
