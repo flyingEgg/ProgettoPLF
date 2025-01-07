@@ -27,6 +27,7 @@
    Inizializza il programma e avvia il menu interattivo
    per l'utente. */
 main :- 
+    nl,
     write('Benvenuto nel sistema di raccomandazione musicale!'),
     carica_canzoni,
     loop_menu.
@@ -35,11 +36,15 @@ main :-
    da parte dell'utente nel menu principale. Ogni opzione del menu
    chiama un predicato specifico per eseguire l'azione corrispondente. */
 loop_menu :- 
-    write('\nScegli un\'azione:\n'),
-    write('1. Gestisci i generi preferiti (aggiungi o modifica)\n'),
-    write('2. Stampa la classifica delle canzoni\n'),
-    write('3. Stampa la lista dei generi preferiti\n'),
-    write('4. Esci\n'),
+    nl,
+    write('======================================'), nl,
+    write('Scegli un\'azione: '), nl,
+    write('1. Gestisci i generi preferiti (aggiungi o modifica)'), nl,
+    write('2. Stampa la classifica delle canzoni'), nl,
+    write('3. Stampa la lista dei generi preferiti'), nl,
+    write('4. Esci'), nl,
+    write('======================================'), nl,
+    write('Inserisci la tua scelta: '), nl,
     read(Scelta),
     (   Scelta = 1 -> gestisci_generi_preferiti
     ;   Scelta = 2 -> stampa_classifica
@@ -115,11 +120,13 @@ chiedi_peso_generi([Genere | Altri]) :-
 /* Predicato che calcola il punteggio ponderato per ogni canzone 
    in base al suo genere e al suo punteggio originale.
    Poi stampa la classifica ordinata delle canzoni. */
-stampa_classifica :-
+stampa_classifica :- 
+    nl, write('Calcolando la classifica...'), nl,
     findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),
     (   Punteggi == []
-    ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
+    ->  nl, write('Nessuna canzone trovata con punteggio ponderato.'), nl
     ;   ordina_lista(Punteggi, PunteggiOrdinati),
+        nl, write('Ecco la classifica delle canzoni:'), nl,
         stampa_canzoni_ordinate(PunteggiOrdinati, 1)
     ).
 
@@ -202,7 +209,6 @@ peso_genere(Genere, Peso) :-
     (   genere_preferito(Genere, Peso) 
     ->  true 
     ;   Peso = 1 ).
-
 
 /* Predicato che ordina una lista in ordine decrescente. */
 ordina_lista(Lista, Ordinata) :-
