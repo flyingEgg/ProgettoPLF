@@ -75,7 +75,7 @@ carica_canzoni :-
    e gestire i generi musicali preferiti. */
 gestisci_generi_preferiti :- 
     mostra_generi_disponibili,
-    write('Inserisci i tuoi generi preferiti, uno per volta. Scrivi "fine" per terminare.\n'),
+    write('Inserisci i tuoi generi preferiti tra apici, uno per volta. Scrivi "fine" per terminare.\n'),
     chiedi_generi_preferiti([]).
 
 /* Predicato che raccoglie i generi preferiti inseriti
@@ -115,7 +115,7 @@ chiedi_peso_generi([Genere | Altri]) :-
 /* Predicato che calcola il punteggio ponderato per ogni canzone 
    in base al suo genere e al suo punteggio originale.
    Poi stampa la classifica ordinata delle canzoni. */
-stampa_classifica :- 
+stampa_classifica :-
     findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),
     (   Punteggi == []
     ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
@@ -198,8 +198,11 @@ stampa_generi([Genere-Peso | Rest]) :-
 
 /* Predicato che 'peso_genere' restituisce il peso di un genere.
    Se non è specificato, viene utilizzato un peso di 1. */
-peso_genere(Genere, Peso) :- 
-    (   genere_preferito(Genere, Peso) -> true ; Peso = 1 ).
+peso_genere(Genere, Peso) :-
+    (   genere_preferito(Genere, Peso) 
+    ->  true 
+    ;   Peso = 1 ).
+
 
 /* Predicato che ordina una lista in ordine decrescente. */
 ordina_lista(Lista, Ordinata) :-
@@ -207,15 +210,16 @@ ordina_lista(Lista, Ordinata) :-
 
 /* Predicato che ordina la lista ricorsivamente. */
 ordina_lista([], Acc, Acc).
-ordina_lista([X|Xs], Acc, Ordinata) :-
+ordina_lista([X | Xs], Acc, Ordinata) :-
     inserisci_decrescente(X, Acc, NuovoAcc),
     ordina_lista(Xs, NuovoAcc, Ordinata).
 
 /* Predicato che inserisce un elemento in una lista mantenendo
    l'ordine decrescente. */
-inserisci_decrescente(X, [], [X]).
-inserisci_decrescente(Punteggio-Titolo, [Y|Ys], [Punteggio-Titolo, Y|Ys]) :-
-    Punteggio >= Y.
-inserisci_decrescente(Punteggio-Titolo, [Punteggio1-Titolo1|Ys], [Punteggio1-Titolo1|NuovaLista]) :-
-    Punteggio < Punteggio1,
-    inserisci_decrescente(Punteggio-Titolo, Ys, NuovaLista).
+inserisci_decrescente(Punteggio1-Titolo1, [], [Punteggio1-Titolo1]).
+inserisci_decrescente(Punteggio1-Titolo1, [Punteggio2-Titolo2 | Rest], [Punteggio1-Titolo1, Punteggio2-Titolo2 | Rest]) :-
+    Punteggio1 >= Punteggio2.
+inserisci_decrescente(Punteggio1-Titolo1, [Punteggio2-Titolo2 | Rest], [Punteggio2-Titolo2 | NewRest]) :-
+    Punteggio1 < Punteggio2,
+    inserisci_decrescente(Punteggio1-Titolo1, Rest, NewRest).
+
