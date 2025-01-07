@@ -90,12 +90,13 @@ chiedi_generi_preferiti(GeneriPreferiti) :-
     read(Genere),
     (   Genere == fine
     ->  chiedi_peso_generi(GeneriPreferiti)
-    ;   mostra_generi_disponibili,  
-        findall(GenereDisponibile, canzone(_, _, GenereDisponibile, _), GeneriDisponibili), 
-        (   membro(Genere, GeneriDisponibili)
+    ;   findall(GenereDisponibile, canzone(_, _, GenereDisponibile, _), GeneriDisponibili), 
+        elimina_duplicati(GeneriDisponibili, GeneriUnici),
+        (   membro(Genere, GeneriUnici)
         ->  append(GeneriPreferiti, [Genere], NuoviGeneri),
             chiedi_generi_preferiti(NuoviGeneri)
-        ;   write('Genere non valido. Riprova.\n'),
+        ;   write('Genere non valido. Ecco i generi disponibili:\n'),
+            scrivi_lista(GeneriUnici),
             chiedi_generi_preferiti(GeneriPreferiti) 
         )
     ).
@@ -228,4 +229,3 @@ inserisci_decrescente(Punteggio1-Titolo1, [Punteggio2-Titolo2 | Rest], [Punteggi
 inserisci_decrescente(Punteggio1-Titolo1, [Punteggio2-Titolo2 | Rest], [Punteggio2-Titolo2 | NewRest]) :-
     Punteggio1 < Punteggio2,
     inserisci_decrescente(Punteggio1-Titolo1, Rest, NewRest).
-
