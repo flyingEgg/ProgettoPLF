@@ -77,18 +77,51 @@ se il genere della canzone appartiene ai generi preferiti, altrimenti è uguale 
 \newpage
 \section{Progettazione dell'algoritmo}
 \subsection{Scelte di progetto}
+Per sviluppare il sistema di raccomandazione musicale, abbiamo adottato approcci distinti per ciascuno dei linguaggi richiesti, Haskell e Prolog, al fine di sfruttare al meglio le peculiarità di ciascuno.
+
+In \textbf{Haskell}, abbiamo deciso di rappresentare le canzoni utilizzando tipi di dati strutturati. Questa scelta ci consente di garantire una gestione chiara e sicura delle informazioni musicali, sfruttando le capacità del sistema di tipi statico per ridurre errori e facilitare l'implementazione delle operazioni. Le canzoni vengono caricate da un file di testo, che deve rispettare un formato predefinito (CSV), per consentire l'integrazione di dataset esterni senza modificare il codice sorgente. La scelta di utilizzare un file di testo è stata motivata dalla necessità di mantenere il sistema flessibile e facilmente adattabile a dataset di dimensioni variabili.
+
+In \textbf{Prolog}, invece, abbiamo optato per una rappresentazione tramite predicati dinamici. Le canzoni sono caricate all’interno del programma attraverso il predicato \texttt{carica\_canzoni/0}, che utilizza \texttt{assertz/1} per definire dinamicamente ogni canzone come un fatto nella base di conoscenza. Questo approccio ci permette di manipolare i dati con la semantica dichiarativa propria di Prolog, evitando problematiche legate all’importazione di file esterni. Ogni canzone è rappresentata da un predicato \texttt{canzone/4}, che descrive il titolo, l’artista, il genere e il punteggio. La struttura dati utilizzata è completamente dinamica, consentendo aggiunte o modifiche in tempo reale senza la necessità di ridefinire l’intero dataset.
+
 \begin{itemize}
-    \item In Haskell, le canzoni sono modellate come tipi di dati strutturati per una manipolazione chiara e leggibile.
-    \item In Prolog, si utilizzano predicati dinamici per rappresentare canzoni, generi preferiti e pesi.
+    \item \textbf{Haskell:}
+    \begin{itemize}
+        \item L’uso di file di testo consente di estendere il dataset semplicemente aggiungendo nuove righe al file.
+        \item Le funzioni per la manipolazione delle stringhe e la costruzione di tipi di dati strutturati in Haskell rendono questa operazione relativamente semplice e modulare.
+        \item Inoltre, Haskell permette un trattamento funzionale dei dati, come la mappatura e il filtraggio, che è particolarmente utile per calcolare e ordinare i punteggi ponderati.
+    \end{itemize}
+    \item \textbf{Prolog:}
+    \begin{itemize}
+        \item La rappresentazione tramite predicati è particolarmente adatta per le relazioni tra canzoni, generi e preferenze dell’utente.
+        \item Caricare le canzoni come fatti dinamici permette di utilizzare direttamente la logica del linguaggio per effettuare operazioni come il filtraggio e l’ordinamento basato sui punteggi.
+        \item Questo approccio evita la necessità di definire una sintassi di input complessa, sfruttando la semplicità dichiarativa propria di Prolog.
+    \end{itemize}
+    \item \textbf{Gestione dell’input e output:}
+    \begin{itemize}
+        \item In Haskell, il file di testo richiede un parsing iniziale per costruire una lista di canzoni. Il formato CSV garantisce una struttura standard e compatibile con molti strumenti di editing.
+        \item In Prolog, invece, la definizione diretta nel predicato \texttt{carica\_canzoni/0} semplifica l’esecuzione e permette di focalizzarsi sull’elaborazione delle raccomandazioni piuttosto che sulla gestione dell’input.
+    \end{itemize}
 \end{itemize}
 
+Queste scelte rispecchiano la necessità di bilanciare semplicità implementativa e aderenza ai paradigmi di programmazione dichiarativa e funzionale, garantendo al contempo un'esperienza utente coerente e priva di ambiguità.
+
 \subsection{Passi dell'algoritmo}
+I passi principali dell'algoritmo, comuni sia per l'implementazione in Haskell che in Prolog, sono i seguenti:
+
 \begin{enumerate}
-    \item Caricare le canzoni.
-    \item Inserire le preferenze dell'utente per i generi e i pesi.
-    \item Calcolare i punteggi ponderati.
-    \item Ordinare le canzoni per punteggio ponderato.
-    \item Stampare la classifica.
+    \item \textbf{Caricare le canzoni:} 
+    \begin{itemize}
+        \item In Haskell, le canzoni vengono caricate da un file di testo in formato CSV, che viene parsato per costruire una lista di canzoni.
+        \item In Prolog, le canzoni sono definite all’interno del programma attraverso il predicato \texttt{carica\_canzoni/0}.
+    \end{itemize}
+    \item \textbf{Inserire le preferenze dell'utente:} 
+    L’utente fornisce i generi musicali preferiti e i relativi pesi, che influenzeranno il calcolo dei punteggi ponderati.
+    \item \textbf{Calcolare i punteggi ponderati:} 
+    Per ogni canzone, viene calcolato un punteggio combinando il peso associato al genere con il punteggio individuale della canzone.
+    \item \textbf{Ordinare le canzoni per punteggio ponderato:} 
+    Le canzoni vengono ordinate in ordine decrescente rispetto al punteggio ponderato, così da ottenere una classifica delle raccomandazioni.
+    \item \textbf{Stampare la classifica:} 
+    L’algoritmo produce in output la lista ordinata delle canzoni con i rispettivi punteggi, offrendo una chiara visualizzazione per l’utente.
 \end{enumerate}
 
 \newpage

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.1.3)  7 JAN 2025 00:14
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.1.3)  7 JAN 2025 11:13
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -315,8 +315,7 @@ Package xcolor Info: Model `wave' substituted by `hsb' on input line 1373.
 File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count301
 \l__pdf_internal_box=\box55
-)
-No file Relazione.aux.
+) (Relazione.aux)
 \openout1 = `Relazione.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 40.
@@ -339,6 +338,7 @@ LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 40.
 LaTeX Font Info:    ... okay on input line 40.
 LaTeX Info: Redefining \it@ocap on input line 40.
 LaTeX Info: Redefining \it@ccap on input line 40.
+
 
 File italian.ldf warning: 
 italian.ldf    With OT1 encoding guillemets are poorly faked
@@ -420,21 +420,21 @@ No file Relazione.toc.
 \tf@toc=\write4
 \openout4 = `Relazione.toc'.
 
-[2] [3] [4] [5] (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+[2] [3] [4] [5] [6] (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2023/02/27 1.9 listings language file
 ) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
 File: lstlang2.sty 2023/02/27 1.9 listings language file
 )
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 98.
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 131.
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:109: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:142: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.109         - Preferenze per uno o più 
+l.142         - Preferenze per uno o più 
                                           generi musicali specificati.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -443,13 +443,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:109: LaTeX Error: Invalid UTF-8 byte "B9.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:142: LaTeX Error: Invalid UTF-8 byte "B9.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.109         - Preferenze per uno o più 
+l.142         - Preferenze per uno o più 
                                           generi musicali specificati.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -458,13 +458,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:110: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:143: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.110 ...i punteggio ponderato per dare priorità 
+l.143 ...i punteggio ponderato per dare priorità 
                                                   a canzoni più rilevanti.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -473,13 +473,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:110: LaTeX Error: Invalid UTF-8 byte "A0.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:143: LaTeX Error: Invalid UTF-8 byte "A0.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.110 ...i punteggio ponderato per dare priorità 
+l.143 ...i punteggio ponderato per dare priorità 
                                                   a canzoni più rilevanti.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -488,13 +488,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:110: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:143: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.110 ...derato per dare priorità a canzoni più 
+l.143 ...derato per dare priorità a canzoni più 
                                                   rilevanti.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -503,13 +503,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:110: LaTeX Error: Invalid UTF-8 byte "B9.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:143: LaTeX Error: Invalid UTF-8 byte "B9.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.110 ...derato per dare priorità a canzoni più 
+l.143 ...derato per dare priorità a canzoni più 
                                                   rilevanti.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -518,13 +518,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:113: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:146: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.113         Dove "Punteggio" è 
+l.146         Dove "Punteggio" è 
                                   un intero da 1 a 10.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -533,13 +533,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:113: LaTeX Error: Invalid UTF-8 byte "A8.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:146: LaTeX Error: Invalid UTF-8 byte "A8.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.113         Dove "Punteggio" è 
+l.146         Dove "Punteggio" è 
                                   un intero da 1 a 10.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -548,13 +548,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:143: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:176: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.143     -- | PesiGeneri è 
+l.176     -- | PesiGeneri è 
                              una mappa che associa un genere musicale a un peso
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -563,13 +563,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:143: LaTeX Error: Invalid UTF-8 byte "A8.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:176: LaTeX Error: Invalid UTF-8 byte "A8.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.143     -- | PesiGeneri è 
+l.176     -- | PesiGeneri è 
                              una mappa che associa un genere musicale a un peso
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -578,13 +578,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:144: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:177: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.144     -- che influenza la priorità 
+l.177     -- che influenza la priorità 
                                         delle raccomandazioni.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -593,13 +593,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:144: LaTeX Error: Invalid UTF-8 byte "A0.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:177: LaTeX Error: Invalid UTF-8 byte "A0.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.144     -- che influenza la priorità 
+l.177     -- che influenza la priorità 
                                         delle raccomandazioni.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -607,19 +607,19 @@ or specify an encoding such as \usepackage [latin1]{inputenc}
 in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
-[6] [7]
-LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line 202.
+[7] [8]
+LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line 235.
  (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/base\ts1cmtt.fd
 File: ts1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
 )
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:205: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:238: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.205     -- | Controlla se il nome del file è 
+l.238     -- | Controlla se il nome del file è 
                                                 espresso
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -628,13 +628,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:205: LaTeX Error: Invalid UTF-8 byte "A8.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:238: LaTeX Error: Invalid UTF-8 byte "A8.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.205     -- | Controlla se il nome del file è 
+l.238     -- | Controlla se il nome del file è 
                                                 espresso
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -642,15 +642,15 @@ or specify an encoding such as \usepackage [latin1]{inputenc}
 in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
-[8]
+[9]
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:243: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:276: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.243     -- Se il genere ha già 
+l.276     -- Se il genere ha già 
                                   un peso, l'utente può scegliere di manten...
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -659,13 +659,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:243: LaTeX Error: Invalid UTF-8 byte "A0.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:276: LaTeX Error: Invalid UTF-8 byte "A0.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.243     -- Se il genere ha già 
+l.276     -- Se il genere ha già 
                                   un peso, l'utente può scegliere di manten...
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -674,13 +674,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:243: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:276: LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.243 ...il genere ha già un peso, l'utente può 
+l.276 ...il genere ha già un peso, l'utente può 
                                                   scegliere di mantenerlo o ...
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -689,13 +689,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:243: LaTeX Error: Invalid UTF-8 byte "B2.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:276: LaTeX Error: Invalid UTF-8 byte "B2.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.243 ...il genere ha già un peso, l'utente può 
+l.276 ...il genere ha già un peso, l'utente può 
                                                   scegliere di mantenerlo o ...
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -704,13 +704,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:279: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:312: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.279 ...-- Restituisce Nothing se la riga non è 
+l.312 ...-- Restituisce Nothing se la riga non è 
                                                   formattata correttamente.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -719,13 +719,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:279: LaTeX Error: Invalid UTF-8 byte "A8.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:312: LaTeX Error: Invalid UTF-8 byte "A8.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.279 ...-- Restituisce Nothing se la riga non è 
+l.312 ...-- Restituisce Nothing se la riga non è 
                                                   formattata correttamente.
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -734,13 +734,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:287: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:320: LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.287 ...-- Restituisce Nothing se la riga non è 
+l.320 ...-- Restituisce Nothing se la riga non è 
                                                   valida
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -749,13 +749,13 @@ in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
 
-c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:287: LaTeX Error: Invalid UTF-8 byte "A8.
+c:/Users/chris/OneDrive/Desktop/Uniurb/Informatica Applicata/coding projects/progetti_esami/Progetto_PLF/relazione/Relazione.tex:320: LaTeX Error: Invalid UTF-8 byte "A8.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.287 ...-- Restituisce Nothing se la riga non è 
+l.320 ...-- Restituisce Nothing se la riga non è 
                                                   valida
 The document does not appear to be in UTF-8 encoding.
 Try adding \UseRawInputEncoding as the first line of the file
@@ -763,70 +763,70 @@ or specify an encoding such as \usepackage [latin1]{inputenc}
 in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
-[9] [10] (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+[10] [11] (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2023/02/27 1.9 listings language file
 ) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.sty
 File: lstlang2.sty 2023/02/27 1.9 listings language file
-) [11]
-<htest1.png, id=326, 295.1025pt x 134.75343pt>
+) [12]
+<htest1.png, id=332, 295.1025pt x 134.75343pt>
 File: htest1.png Graphic file (type png)
 <use htest1.png>
-Package pdftex.def Info: htest1.png  used on input line 361.
+Package pdftex.def Info: htest1.png  used on input line 394.
 (pdftex.def)             Requested size: 226.48395pt x 103.42119pt.
-<htest2.png, id=328, 292.09125pt x 144.54pt>
+<htest2.png, id=334, 292.09125pt x 144.54pt>
 File: htest2.png Graphic file (type png)
 <use htest2.png>
-Package pdftex.def Info: htest2.png  used on input line 367.
+Package pdftex.def Info: htest2.png  used on input line 400.
 (pdftex.def)             Requested size: 226.48395pt x 112.07907pt.
-<htest3.png, id=329, 294.34969pt x 155.07938pt>
+<htest3.png, id=335, 294.34969pt x 155.07938pt>
 File: htest3.png Graphic file (type png)
 <use htest3.png>
-Package pdftex.def Info: htest3.png  used on input line 373.
+Package pdftex.def Info: htest3.png  used on input line 406.
 (pdftex.def)             Requested size: 226.48395pt x 119.32391pt.
- [12 <./htest1.png> <./htest2.png> <./htest3.png>]
-<htest4.png, id=340, 613.54219pt x 378.66469pt>
+ [13 <./htest1.png> <./htest2.png> <./htest3.png>]
+<htest4.png, id=346, 613.54219pt x 378.66469pt>
 File: htest4.png Graphic file (type png)
 <use htest4.png>
-Package pdftex.def Info: htest4.png  used on input line 381.
+Package pdftex.def Info: htest4.png  used on input line 414.
 (pdftex.def)             Requested size: 226.48395pt x 139.78017pt.
-<htest5.png, id=341, 300.3722pt x 140.77594pt>
+<htest5.png, id=347, 300.3722pt x 140.77594pt>
 File: htest5.png Graphic file (type png)
 <use htest5.png>
-Package pdftex.def Info: htest5.png  used on input line 387.
+Package pdftex.def Info: htest5.png  used on input line 420.
 (pdftex.def)             Requested size: 226.48395pt x 106.14876pt.
-<htest10.png, id=342, 347.79938pt x 115.93312pt>
+<htest10.png, id=348, 347.79938pt x 115.93312pt>
 File: htest10.png Graphic file (type png)
 <use htest10.png>
-Package pdftex.def Info: htest10.png  used on input line 388.
+Package pdftex.def Info: htest10.png  used on input line 421.
 (pdftex.def)             Requested size: 226.48395pt x 75.4936pt.
- [13 <./htest4.png> <./htest5.png> <./htest10.png>]
-<htest6.png, id=351, 310.15875pt x 712.16063pt>
+ [14 <./htest4.png> <./htest5.png> <./htest10.png>]
+<htest6.png, id=356, 310.15875pt x 712.16063pt>
 File: htest6.png Graphic file (type png)
 <use htest6.png>
-Package pdftex.def Info: htest6.png  used on input line 396.
+Package pdftex.def Info: htest6.png  used on input line 429.
 (pdftex.def)             Requested size: 226.48395pt x 520.03593pt.
- [14 <./htest6.png>]
-<htest7.png, id=357, 612.78937pt x 509.65407pt>
+ [15 <./htest6.png>]
+<htest7.png, id=362, 612.78937pt x 509.65407pt>
 File: htest7.png Graphic file (type png)
 <use htest7.png>
-Package pdftex.def Info: htest7.png  used on input line 404.
+Package pdftex.def Info: htest7.png  used on input line 437.
 (pdftex.def)             Requested size: 226.48395pt x 188.36685pt.
-<htest8.png, id=358, 292.09125pt x 161.85469pt>
+<htest8.png, id=363, 292.09125pt x 161.85469pt>
 File: htest8.png Graphic file (type png)
 <use htest8.png>
-Package pdftex.def Info: htest8.png  used on input line 410.
+Package pdftex.def Info: htest8.png  used on input line 443.
 (pdftex.def)             Requested size: 226.48395pt x 125.50522pt.
- [15 <./htest7.png> <./htest8.png>]
-<htest9.png, id=365, 315.42844pt x 703.12688pt>
+ [16 <./htest7.png> <./htest8.png>]
+<htest9.png, id=370, 315.42844pt x 703.12688pt>
 File: htest9.png Graphic file (type png)
 <use htest9.png>
-Package pdftex.def Info: htest9.png  used on input line 418.
+Package pdftex.def Info: htest9.png  used on input line 451.
 (pdftex.def)             Requested size: 226.48395pt x 504.86694pt.
 File: htest10.png Graphic file (type png)
 <use htest10.png>
-Package pdftex.def Info: htest10.png  used on input line 424.
+Package pdftex.def Info: htest10.png  used on input line 457.
 (pdftex.def)             Requested size: 226.48395pt x 75.4936pt.
- [16 <./htest9.png>] [17] (Relazione.aux)
+ [17 <./htest9.png>] [18] (Relazione.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
@@ -842,17 +842,17 @@ Package rerunfilecheck Info: Checksums for `Relazione.out':
 (rerunfilecheck)             After:  DBF1668F00FE4F27790BF92C7B18C465;2362.
  ) 
 Here is how much of TeX's memory you used:
- 14431 strings out of 474486
- 220829 string characters out of 5743756
+ 14439 strings out of 474486
+ 221044 string characters out of 5743756
  2275542 words of memory out of 5000000
- 36252 multiletter control sequences out of 15000+600000
- 568329 words of font info for 74 fonts, out of 8000000 for 9000
+ 36256 multiletter control sequences out of 15000+600000
+ 568637 words of font info for 75 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,6n,79p,564b,2532s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\chris\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcit1000.pk> <C:\Users\chris\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.pk><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbxti10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmitt10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on Relazione.pdf (17 pages, 304653 bytes).
+ 75i,6n,79p,925b,2532s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\chris\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcit1000.pk> <C:\Users\chris\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.pk><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbxti10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmitt10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on Relazione.pdf (18 pages, 324813 bytes).
 PDF statistics:
- 482 PDF objects out of 1000 (max. 8388607)
- 288 named destinations out of 1000 (max. 500000)
+ 493 PDF objects out of 1000 (max. 8388607)
+ 289 named destinations out of 1000 (max. 500000)
  51 words of extra memory for PDF output out of 10000 (max. 10000000)
 
