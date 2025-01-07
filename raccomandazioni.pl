@@ -71,6 +71,8 @@ carica_canzoni :-
     assertz(canzone('El Cantante', 'Hector Lavoe', 'Salsa', 9)),
     assertz(canzone('Suavemente', 'Elvis Crespo', 'Merengue', 10)),
     assertz(canzone('La Vaca', 'Los Toros Band', 'Merengue', 9)).
+    assert(canzone('Runnin', '21 Savage', 'Trap', 9)).
+    
 
 /* ================================================
    Predicati per la gestione dei generi preferiti
