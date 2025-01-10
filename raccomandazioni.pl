@@ -75,22 +75,22 @@
 % boh riprendi da qui
     carica_canzoni(File) :-
         open(File, read, Stream),
-        read_lines(Stream, Lines),
+        leggi_righe(Stream, Lines),
         close(Stream),
-        process_lines(Lines).
+        processa_righe(Lines).
        
-    read_lines(Stream,[]):- 
+    leggi_righe(Stream,[]):- 
         at_end_of_stream(Stream).
         
-    read_lines(Stream,[X|L]):-
+    leggi_righe(Stream,[X|L]):-
         \+ at_end_of_stream(Stream),
         get_char(Stream,X),
-        read_lines(Stream,L).
+        leggi_righe(Stream,L).
        
-    process_lines([]) :- !.
-    process_lines([Line | Rest]) :-
-        write(Line),  % Print each line for now
-        process_lines(Rest).
+    processa_righe([]) :- !.
+    processa_righe([Line | Rest]) :-
+        write(Line),
+        processa_righe(Rest).
 
 
    
