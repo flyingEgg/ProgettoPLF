@@ -66,66 +66,34 @@
        write('Inserire tra apici il nome del file contenente le canzoni: '), nl,
        read(File),
        (   catch(carica_canzoni(File), _, fail)
-       ->  write('Canzoni caricate con successo!\n'),
+       ->  write('\n\nCanzoni caricate con successo!\n'),
            mostra_generi_disponibili
        ;   write('\nErrore nel caricamento del file. Riprova.\n')
        ).
    
-   /* Predicato che apre il file specificato e legge le canzoni
-      riga per riga, aggiungendole al database. */
-   carica_canzoni(File) :-
+
+% boh riprendi da qui
+    carica_canzoni(File) :-
         open(File, read, Stream),
-        leggi_canzoni(Stream),
-        close(Stream).
+        read_lines(Stream, Lines),
+        close(Stream),
+        process_lines(Lines).
        
-       
-       
-   
-   /* Predicato che legge il file e per ogni riga estrae il
-      titolo, l'artista, il genere e il punteggio della canzone.
-      Le informazioni vengono memorizzate nel database. */
-   leggi_canzoni(Stream) :- 
-       read_line(Stream, Line),
-       (    Line == end_of_file
-       ->   true
-       ;    split_riga(Line, Titolo, Artista, Genere, Punteggio),
-            write('Canzone parsata: '), write(canzone(Titolo, Artista, Genere, Punteggio)), nl,
-            assertz(canzone(Titolo, Artista, Genere, Punteggio)),
-            leggi_canzoni(Stream)
-       ).
-
-    /* Legge una riga carattere per carattere. */
-    leggi_riga(Stream, Line) :-
-        leggi_caratteri(Stream, [], Line).
-
-    /* Legge i caratteri fino a '\n' o 'end_of_file', e costruisce la riga. */
-    leggi_caratteri(Stream, Accumulatore, Linea) :-
-        get_code(Stream, Code),
-        (   Code == 10  % '\n'
-        ->  atom_codes(Linea, Accumulatore)
-        ;   Code == -1  % end_of_file
-        ->  Linea = end_of_file
-        ;   leggi_caratteri(Stream, [Code|Accumulatore], Linea)
-        ).
-
-   
-    /* Predicato che divide la riga in base alla virgola e restituisce i vari campi. */
-    split_riga(Line, Titolo, Artista, Genere, Punteggio) :-
-        split_string(Line, ",", "", [Titolo, Artista, Genere, PunteggioStr]),
-        atom_string(TitoloAtom, Titolo),
-        atom_string(ArtistaAtom, Artista),
-        atom_string(GenereAtom, Genere),
-        atom_number(PunteggioStr, Punteggio).
-
-    atom_string(Atom, String) :-
-        atom(Atom),
-        atom_chars(Atom, Chars),  
-        string_chars(String, Chars).
+    read_lines(Stream,[]):- 
+        at_end_of_stream(Stream).
         
-    atom_string(String, Atom) :-
-        string(String), 
-        string_chars(String, Chars),
-        atom_chars(Atom, Chars).    
+    read_lines(Stream,[X|L]):-
+        \+ at_end_of_stream(Stream),
+        get_char(Stream,X),
+        read_lines(Stream,L).
+       
+    process_lines([]) :- !.
+    process_lines([Line | Rest]) :-
+        write(Line),  % Print each line for now
+        process_lines(Rest).
+
+
+   
    
    
    /* ================================================
