@@ -81,15 +81,24 @@ menuLoop maybeCanzoni pesi = do
 
 -- | Carica un file di testo, legge i dati delle canzoni e li
 -- trasforma in una lista di Canzone.
--- Il file deve avere un formato valido: Titolo,Artista,Genere,Punteggio.
 caricaCanzoni :: IO [Canzone]
 caricaCanzoni = do
     nomeFile <- chiediNomeFile
     contenuto <- readFile nomeFile
     let canzoni = mapMaybe analizzaCanzone (lines contenuto)
-    if null canzoni
-        then putStrLn "Errore: il file non contiene dati validi! Riprova." >> caricaCanzoni
-        else putStrLn "File caricato con successo!" >> return canzoni
+    verificaCanzoni canzoni
+
+-- | Verifica il contenuto del file per assicurarsi che sia
+-- nel formato valido: Titolo,Artista,Genere,Punteggio.
+verificaCanzoni :: [Canzone] -> IO [Canzone]
+verificaCanzoni canzoni
+    | null canzoni = do
+        putStrLn "Errore: il file non contiene dati validi! Riprova."
+        caricaCanzoni
+    | otherwise = do
+        putStrLn "File caricato con successo!"
+        return canzoni
+
 
 -- | Richiede all'utente di inserire il nome del file con le canzoni
 -- e ne effettua una validazione dell'input tramite la funzione validaFile.
