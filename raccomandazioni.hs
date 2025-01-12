@@ -117,10 +117,11 @@ chiediNomeFile = do
 -- correttamente e se tale file esiste.
 validaFile :: FilePath -> IO (Either String ())
 validaFile nomeFile =
-    catch (readFile nomeFile >> return (Right ()))
-          (\e -> if isDoesNotExistError e
-                 then return $ Left "File non trovato!"
-                 else return $ Left "Errore durante l'apertura del file.")
+        catch (readFile nomeFile >> return (Right ())) handler
+    where
+        handler e
+            | isDoesNotExistError e = return $ Left "File non trovato!"
+            | otherwise = return $ Left "Errore durante l'apertura del file."
 
 -- | Permette all'utente di scegliere
 -- i generi preferiti e assegnare un peso a ciascuno di essi.
