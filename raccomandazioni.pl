@@ -77,7 +77,20 @@
         open(File, read, Stream),
         leggi_righe(Stream, Lines),
         close(Stream),
-        processa_righe(Lines).
+        riproduci_righe(Lines).
+
+%    leggi_canzoni(Stream) :-
+%        read_line_to_codes(Stream, Codici),
+%        (   Codici \= end_of_file
+%        ->  string_codes(Linia, Codici),
+%            split_string(Linia, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
+%            number_string(Punteggio, PunteggioStr),
+%            (   \+ canzone(Titolo, Artista, Genere, Punteggio)
+%            ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
+%            ;   true
+%            ),
+%            leggi_canzoni(Stream)
+%        ;   true ).
        
     leggi_righe(Stream,[]):- 
         at_end_of_stream(Stream).
@@ -87,10 +100,17 @@
         get_char(Stream,X),
         leggi_righe(Stream,L).
 
+    riproduci_righe([]) :- !.
+        riproduci_righe([Line | Rest]) :-
+            split_string(Line, ",", "", [Titolo, Artista, Genere, PunteggioStr]),
+            number_string(Punteggio, PunteggioStr),
+            assertz(canzone(Titolo, Artista, Genere, Punteggio)),
+            write(Line),
+            riproduci_righe(Rest).
 
     processa_righe([]) :- !.
     processa_righe([Line | Rest]) :-
-        split_string(Line, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
+        split_string(Line, ",", "", [Titolo, Artista, Genere, PunteggioStr]),
         number_string(Punteggio, PunteggioStr),
         assertz(canzone(Titolo, Artista, Genere, Punteggio)),
         processa_righe(Rest).
