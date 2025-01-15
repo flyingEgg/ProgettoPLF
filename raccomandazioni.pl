@@ -86,11 +86,17 @@
         \+ at_end_of_stream(Stream),
         get_char(Stream,X),
         leggi_righe(Stream,L).
-       
+
+
     processa_righe([]) :- !.
     processa_righe([Line | Rest]) :-
-        write(Line),
+        split_string(Line, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
+        number_string(Punteggio, PunteggioStr),
+        assertz(canzone(Titolo, Artista, Genere, Punteggio)),
         processa_righe(Rest).
+
+    split_campi(Line, [Titolo, Artista, Genere, Punteggio]) :-
+        atomic_list_concat([Titolo, Artista, Genere, Punteggio], ',', Line).
 
 
    
