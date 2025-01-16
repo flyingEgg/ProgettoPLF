@@ -13,11 +13,10 @@
        riproduci_righe(Stringz).
 
    carica_stringhe :-
-        assertz(stringa('Despacito,Luis Fonsi,Reggaeton,8')),
-        assertz(stringa('All Eyez On Me,Tupac,HipHop,9')).
+        assertz(stringa('Despacito,Luis Fonsi,Reggaeton,8')).
 
    riproduci_righe(Riga) :-
-        split_string(Riga, ",", "", [Titolo, Artista, Genere, PunteggioStr]),
+        split_string(Riga, ',', "", [Titolo, Artista, Genere, PunteggioStr]),
         number_string(Punteggio, PunteggioStr),
         assertz(canzone(Titolo, Artista, Genere, Punteggio)),
         format('~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n',
@@ -69,7 +68,7 @@
    char_to_code(Char, Code) :-
        char_code(Char, Code). % Convert character to its ASCII code*/
 
-/*=================================================================================*/
+%=================================================================================
    % Definisci il predicato number_string/2
    number_string(Number, String) :-
        var(Number), !,
@@ -80,7 +79,7 @@
        number(Number), !,
        number_codes(Number, Codes),
        atom_codes(String, Codes).
-/*=================================================================================*/
+%=================================================================================
    % Definisci il predicato split_string/4
    split_string(String, Separator, Padding, Substrings) :-
        atom_codes(String, StringCodes),
@@ -104,6 +103,3 @@
    split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes) :-
        member(C, PaddingCodes), !,
        split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
-
-
-
