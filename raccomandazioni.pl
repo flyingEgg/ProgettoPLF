@@ -90,46 +90,32 @@
 
    processa_righe([]) :- !.
    processa_righe([Char | Rest]) :-
-       processa_riga(Rest, [Char], Stringa),
-       write('\n\n'),
+       processa_riga_singola(Rest, [Char], Stringa, RestDopoLinea),
        write(Stringa),
-       processa_righe(Rest).
+       write('\n'),
+       parsing_righe(Stringa),
+       processa_righe(RestDopoLinea).
 
-   processa_riga_singola([], Accumulatore, Stringa) :-
-        atom_chars(Stringa, Accumulatore),
-        assertz(stringa(Stringa)).
+   processa_riga_singola([], Accumulatore, Stringa, []) :-
+        atom_chars(Stringa, Accumulatore).
 
-   processa_riga_singola([10 | Rest], Accumulatore, Stringa) :-
-        atom_chars(Stringa, Accumulatore),
-        assertz(stringa(Stringa)),
-        processa_righe(Rest).
+   processa_riga_singola(['\n' | Rest], Accumulatore, Stringa, Rest) :-
+        atom_chars(Stringa, Accumulatore).
 
-   processa_riga_singola([Char | Rest], Accumulatore, Stringa) :-
-        Char \= 10,
+   processa_riga_singola([Char | Rest], Accumulatore, Stringa, RestDopoLinea) :-
+        Char \= '\n',
         append(Accumulatore, [Char], NuovoAccumulatore),
-        processa_riga_singola(Rest, NuovoAccumulatore, Stringa).
+        processa_riga_singola(Rest, NuovoAccumulatore, Stringa, RestDopoLinea).
 
-   separa_righe([], RigaParziale, Acc) :-
-        RigaParziale \= '',
-        atom_chars(Stringa, Acc),
-        assertz(canzone(Stringa)).
-
-   separa_righe([], '', _).
-
-   separa_righe([10, Rest], _, Acc) :-
-        atom_chars(Stringa, Acc),
-        assertz(canzone(Stringa)),
-        separa_righe(Rest, '', []).
-
-   separa_righe([Char | Rest], _, Acc) :-
-       Char \= 10,
-       append(Acc, [Char], NuovoAcc),
-       separa_righe(Rest, _, NuovoAcc).
 
    parsing_righe(Riga) :-
+       write('\nEntro nel parsing...'),
        split_string(Riga, ',', "", [Titolo, Artista, Genere, PunteggioStr]),
+       write('\nSplit string effettuato...'),
        number_string(Punteggio, PunteggioStr),
+       write('\nNumber string effettuato...'),
        assertz(canzone(Titolo, Artista, Genere, Punteggio)),
+       write('\nAssertz effettuato...'),
        format('~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n',
                [Titolo, Artista, Genere, Punteggio]).
 
