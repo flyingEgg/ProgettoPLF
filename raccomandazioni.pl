@@ -95,19 +95,19 @@
        write(Stringa),
        processa_righe(Rest).
 
-   processa_riga([], Accumulatore, Stringa) :-
+   processa_riga_singola([], Accumulatore, Stringa) :-
         atom_chars(Stringa, Accumulatore),
         assertz(stringa(Stringa)).
 
-   processa_riga([10 | Rest], Accumulatore, Stringa) :-
+   processa_riga_singola([10 | Rest], Accumulatore, Stringa) :-
         atom_chars(Stringa, Accumulatore),
         assertz(stringa(Stringa)),
         processa_righe(Rest).
 
-   processa_riga([Char | Rest], Accumulatore, Stringa) :-
+   processa_riga_singola([Char | Rest], Accumulatore, Stringa) :-
         Char \= 10,
         append(Accumulatore, [Char], NuovoAccumulatore),
-        processa_riga(Rest, NuovoAccumulatore, Stringa).
+        processa_riga_singola(Rest, NuovoAccumulatore, Stringa).
 
    separa_righe([], RigaParziale, Acc) :-
         RigaParziale \= '',
