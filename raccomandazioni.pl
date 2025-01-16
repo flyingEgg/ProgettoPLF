@@ -77,50 +77,86 @@
         open(File, read, Stream),
         leggi_righe(Stream, Lines),
         close(Stream),
-        riproduci_righe(Lines).
-
-%    leggi_canzoni(Stream) :-
-%        read_line_to_codes(Stream, Codici),
-%        (   Codici \= end_of_file
-%        ->  string_codes(Linia, Codici),
-%            split_string(Linia, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
-%            number_string(Punteggio, PunteggioStr),
-%            (   \+ canzone(Titolo, Artista, Genere, Punteggio)
-%            ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
-%            ;   true
-%            ),
-%            leggi_canzoni(Stream)
-%        ;   true ).
+        processa_righe(Lines).
        
     leggi_righe(Stream,[]):- 
         at_end_of_stream(Stream).
-        
+
     leggi_righe(Stream,[X|L]):-
         \+ at_end_of_stream(Stream),
         get_char(Stream,X),
         leggi_righe(Stream,L).
 
-    riproduci_righe([]) :- !.
-        riproduci_righe([Line | Rest]) :-
-            split_string(Line, ",", "", [Titolo, Artista, Genere, PunteggioStr]),
+    processa_righe([]) :- !.
+        processa_righe([Line | Rest]) :-
+            write(Line),
+            processa_righe(Rest).
+
+    riproduci_righe(Riga) :-
+            split_string(Riga, ',', "", [Titolo, Artista, Genere, PunteggioStr]),
             number_string(Punteggio, PunteggioStr),
             assertz(canzone(Titolo, Artista, Genere, Punteggio)),
-            write(Line),
-            riproduci_righe(Rest).
+            format('~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n',
+                       [Titolo, Artista, Genere, Punteggio]).
 
-    processa_righe([]) :- !.
-    processa_righe([Line | Rest]) :-
-        split_string(Line, ",", "", [Titolo, Artista, Genere, PunteggioStr]),
-        number_string(Punteggio, PunteggioStr),
-        assertz(canzone(Titolo, Artista, Genere, Punteggio)),
-        processa_righe(Rest).
+    /* ================================================
+       Predicati ausiliari per la gestione delle stringhe
+       ================================================ */
 
-    split_campi(Line, [Titolo, Artista, Genere, Punteggio]) :-
-        atomic_list_concat([Titolo, Artista, Genere, Punteggio], ',', Line).
+       % Definisci il predicato number_string/2
+    number_string(Number, String) :-
+        var(Number), !,
+        atom_codes(String, Codes),
+        number_codes(Number, Codes).
+
+    number_string(Number, String) :-
+        number(Number), !,
+        number_codes(Number, Codes),
+        atom_codes(String, Codes).
 
 
-   
-   
+       % Definisci il predicato split_string/4
+    split_string(String, Separator, Padding, Substrings) :-
+        atom_codes(String, StringCodes),
+        atom_codes(Separator, SeparatorCodes),
+        atom_codes(Padding, PaddingCodes),
+        split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, Substrings).
+
+    split_string_codes([], _, _, []) :- !.
+    split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substrings]) :-
+        split_string_codes_aux(StringCodes, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes),
+        atom_codes(Substring, SubstringCodes),
+        split_string_codes(RestCodes, SeparatorCodes, PaddingCodes, Substrings).
+
+    split_string_codes_aux([], _, _, [], []) :- !.
+    split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, [], Cs) :-
+        member(C, SeparatorCodes), !.
+    split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, [C|SubstringCodes], RestCodes) :-
+        \+ member(C, SeparatorCodes),
+        \+ member(C, PaddingCodes), !,
+        split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
+    split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes) :-
+        member(C, PaddingCodes), !,
+        split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
+
+
+
+
+/*
+    leggi_canzoni(Stream) :-
+            read_line_to_codes(Stream, Codici),
+            (   Codici \= end_of_file
+            ->  string_codes(Linia, Codici),
+                split_string(Linia, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
+                number_string(Punteggio, PunteggioStr),
+                (   \+ canzone(Titolo, Artista, Genere, Punteggio)
+                ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
+                ;   true
+                ),
+                leggi_canzoni(Stream)
+            ;   true ).
+   */
+
    
    /* ================================================
       Predicati per la gestione dei generi preferiti
