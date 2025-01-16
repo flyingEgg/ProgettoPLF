@@ -20,6 +20,8 @@
       il secondo è il Peso associato a quel genere. */
     :- dynamic(genere_preferito/2).
 
+    :- dynamic(stringa/1).
+
 
 
    
@@ -73,31 +75,63 @@
    
 
 % boh riprendi da qui
-    carica_canzoni(File) :-
-        open(File, read, Stream),
-        leggi_righe(Stream, Lines),
-        close(Stream),
-        processa_righe(Lines).
-       
-    leggi_righe(Stream,[]):- 
-        at_end_of_stream(Stream).
+   carica_canzoni(File) :-
+       open(File, read, Stream),
+       leggi_righe(Stream, Lines),
+       close(Stream),
+       processa_righe(Lines).
 
-    leggi_righe(Stream,[X|L]):-
-        \+ at_end_of_stream(Stream),
-        get_char(Stream,X),
-        leggi_righe(Stream,L).
+   leggi_righe(Stream,[]):-
+       at_end_of_stream(Stream).
+   leggi_righe(Stream,[X|L]):-
+       \+ at_end_of_stream(Stream),
+       get_char(Stream,X),
+       leggi_righe(Stream,L).
 
-    processa_righe([]) :- !.
-        processa_righe([Line | Rest]) :-
-            write(Line),
-            processa_righe(Rest).
+   processa_righe([]) :- !.
+   processa_righe([Char | Rest]) :-
+       processa_riga(Rest, [Char], Stringa),
+       write('\n\n'),
+       write(Stringa),
+       processa_righe(Rest).
 
-    riproduci_righe(Riga) :-
-            split_string(Riga, ',', "", [Titolo, Artista, Genere, PunteggioStr]),
-            number_string(Punteggio, PunteggioStr),
-            assertz(canzone(Titolo, Artista, Genere, Punteggio)),
-            format('~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n',
-                       [Titolo, Artista, Genere, Punteggio]).
+   processa_riga([], Accumulatore, Stringa) :-
+        atom_chars(Stringa, Accumulatore),
+        assertz(stringa(Stringa)).
+
+   processa_riga([10 | Rest], Accumulatore, Stringa) :-
+        atom_chars(Stringa, Accumulatore),
+        assertz(stringa(Stringa)),
+        processa_righe(Rest).
+
+   processa_riga([Char | Rest], Accumulatore, Stringa) :-
+        Char \= 10,
+        append(Accumulatore, [Char], NuovoAccumulatore),
+        processa_riga(Rest, NuovoAccumulatore, Stringa).
+
+   separa_righe([], RigaParziale, Acc) :-
+        RigaParziale \= '',
+        atom_chars(Stringa, Acc),
+        assertz(canzone(Stringa)).
+
+   separa_righe([], '', _).
+
+   separa_righe([10, Rest], _, Acc) :-
+        atom_chars(Stringa, Acc),
+        assertz(canzone(Stringa)),
+        separa_righe(Rest, '', []).
+
+   separa_righe([Char | Rest], _, Acc) :-
+       Char \= 10,
+       append(Acc, [Char], NuovoAcc),
+       separa_righe(Rest, _, NuovoAcc).
+
+   parsing_righe(Riga) :-
+       split_string(Riga, ',', "", [Titolo, Artista, Genere, PunteggioStr]),
+       number_string(Punteggio, PunteggioStr),
+       assertz(canzone(Titolo, Artista, Genere, Punteggio)),
+       format('~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n',
+               [Titolo, Artista, Genere, Punteggio]).
 
     /* ================================================
        Predicati ausiliari per la gestione delle stringhe
