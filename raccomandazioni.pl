@@ -110,7 +110,8 @@
 
    parsing_righe(Riga) :-
        write('\nEntro nel parsing...'),
-       split_string(Riga, ',', "", [Titolo, Artista, Genere, PunteggioStr]),
+       trim_string(Riga, TrimmedRiga),
+       split_string(TrimmedRiga, ',', ' ', [Titolo, Artista, Genere, PunteggioStr]),
        write('\nSplit string effettuato...'),
        number_string(Punteggio, PunteggioStr),
        write('\nNumber string effettuato...'),
@@ -119,14 +120,32 @@
        format('~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n',
                [Titolo, Artista, Genere, Punteggio]).
 
+   trim_string(String, TrimmedString) :-
+        atom_codes(String, Codes),
+        trim_left(Codes, TrimmedLeftCodes),
+        reverse(TrimmedLeftCodes, ReversedTrimmedLeftCodes),
+        trim_left(ReversedTrimmedLeftCodes, TrimmedRightCodes),
+        reverse(TrimmedRightCodes, TrimmedStringCodes),
+        atom_codes(TrimmedString, TrimmedStringCodes).
+
+   trim_left([], []).
+   trim_left([' '|Cs], TrimmedCs) :-  % 32 è il codice per lo spazio
+       trim_left(Cs, TrimmedCs).
+   trim_left(['\n'|Cs], TrimmedCs) :-  % 10 è il codice per il carattere di nuova linea
+       trim_left(Cs, TrimmedCs).
+   trim_left(Cs, Cs).
+
     /* ================================================
        Predicati ausiliari per la gestione delle stringhe
        ================================================ */
 
        % Definisci il predicato number_string/2
     number_string(Number, String) :-
+        write('\n0'),
         var(Number), !,
+        write('\n1'),
         atom_codes(String, Codes),
+        write('\n2'),
         number_codes(Number, Codes).    % e' lui il problema
 
     number_string(Number, String) :-
@@ -253,6 +272,7 @@
       ================================================ */
    
       atom_number(Atom, Number) :-
+      write('\nCiao3'),
        atom_codes(Atom, Codes),
        number_codes(Number, Codes).
    
