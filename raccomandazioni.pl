@@ -127,7 +127,7 @@
     number_string(Number, String) :-
         var(Number), !,
         atom_codes(String, Codes),
-        number_codes(Number, Codes).
+        number_codes(Number, Codes).    % e' lui il problema
 
     number_string(Number, String) :-
         number(Number), !,
