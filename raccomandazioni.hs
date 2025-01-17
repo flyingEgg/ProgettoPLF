@@ -145,11 +145,16 @@ raccogliGeneri generiDisponibili = do
     loop acc = do
         putStrLn "Inserisci un genere preferito:"
         input <- getLine
-        if input == "fine"
-            then return (nub acc)
-            else if input `elem` generiDisponibili
-                 then putStrLn ("Genere '" ++ input ++ "' aggiunto ai preferiti.") >> loop (input : acc)
-                 else putStrLn "Genere non valido. Riprova." >> loop acc
+        verificaInput input
+       where
+            verificaInput "fine" = return (nub acc)
+            verificaInput i
+                | i `elem` generiDisponibili = do
+                    putStrLn $ "Genere '" ++ i ++ "' aggiunto ai preferiti."
+                    loop (i : acc)
+                | otherwise = do
+                    putStrLn "Genere non valido. Riprova."
+                    loop acc
 
 -- | Consente all'utente di modificare i pesi dei generi preferiti.
 -- Se il genere ha già un peso, l'utente può scegliere di mantenerlo o aggiornarlo.
