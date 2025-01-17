@@ -179,9 +179,11 @@ raccomandaCanzoni :: Maybe [Canzone] -> PesiGeneri -> IO ()
 raccomandaCanzoni Nothing _ = putStrLn "Errore: nessun file caricato. Carica un file prima di continuare."
 raccomandaCanzoni (Just canzoni) pesi = do
     let raccomandate = raccomanda pesi canzoni
-    if null raccomandate
-        then putStrLn "Nessuna canzone trovata con i pesi attuali."
-        else stampaClassifica raccomandate
+    controllaRaccomandate raccomandate
+   where
+        controllaRaccomandate r
+            | null r = putStrLn "Nessuna canzone trovata con i pesi attuali."
+            | otherwise = stampaClassifica r
 
 -- #########################################################
 -- Funzioni ausiliarie
