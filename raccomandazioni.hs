@@ -203,9 +203,12 @@ separa :: Char -> String -> [String]
 separa _ "" = []
 separa delimiter string =
     let (primo, resto) = break (== delimiter) string
-    in primo : case resto of
-        [] -> []
-        x -> separa delimiter (dropWhile (== delimiter) (tail x))
+    in primo : separaResto resto
+   where
+        separaResto [] = []
+        separaResto r
+            | null r = []
+            | otherwise = separa delimiter (dropWhile (== delimiter) (tail r))
 
 -- | Divide una stringa in campi separati, pulendo gli spazi.
 separaTaglia :: Char -> String -> [String]
@@ -215,9 +218,11 @@ separaTaglia delimiter string = map (filter (/= ' ')) (separa delimiter string)
 leggiPesoValido :: IO Double
 leggiPesoValido = do
     input <- getLine
-    case readMaybe input of
-        Just peso | peso > 0 -> return peso
-        _ -> putStrLn "Peso non valido. Riprova." >> leggiPesoValido
+    let peso = readMaybe input :: Maybe Double
+    controllaPeso peso
+   where
+        controllaPeso (Just p) | p > 0 = return p
+        controllaPeso _ = putStrLn "Peso non valido. Riprova." >> leggiPesoValido
 
 -- | Calcola il punteggio ponderato per ogni canzone e le ordina.
 raccomanda :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
