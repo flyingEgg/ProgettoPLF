@@ -200,13 +200,13 @@ raccomandaCanzoni (Just canzoni) pesi = do
 -- | Converte una riga di testo in un oggetto Canzone.
 -- Restituisce Nothing se la riga non è formattata correttamente.
 analizzaCanzone :: String -> Maybe Canzone
-analizzaCanzone riga =
-    case separaTaglia ',' riga of
-        [titolo, artista, genere, punteggioStr]
-            | "" `notElem` [titolo, artista, genere, punteggioStr]  -- Controlla che tutte le parti siano non vuote
-            , Just punteggio <- readMaybe punteggioStr  -- Prova a leggere il punteggio
-            , punteggio >= 1 && punteggio <= 10 -> Just (Canzone titolo artista genere punteggio)  -- Verifica che il punteggio sia valido
-        _ -> Nothing  -- Restituisce Nothing se la riga non è valida
+analizzaCanzone riga = match (separa ',' riga)
+  where
+    match [titolo, artista, genere, punteggioStr]
+        | not (null titolo) && not (null artista) && not (null genere) && not (null punteggioStr)
+        , Just punteggio <- readMaybe punteggioStr
+        , punteggio >= 1 && punteggio <= 10 = Just (Canzone titolo artista genere punteggio)
+    match _ = Nothing
 
 -- | Divide una stringa in una lista di stringhe, usando un delimitatore.
 separa :: Char -> String -> [String]
