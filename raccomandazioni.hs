@@ -107,9 +107,10 @@ chiediNomeFile = do
     putStrLn "Inserire il nome del file:"
     nomeFile <- getLine
     esito_lettura <- validaFile nomeFile
-    case esito_lettura of
-        Right () -> return nomeFile  -- Restituisce il nome del file se valido
-        Left err -> do
+    verificaEsito esito_lettura nomeFile
+   where
+        verificaEsito (Right ()) nomeFile = return nomeFile
+        verificaEsito (Left err) _ = do
             putStrLn $ "Errore: " ++ err
             chiediNomeFile
 
