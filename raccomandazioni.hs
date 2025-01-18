@@ -166,14 +166,16 @@ aggiornaPesi (g:gs) pesi = do
     putStrLn $ "Peso corrente per il genere '" ++ g ++ "': " ++ show pesoCorrente
     putStrLn "Vuoi aggiornare il peso? (s/n)"
     risposta <- getLine
-    if risposta == "s"
-        then do
-            putStrLn $ "Inserisci il nuovo peso per il genere '" ++ g ++ "':"
-            nuovoPeso <- leggiPesoValido
-            aggiornaPesi gs (Map.insert g nuovoPeso pesi)
-        else do
-            putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
-            aggiornaPesi gs pesi
+    controllaRisposta risposta
+   where
+        controllaRisposta r
+            | r == "s" = do
+                putStrLn $ "Inserisci il nuovo peso per il genere '" ++ g ++ "':"
+                nuovoPeso <- leggiPesoValido
+                aggiornaPesi gs (Map.insert g nuovoPeso pesi)
+            | otherwise = do
+                putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
+                aggiornaPesi gs pesi
 
 -- #########################################################
 -- Raccomandazioni
