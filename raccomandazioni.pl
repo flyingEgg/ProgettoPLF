@@ -33,29 +33,29 @@
    /* Predicato che 'main' è il punto di ingresso principale.
       Inizializza il programma e avvia il menu interattivo
       per l'utente. */
-   main :- 
-       write('Benvenuto nel sistema di raccomandazione musicale!\n'),
-       loop_menu.
+    main :-
+        write('Benvenuto nel sistema di raccomandazione musicale!\n'),
+        loop_menu.
    
    /* Predicato che 'loop_menu' gestisce la selezione delle azioni
       da parte dell'utente nel menu principale. Ogni opzione del menu
       chiama un predicato specifico per eseguire l'azione corrispondente. */
-   loop_menu :- 
-       write('\nScegli un\'azione:\n'),
-       write('1. Carica un file con le canzoni\n'),
-       write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
-       write('3. Stampa la classifica delle canzoni\n'),
-       write('4. Stampa la lista dei generi preferiti\n'),
-       write('5. Esci\n'),
-       read(Scelta),
-       (   Scelta = 1 -> carica_canzoni_interattivo
-       ;   Scelta = 2 -> gestisci_generi_preferiti
-       ;   Scelta = 3 -> stampa_classifica
-       ;   Scelta = 4 -> mostra_generi_preferiti
-       ;   Scelta = 5 -> write('Arrivederci!\n'), halt
-       ;   write('Scelta non valida. Riprova.\n')
-       ),
-       loop_menu.
+    loop_menu :-
+        write('\nScegli un\'azione:\n'),
+        write('1. Carica un file con le canzoni\n'),
+        write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
+        write('3. Stampa la classifica delle canzoni\n'),
+        write('4. Stampa la lista dei generi preferiti\n'),
+        write('5. Esci\n'),
+        read(Scelta),
+        (   Scelta = 1 -> carica_canzoni_interattivo
+        ;   Scelta = 2 -> gestisci_generi_preferiti
+        ;   Scelta = 3 -> stampa_classifica
+        ;   Scelta = 4 -> mostra_generi_preferiti
+        ;   Scelta = 5 -> write('Arrivederci!\n'), halt
+        ;   write('Scelta non valida. Riprova.\n')
+        ),
+        loop_menu.
    
    /* ================================================
       Predicati di caricamento delle canzoni
@@ -64,94 +64,101 @@
    /* Predicato che permette all'utente di inserire il nome del
       file che contiene le canzoni.
       Se il caricamento ha successo, stampa un messaggio di conferma. */
-   carica_canzoni_interattivo :- 
-       write('Inserire tra apici il nome del file contenente le canzoni: '), nl,
-       read(File),
-       (   catch(carica_canzoni(File), _, fail)
-       ->  write('\n\nCanzoni caricate con successo!\n'),
-           mostra_generi_disponibili
-       ;   write('\nErrore nel caricamento del file. Riprova.\n')
-       ).
+    carica_canzoni_interattivo :-
+        write('Inserire tra apici il nome del file contenente le canzoni: '), nl,
+        read(File),
+        (   catch(carica_canzoni(File), _, fail)
+        ->  write('\n\nCanzoni caricate con successo!\n'),
+            mostra_generi_disponibili
+        ;   write('\nErrore nel caricamento del file. Riprova.\n')
+        ).
    
 
 % boh riprendi da qui
-   carica_canzoni(File) :-
-       open(File, read, Stream),
-       leggi_righe(Stream, Lines),
-       close(Stream),
-       processa_righe(Lines).
+    carica_canzoni(File) :-
+        open(File, read, Stream),
+        leggi_righe(Stream, Lines),
+        close(Stream),
+        processa_righe(Lines).
 
-   leggi_righe(Stream,[]):-
-       at_end_of_stream(Stream).
-   leggi_righe(Stream,[X|L]):-
-       \+ at_end_of_stream(Stream),
-       get_char(Stream,X),
-       leggi_righe(Stream,L).
+    leggi_righe(Stream,[]):-
+        at_end_of_stream(Stream).
 
-   processa_righe([]) :- !.
-   processa_righe([Char | Rest]) :-
-       processa_riga_singola(Rest, [Char], Stringa, RestDopoLinea),
-       write(Stringa),
-       write('\n'),
-       parsing_righe(Stringa),
-       processa_righe(RestDopoLinea).
+    leggi_righe(Stream,[X|L]):-
+        \+ at_end_of_stream(Stream),
+        get_char(Stream,X),
+        leggi_righe(Stream,L).
 
-   processa_riga_singola([], Accumulatore, Stringa, []) :-
-        atom_chars(Stringa, Accumulatore).
+    processa_righe([]) :- !.
+    processa_righe([Char | Rest]) :-
+        processa_riga_singola(Rest, [Char], Stringa, RestDopoLinea),
+        write(Stringa),
+        write('\n'),
+        parsing_righe(Stringa),
+        processa_righe(RestDopoLinea).
 
-   processa_riga_singola(['\n' | Rest], Accumulatore, Stringa, Rest) :-
-        atom_chars(Stringa, Accumulatore).
+    processa_riga_singola([], Accumulatore, Stringa, []) :-
+         atom_chars(Stringa, Accumulatore).
 
-   processa_riga_singola([Char | Rest], Accumulatore, Stringa, RestDopoLinea) :-
-        Char \= '\n',
-        append(Accumulatore, [Char], NuovoAccumulatore),
-        processa_riga_singola(Rest, NuovoAccumulatore, Stringa, RestDopoLinea).
+    processa_riga_singola(['\n' | Rest], Accumulatore, Stringa, Rest) :-
+         atom_chars(Stringa, Accumulatore).
+
+    processa_riga_singola([Char | Rest], Accumulatore, Stringa, RestDopoLinea) :-
+         Char \= '\n',
+         append(Accumulatore, [Char], NuovoAccumulatore),
+         processa_riga_singola(Rest, NuovoAccumulatore, Stringa, RestDopoLinea).
 
 
-   parsing_righe(Riga) :-
-       write('\nEntro nel parsing...'),
-       trim_string(Riga, TrimmedRiga),
-       split_string(TrimmedRiga, ',', ' ', [Titolo, Artista, Genere, PunteggioStr]),
-       write('\nSplit string effettuato...'),
-       number_string(Punteggio, PunteggioStr),
-       write('\nNumber string effettuato...'),
-       assertz(canzone(Titolo, Artista, Genere, Punteggio)),
-       write('\nAssertz effettuato...'),
-       format('~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n',
-               [Titolo, Artista, Genere, Punteggio]).
-
-   trim_string(String, TrimmedString) :-
-        atom_codes(String, Codes),
-        trim_left(Codes, TrimmedLeftCodes),
-        reverse(TrimmedLeftCodes, ReversedTrimmedLeftCodes),
-        trim_left(ReversedTrimmedLeftCodes, TrimmedRightCodes),
-        reverse(TrimmedRightCodes, TrimmedStringCodes),
-        atom_codes(TrimmedString, TrimmedStringCodes).
-
-   trim_left([], []).
-   trim_left([' '|Cs], TrimmedCs) :-  % 32 è il codice per lo spazio
-       trim_left(Cs, TrimmedCs).
-   trim_left(['\n'|Cs], TrimmedCs) :-  % 10 è il codice per il carattere di nuova linea
-       trim_left(Cs, TrimmedCs).
-   trim_left(Cs, Cs).
-
+    parsing_righe(Riga) :-
+        split_string(Riga, ',', ' ', [Titolo, Artista, Genere, PunteggioStr]),
+            string_trim(PunteggioStr, TrimmedPunteggioStr),  % Rimuove padding
+            (   number_string(Punteggio, TrimmedPunteggioStr)
+            ->  assertz(canzone(Titolo, Artista, Genere, Punteggio)),
+                format('~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n',
+                       [Titolo, Artista, Genere, Punteggio])
+            ;   format('Errore nella conversione del punteggio: ~w\n', [PunteggioStr])
+            ).
     /* ================================================
        Predicati ausiliari per la gestione delle stringhe
        ================================================ */
 
-       % Definisci il predicato number_string/2
     number_string(Number, String) :-
-        write('\n0'),
         var(Number), !,
-        write('\n1'),
         atom_codes(String, Codes),
-        write('\n2'),
-        number_codes(Number, Codes).    % e' lui il problema
+        catch(number_codes(Number, Codes), _, fail).    % potenziale causa del problema
 
     number_string(Number, String) :-
         number(Number), !,
         number_codes(Number, Codes),
         atom_codes(String, Codes).
+
+    string_codes(String, Codes) :-
+        String = Codes.
+
+    % Utilità per rimuovere spazi o padding
+    string_trim(String, Trimmed) :-
+        split_string(String, '', ' \t\n\r', [Trimmed|_]).
+
+    % Read a line of input and return it as a string
+    read_line_to_string(Stream, String) :-
+        read_line(Stream, Codes),
+        atom_codes(Atom, Codes),
+        atom_string(Atom, String).
+
+    atom_string(Atom, String) :-
+        atom_codes(Atom, Codes),
+        string_codes(String, Codes).
+
+    % Read a line of input as a list of character codes
+    read_line(Stream, Codes) :-
+        get_code(Stream, Char),
+        ( Char == -1 -> % End of file
+            Codes = []
+        ; Char == 10 ->
+            Codes = []
+        ; Codes = [Char|Rest],
+          read_line(Stream, Rest)
+        ).
 
 
        % Definisci il predicato split_string/4
@@ -270,32 +277,6 @@
    /* ================================================
       Predicati ausiliari
       ================================================ */
-   
-      atom_number(Atom, Number) :-
-      write('\nCiao3'),
-       atom_codes(Atom, Codes),
-       number_codes(Number, Codes).
-   
-   
-   read_line(Stream, Line) :-
-       leggi_riga_acc(Stream, [], Line).
-   
-   leggi_riga_acc(Stream, Acc, Line) :-
-       get_char(Stream, Char),
-       (   Char == end_of_file
-       ->  Line = end_of_file
-       ;   Char == '\n'
-       ->  reverse(Acc, Line)
-       ;   leggi_riga_acc(Stream, [Char | Acc], Line)
-       ).
-   
-   read_chars(Stream, Char, Line) :-
-       (   Char == '\n'
-       ->  Line = []
-       ;   get_char(Stream, NextChar),
-           read_chars(Stream, NextChar, Rest),
-           Line = [Char | Rest]
-       ).
    
    split_string(Input, Sep, Parts) :-
        atom_codes(Input, Codes),
