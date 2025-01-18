@@ -122,7 +122,7 @@
     number_string(Number, String) :-
         var(Number), !,
         atom_codes(String, Codes),
-        catch(number_codes(Number, Codes), _, fail).    % potenziale causa del problema
+        catch(number_codes(Number, Codes), _, fail).
 
     number_string(Number, String) :-
         number(Number), !,
@@ -172,7 +172,7 @@
         split_string_codes(RestCodes, SeparatorCodes, PaddingCodes, Substrings).
 
     split_string_codes_aux([], _, _, [], []) :- !.
-    split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, [], Cs) :-
+    split_string_codes_aux([C|Cs], SeparatorCodes, _, [], Cs) :-
         member(C, SeparatorCodes), !.
     split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, [C|SubstringCodes], RestCodes) :-
         \+ member(C, SeparatorCodes),
@@ -252,8 +252,8 @@
    /* Predicato che calcola il punteggio ponderato per ogni canzone 
       in base al suo genere e al suo punteggio originale.
       Poi stampa la classifica ordinata delle canzoni. */
-   stampa_classifica :- 
-       findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),
+   stampa_classifica :-
+       findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),   % probabile causa del problema
        (   Punteggi == []
        ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
        ;   maplist(invert_punteggio, Punteggi, InvertedPunteggi),
@@ -267,6 +267,7 @@
       moltiplicato per il punteggio originale della canzone. */
    calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :- 
        canzone(Titolo, _, Genere, Punteggio),
+       write('Genere: '), write(Genere), nl,  % Debug
        normalizza_genere(Genere, GenereNormalizzato),
        peso_genere(GenereNormalizzato, Peso),
        PunteggioPonderato is Punteggio * Peso.
@@ -342,7 +343,8 @@
    
    /* Predicato che normalizza il genere, 
       trasformandolo in minuscolo e rimuovendo eventuali spazi. */
-   normalizza_genere(Genere, GenereNormalizzato) :- 
+   normalizza_genere(Genere, GenereNormalizzato) :-
+       (atom(Genere) -> true ; atom_codes(Genere, Genere)),
        downcase_atom(Genere, GenereLower),
        atom_codes(GenereLower, Codici),
        rimuovi_spazi(Codici, CodiciNormalizzati),
@@ -380,10 +382,10 @@
        (   genere_preferito(Genere, Peso) -> true ; Peso = 1 ).
    
    /* Predicato che rimuove gli spazi da una stringa. */
-   rimuovi_spazi(Stringa, StringaRimossa) :- 
-       atom_codes(Stringa, Codici),
+   rimuovi_spazi(Stringa, StringaRimossa) :-
+       (    atom(Stringa) -> atom_codes(Stringa, Codici) ; Codici = Stringa ),
        rimuovi_spazi_codici(Codici, CodiciRimossi),
-       atom_codes(StringaRimossa, CodiciRimossi).
+       (    atom(Stringa) -> atom_codes(StringaRimossa, CodiciRimossi) ; StringaRimossa = CodiciRimossi ).
    
    /* Predicato che rimuove gli spazi dalla lista
       di codici ASCII di una stringa. */
