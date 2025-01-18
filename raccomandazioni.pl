@@ -107,7 +107,7 @@
 
 
     parsing_righe(Riga) :-
-        split_string(Riga, ',', ' ', [Titolo, Artista, Genere, PunteggioStr]),
+        split_string(Riga, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
             string_trim(PunteggioStr, TrimmedPunteggioStr),  % Rimuove padding
             (   number_string(Punteggio, TrimmedPunteggioStr)
             ->  assertz(canzone(Titolo, Artista, Genere, Punteggio)),
