@@ -68,8 +68,7 @@
         write('Inserire tra apici il nome del file contenente le canzoni: '), nl,
         read(File),
         (   catch(carica_canzoni(File), _, fail)
-        ->  write('\n\nCanzoni caricate con successo!\n'),
-            mostra_generi_disponibili
+        ->  write('\n\nCanzoni caricate con successo!\n')
         ;   write('\nErrore nel caricamento del file. Riprova.\n')
         ).
    
@@ -304,10 +303,9 @@
    
    /* Predicato che restituisce una lista dei generi musicali 
       univoci presenti nel database delle canzoni. */
-   mostra_generi_disponibili :- 
+   mostra_generi_disponibili :-
        findall(Genere, canzone(_, _, Genere, _), Generi),
-       rimuovi_duplicati(Generi, GeneriSenzaDuplicati),
-       ordina_generi(GeneriSenzaDuplicati, GeneriOrdinati),
+       sort(Generi, GeneriOrdinati),
        format('Generi disponibili: ~w\n', [GeneriOrdinati]).
    
    /* Predicato che rimuove i duplicati da una lista */
