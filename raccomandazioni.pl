@@ -92,8 +92,6 @@
     processa_righe([]) :- !.
     processa_righe([Char | Rest]) :-
         processa_riga_singola(Rest, [Char], Stringa, RestDopoLinea),
-        write(Stringa),
-        write('\n'),
         parsing_righe(Stringa),
         processa_righe(RestDopoLinea).
 
