@@ -238,12 +238,14 @@
       in base al suo genere e al suo punteggio originale.
       Poi stampa la classifica ordinata delle canzoni. */
    stampa_classifica :-
-       findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),   % probabile causa del problema
+       findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),   
        (   Punteggi == []
        ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
-       ;   maplist(invert_punteggio, Punteggi, InvertedPunteggi),
+       ;   list_to_set(Punteggi, PunteggiUnici),
+           maplist(invert_punteggio, PunteggiUnici, InvertedPunteggi),
            keysort(InvertedPunteggi, SortedInverted),
            maplist(invert_punteggio, SortedInverted, Ordinata),
+           write('\n'),
            stampa_canzoni_ordinate(Ordinata, 1)
        ).
    
@@ -252,7 +254,6 @@
       moltiplicato per il punteggio originale della canzone. */
    calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :- 
        canzone(Titolo, _, Genere, Punteggio),
-       write('Genere: '), write(Genere), nl,  % Debug
        normalizza_genere(Genere, GenereNormalizzato),
        peso_genere(GenereNormalizzato, Peso),
        PunteggioPonderato is Punteggio * Peso.
@@ -261,21 +262,34 @@
       Predicati ausiliari
       ================================================ */
    
-   split_string(Input, Sep, Parts) :-
-       atom_codes(Input, Codes),
-       atom_codes(Sep, [SepCode]),
-       split_codes(Codes, SepCode, [], Parts).
+    split_string(Input, Sep, Parts) :-
+        atom_codes(Input, Codes),
+        atom_codes(Sep, [SepCode]),
+        split_codes(Codes, SepCode, [], Parts).
        
    
-       split_codes([], _, Acc, [Part]) :-
-           atom_codes(Part, Acc).
-       split_codes([Sep|Rest], Sep, Acc, [Part|Parts]) :-
-           atom_codes(Part, Acc),
-           split_codes(Rest, Sep, [], Parts).
-       split_codes([C|Rest], Sep, Acc, Parts) :-
-           C \= Sep,
-           append(Acc, [C], NewAcc),
-           split_codes(Rest, Sep, NewAcc, Parts).
+    split_codes([], _, Acc, [Part]) :-
+        atom_codes(Part, Acc).
+
+    split_codes([Sep|Rest], Sep, Acc, [Part|Parts]) :-
+        atom_codes(Part, Acc),
+        split_codes(Rest, Sep, [], Parts).
+
+    split_codes([C|Rest], Sep, Acc, Parts) :-
+        C \= Sep,
+        append(Acc, [C], NewAcc),
+        split_codes(Rest, Sep, NewAcc, Parts).
+
+    
+    list_to_set([], []).
+
+    list_to_set([Head|Tail], [Head|SetTail]) :-
+        \+ member(Head, Tail), 
+        list_to_set(Tail, SetTail).
+
+    list_to_set([Head|Tail], Set) :-
+        member(Head, Tail),
+        list_to_set(Tail, Set).
    
    /* Predicato che mostra i generi preferiti associati
       con il rispettivo peso. */
@@ -355,8 +369,8 @@
        keysort(InvertedList, SortedInverted),
        maplist(invert_punteggio, SortedInverted, Sorted).
    
-   invert_punteggio(-Punteggio, Titolo, Punteggio-Titolo) :- !.
-   invert_punteggio(Punteggio, Titolo, -Punteggio-Titolo).
+   invert_punteggio(-Punteggio-Titolo, Punteggio-Titolo) :- !.
+   invert_punteggio(Punteggio-Titolo, -Punteggio-Titolo).
    
    compare_descending(Delta, X, Y) :-
        compare(DeltaReverse, X, Y),
