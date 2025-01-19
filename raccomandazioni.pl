@@ -9,8 +9,7 @@
    Predicati dinamici
    ================================================ */
 
-
-/* Predicato che 'canzone/4' memorizza informazioni relative
+   /* Predicato che 'canzone/4' memorizza informazioni relative
    alle canzoni caricate dal file. Ogni canzone è rappresentata 
    dai seguenti argomenti: Titolo, Artista, Genere e Punteggio. */
     :- dynamic(canzone/4).
@@ -20,12 +19,11 @@
       il secondo è il Peso associato a quel genere. */
     :- dynamic(genere_preferito/2).
 
+    /* Predicato che 'stringa/1' memorizzi una riga del file 
+       con le canzoni per poi operarvici di conseguenza con i
+       predicati di memorizzazione delle canzoni. */
     :- dynamic(stringa/1).
 
-
-
-   
-   
    /* ================================================
       Predicati principali
       ================================================ */
@@ -181,25 +179,6 @@
     split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes) :-
         member(C, PaddingCodes), !,
         split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
-
-
-
-
-/*
-    leggi_canzoni(Stream) :-
-            read_line_to_codes(Stream, Codici),
-            (   Codici \= end_of_file
-            ->  string_codes(Linia, Codici),
-                split_string(Linia, ",", " ", [Titolo, Artista, Genere, PunteggioStr]),
-                number_string(Punteggio, PunteggioStr),
-                (   \+ canzone(Titolo, Artista, Genere, Punteggio)
-                ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
-                ;   true
-                ),
-                leggi_canzoni(Stream)
-            ;   true ).
-   */
-
    
    /* ================================================
       Predicati per la gestione dei generi preferiti
