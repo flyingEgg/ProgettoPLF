@@ -106,11 +106,9 @@
 
     parsing_righe(Riga) :-
         split_string(Riga, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
-            string_trim(PunteggioStr, TrimmedPunteggioStr),  % Rimuove padding
+            string_trim(PunteggioStr, TrimmedPunteggioStr),
             (   number_string(Punteggio, TrimmedPunteggioStr)
-            ->  assertz(canzone(Titolo, Artista, Genere, Punteggio)),
-                format('~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n',
-                       [Titolo, Artista, Genere, Punteggio])
+            ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
             ;   format('Errore nella conversione del punteggio: ~w\n', [PunteggioStr])
             ).
     /* ================================================
@@ -194,13 +192,21 @@
    /* Predicato che raccoglie i generi preferiti inseriti
       dall'utente e li aggiunge alla lista di preferiti. */
    chiedi_generi_preferiti(GeneriPreferiti) :- 
+       ottieni_generi_disponibili(GeneriDisponibili),
        write('Inserisci un genere preferito: '),
        read(Genere),
        (   Genere == fine
        ->  chiedi_peso_generi(GeneriPreferiti)
        ;   normalizza_genere(Genere, GenereNormalizzato),
-           append(GeneriPreferiti, [GenereNormalizzato], NuoviGeneri),
-           chiedi_generi_preferiti(NuoviGeneri) ).
+           downcase_atom(GenereNormalizzato, GenereNormalizzatoMinuscolo),
+           maplist(downcase_atom, GeneriDisponibili, GeneriDisponibiliMinuscolo),
+           (   member(GenereNormalizzatoMinuscolo, GeneriDisponibiliMinuscolo)
+           ->  append(GeneriPreferiti, [GenereNormalizzato], NuoviGeneri),
+               chiedi_generi_preferiti(NuoviGeneri)
+           ;   write('Genere non valido. Riprova.\n'),
+               chiedi_generi_preferiti(GeneriPreferiti)
+           )
+       ).
    
    /* Predicato che chiede all'utente di inserire
       un peso per ciascun genere musicale preferito. */
@@ -280,14 +286,19 @@
        ;   write('I tuoi generi preferiti e i loro pesi:\n'),
            stampa_generi(Generi)
        ).
-   
-   /* Predicato che restituisce una lista dei generi musicali 
+
+    /* Predicato che restituisce i generi disponibili */
+    ottieni_generi_disponibili(GeneriDisponibili):-
+        findall(Genere, canzone(_, _, Genere, _), Generi),
+        sort(Generi, GeneriOrdinati),
+        GeneriDisponibili = GeneriOrdinati.
+
+   /* Predicato che stampa a video una lista dei generi musicali 
       univoci presenti nel database delle canzoni. */
    mostra_generi_disponibili :-
-       findall(Genere, canzone(_, _, Genere, _), Generi),
-       sort(Generi, GeneriOrdinati),
+       ottieni_generi_disponibili(GeneriOrdinati),
        format('Generi disponibili: ~w\n', [GeneriOrdinati]).
-   
+
    /* Predicato che rimuove i duplicati da una lista */
    rimuovi_duplicati([], []).
    rimuovi_duplicati([H|T], [H|Rest]) :-
