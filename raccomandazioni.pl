@@ -242,11 +242,9 @@
        (   Punteggi == []
        ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
        ;   list_to_set(Punteggi, PunteggiUnici),
-           maplist(invert_punteggio, PunteggiUnici, InvertedPunteggi),
-           keysort(InvertedPunteggi, SortedInverted),
-           maplist(invert_punteggio, SortedInverted, Ordinata),
+           sort_descending(PunteggiUnici, PunteggiOrdinati),
            write('\n'),
-           stampa_canzoni_ordinate(Ordinata, 1)
+           stampa_canzoni_ordinate(PunteggiOrdinati, 1)
        ).
    
    /* Predicato che calcola il punteggio ponderato
@@ -364,10 +362,16 @@
        LowerCode is Code + 32.
    to_lower(Code, Code).
    
-   sort_descending(List, Sorted) :-
-       maplist(invert_punteggio, List, InvertedList),
-       keysort(InvertedList, SortedInverted),
-       maplist(invert_punteggio, SortedInverted, Sorted).
+   sort_descending([], []).
+
+   sort_descending([X], [X]).
+
+   sort_descending([X, Y | Rest], [X | SortedRest]) :-
+        compare(>, X, Y), !,
+        sort_descending([Y | Rest], SortedRest).
+
+   sort_descending([X, Y | Rest], [Y | SortedRest]) :-
+        sort_descending([X | Rest], SortedRest).
    
    invert_punteggio(-Punteggio-Titolo, Punteggio-Titolo) :- !.
    invert_punteggio(Punteggio-Titolo, -Punteggio-Titolo).
