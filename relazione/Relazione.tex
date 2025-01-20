@@ -129,31 +129,8 @@ Il \textbf{Peso Genere} rappresenta un coefficiente che riflette il livello di p
 \newpage
 \section{Progettazione dell'algoritmo}
 \subsection{Scelte di progetto}
-Per sviluppare il sistema di raccomandazione musicale, abbiamo adottato approcci distinti per ciascuno dei linguaggi richiesti, Haskell e Prolog, al fine di sfruttare al meglio le peculiarità di ciascuno.
+Il programma acquisisce da tastiera dati di diverso tipo, tra cui: valori \textbf{interi} per selezionare opzioni nel menu, valori \textbf{decimali} per indicare il peso attribuito ad un genere e \textbf{stringhe} per indicare il nome del file da cui si intende leggere o per indicare il/i generi che si intendono impostare come preferiti; pertanto è fondamentale una validazione stretta che si occupi di assicurare l’assenza di eccezioni dovute all’inserimento inappropriato dei dati richiesti.
 
-In \textbf{Haskell}, abbiamo deciso di rappresentare le canzoni utilizzando tipi di dati strutturati. Questa scelta ci consente di garantire una gestione chiara e sicura delle informazioni musicali, sfruttando le capacità del sistema di tipi statico per ridurre errori e facilitare l'implementazione delle operazioni. Le canzoni vengono caricate da un file di testo, per consentire l'integrazione di dataset esterni senza modificare il codice sorgente. La scelta di utilizzare un file di testo è stata motivata dalla necessità di mantenere il sistema flessibile e facilmente adattabile a dataset di dimensioni variabili.
-
-In \textbf{Prolog}, invece, abbiamo optato per una rappresentazione tramite predicati dinamici. Le canzoni sono caricate all’interno del programma attraverso il predicato \texttt{carica\_canzoni/0}, che utilizza \texttt{assertz/1} per definire dinamicamente ogni canzone come un fatto nella base di conoscenza. Questo approccio ci permette di manipolare i dati con la semantica dichiarativa propria di Prolog, evitando problematiche legate all’importazione di file esterni. Ogni canzone è rappresentata da un predicato \texttt{canzone/4}, che descrive il titolo, l’artista, il genere e il punteggio. La struttura dati utilizzata è completamente dinamica, consentendo aggiunte o modifiche in tempo reale senza la necessità di ridefinire l’intero dataset.
-
-\begin{itemize}
-    \item \textbf{Haskell:}
-    \begin{itemize}
-        \item L’uso di file di testo consente di estendere il dataset semplicemente aggiungendo nuove righe al file.
-        \item Le funzioni per la manipolazione delle stringhe e la costruzione di tipi di dati strutturati in Haskell rendono questa operazione relativamente semplice e modulare.
-        \item Inoltre, Haskell permette un trattamento funzionale dei dati, come la mappatura e il filtraggio, che è particolarmente utile per calcolare e ordinare i punteggi ponderati.
-    \end{itemize}
-    \item \textbf{Prolog:}
-    \begin{itemize}
-        \item La rappresentazione tramite predicati è particolarmente adatta per le relazioni tra canzoni, generi e preferenze dell’utente.
-        \item Caricare le canzoni come fatti dinamici permette di utilizzare direttamente la logica del linguaggio per effettuare operazioni come il filtraggio e l’ordinamento basato sui punteggi.
-        \item Questo approccio evita la necessità di definire una sintassi di input complessa, sfruttando la semplicità dichiarativa propria di Prolog.
-    \end{itemize}
-    \item \textbf{Gestione dell’input e output:}
-    \begin{itemize}
-        \item In Haskell, il file di testo richiede un parsing iniziale per costruire una lista di canzoni.
-        \item In Prolog, invece, la definizione diretta nel predicato \texttt{carica\_canzoni/0} semplifica l’esecuzione e permette di focalizzarsi sull’elaborazione delle raccomandazioni piuttosto che sulla gestione dell’input.
-    \end{itemize}
-\end{itemize}
 
 \newpage
 \subsection{Passi dell'algoritmo}
@@ -189,251 +166,275 @@ La ricorsività è utilizzata in entrambi i linguaggi per garantire la gestione 
 \subsection{Implementazione in Haskell}
 Il file \texttt{raccomandazioni.hs} implementa l'algoritmo in Haskell. Un esempio di calcolo dei punteggi ponderati:
 \begin{lstlisting}[language=Haskell]
-    -- #########################################################
-    -- # Corso di Programmazione Logica e Funzionale           #
-    -- # Progetto di raccomandazione di canzoni                #
-    -- # Studente: Giaconi Christian, Giacomo Rossi            #
-    -- # Matricola: 314045, 314671                             #
-    -- #########################################################
-    
-    {- Specifica:
-        Scrivere un programma in Haskell per implementare un sistema avanzato di raccomandazione di canzoni.
-        Il sistema suggerisce canzoni a un utente in base a:
-        - Preferenze per uno o più generi musicali specificati.
-        - Un sistema di punteggio ponderato per dare priorità a canzoni più rilevanti.
-        L'utente deve fornire un file di testo con le canzoni nel seguente formato:
-            Titolo,Artista,Genere,Punteggio
-        Dove "Punteggio" è un intero da 1 a 10.
-        Le canzoni saranno ordinate in base al punteggio ponderato e filtrate per genere.
-    -}
-    
-    module Main where
-    
-    import Data.List (sortOn, nub, intercalate)
-    import Data.Maybe (mapMaybe)
-    import Data.Ord (Down(..))
-    import qualified Data.Map as Map
-    import System.IO.Error(isDoesNotExistError)
-    import Control.Exception (catch, IOException)
-    import Text.Read (readMaybe)
-    
-    -- #########################################################
-    -- Definizioni dei tipi di dati
-    -- #########################################################
-    
-    -- | La struttura 'Canzone' rappresenta una canzone con:
-    -- - titolo: il titolo della canzone.
-    -- - artista: l'artista che la interpreta.
-    -- - genere: il genere musicale della canzone.
-    -- - punteggio: un punteggio assegnato (da 1 a 10).
-    data Canzone = Canzone
-        { titolo    :: String
-        , artista   :: String
-        , genere    :: String
-        , punteggio :: Int
-        } deriving (Show, Eq)
-    
-    -- | PesiGeneri è una mappa che associa un genere musicale a un peso
-    -- che influenza la priorità delle raccomandazioni.
-    type PesiGeneri = Map.Map String Double
-    
-    -- #########################################################
-    -- Main: Menu interattivo
-    -- #########################################################
-    
-    -- | Funzione principale che avvia il menu interattivo.
-    main :: IO ()
-    main = menuLoop Nothing Map.empty
-    
-    -- | Gestisce il menu principale, mantenendo lo stato del sistema:
-    -- - maybeCanzoni: un elenco opzionale delle canzoni caricate.
-    -- - pesi: i pesi dei generi preferiti, gestiti dall'utente.
-    menuLoop :: Maybe [Canzone] -> PesiGeneri -> IO ()
-    menuLoop maybeCanzoni pesi = do
-        putStrLn "\n--- Sistema di Raccomandazione Musicale ---"
-        putStrLn "1. Carica un file con le canzoni"
-        putStrLn "2. Gestisci i generi preferiti (aggiungi o modifica)"
-        putStrLn "3. Stampa la classifica delle canzoni"
-        putStrLn "4. Stampa i generi preferiti con il relativo punteggio"
-        putStrLn "5. Esci"
-        putStrLn "Seleziona un'opzione:"
-        scelta <- getLine
-        case scelta of
-            "1" -> caricaCanzoni >>= (`menuLoop` pesi) . Just
-            "2" -> selezionaGeneriPreferitiEImpostaPesi maybeCanzoni pesi >>= menuLoop maybeCanzoni
-            "3" -> raccomandaCanzoni maybeCanzoni pesi >> menuLoop maybeCanzoni pesi
-            "4" -> visualizzaGeneriPreferiti pesi >> menuLoop maybeCanzoni pesi
-            "5" -> putStrLn "Grazie per aver usato il sistema di raccomandazione. Arrivederci!"
-            _   -> putStrLn "Opzione non valida. Riprova." >> menuLoop maybeCanzoni pesi
-    
-    -- #########################################################
-    -- Funzioni di caricamento e gestione dei dati
-    -- #########################################################
-    
-    -- | Carica un file di testo, legge i dati delle canzoni e li
-    -- trasforma in una lista di Canzone.
-    -- Il file deve avere un formato valido: Titolo,Artista,Genere,Punteggio.
-    caricaCanzoni :: IO [Canzone]
-    caricaCanzoni = do
-        nomeFile <- chiediNomeFile
-        contenuto <- readFile nomeFile
-        let canzoni = mapMaybe analizzaCanzone (lines contenuto)
-        if null canzoni
-            then putStrLn "Errore: il file non contiene dati validi! Riprova." >> caricaCanzoni
-            else putStrLn "File caricato con successo!" >> return canzoni
-    
-    -- | Richiede all'utente di inserire il nome del file con le canzoni
-    -- e ne effettua una validazione dell'input tramite la funzione validaFile.
-    chiediNomeFile :: IO FilePath
-    chiediNomeFile = do
-        putStrLn "Inserire il nome del file:"
-        nomeFile <- getLine
-        esito_lettura <- validaFile nomeFile
-        case esito_lettura of
-            Right () -> return nomeFile  -- Restituisce il nome del file se valido
-            Left err -> do
-                putStrLn $ "Errore: " ++ err
-                chiediNomeFile
-    
-    -- | Controlla se il nome del file è espresso
-    -- correttamente e se tale file esiste.
-    validaFile :: FilePath -> IO (Either String ())
-    validaFile nomeFile =
-        catch (readFile nomeFile >> return (Right ()))
-              (\e -> if isDoesNotExistError e
-                     then return $ Left "File non trovato!"
-                     else return $ Left "Errore durante l'apertura del file.")
-    
-    -- | Permette all'utente di scegliere
-    -- i generi preferiti e assegnare un peso a ciascuno di essi.
-    selezionaGeneriPreferitiEImpostaPesi :: Maybe [Canzone] -> PesiGeneri -> IO PesiGeneri
-    selezionaGeneriPreferitiEImpostaPesi Nothing pesi = do
-        putStrLn "Errore: nessun file caricato. Carica un file prima di continuare."
-        return pesi
-    selezionaGeneriPreferitiEImpostaPesi (Just canzoni) pesi = do
-        let generiDisponibili = nub $ map genere canzoni
-        putStrLn $ "Generi disponibili: " ++ intercalate ", " generiDisponibili
-        generiSelezionati <- raccogliGeneri generiDisponibili
-        aggiornaPesi generiSelezionati pesi
-    
-    -- | Consente all'utente di inserire i generi
-    -- preferiti uno alla volta, terminando con "fine".
-    raccogliGeneri :: [String] -> IO [String]
-    raccogliGeneri generiDisponibili = do
-        putStrLn "Inserisci i generi preferiti uno alla volta. Scrivi 'fine' per terminare."
-        loop []
-      where
-        loop acc = do
-            putStrLn "Inserisci un genere preferito:"
-            input <- getLine
-            if input == "fine"
-                then return (nub acc)
-                else if input `elem` generiDisponibili
-                     then putStrLn ("Genere '" ++ input ++ "' aggiunto ai preferiti.") >> loop (input : acc)
-                     else putStrLn "Genere non valido. Riprova." >> loop acc
-    
-    -- | Consente all'utente di modificare i pesi dei generi preferiti.
-    -- Se il genere ha già un peso, l'utente può scegliere di mantenerlo o aggiornarlo.
-    aggiornaPesi :: [String] -> PesiGeneri -> IO PesiGeneri
-    aggiornaPesi [] pesi = return pesi
-    aggiornaPesi (g:gs) pesi = do
-        let pesoCorrente = Map.findWithDefault 1.0 g pesi
-        putStrLn $ "Peso corrente per il genere '" ++ g ++ "': " ++ show pesoCorrente
-        putStrLn "Vuoi aggiornare il peso? (s/n)"
-        risposta <- getLine
-        if risposta == "s"
-            then do
+-- #########################################################
+-- # Corso di Programmazione Logica e Funzionale           #
+-- # Progetto di raccomandazione di canzoni                #
+-- # Studente: Giaconi Christian, Giacomo Rossi            #
+-- # Matricola: 314045, 314671                             #
+-- #########################################################
+
+{-  Specifica: scrivere un programma Haskell per implementare un sistema di raccoandazione di canzoni.
+    Il programma legge le canzoni espresse in quattro attributi: titolo, artista,
+    genere musicale e punteggio; da un file con valori separati da virgole, il cui nome viene acquisito
+    da tastiera e le suggerisce all’utente basandosi sulle sue preferenze musicali, utilizzando un
+    punteggio di gradimento acquisito da tastiera e configurato su uno o più generi, per creare una
+    classifica con le canzoni ordinate secondo il punteggio ponderato da quello di gradimento del
+    o dei generi musicali.
+-}
+
+module Main where
+
+-- Caricamento delle funzioni necessarie per le operazioni
+import Data.List (sortOn, nub, intercalate)
+import Data.Maybe (mapMaybe)
+import Data.Ord (Down(..))
+import qualified Data.Map as Map
+import System.IO.Error(isDoesNotExistError)
+import Control.Exception (catch, IOException)
+import Text.Read (readMaybe)
+
+-- #########################################################
+-- Definizioni dei tipi di dati
+-- #########################################################
+
+{- La struttura 'Canzone' rappresenta una canzone con:
+   - titolo: il titolo della canzone;
+   - artista: l'artista che la interpreta;
+   - genere: il genere musicale della canzone;
+   - punteggio: un punteggio assegnato (da 1 a 10). -} 
+data Canzone = Canzone
+    { titolo    :: String
+    , artista   :: String
+    , genere    :: String
+    , punteggio :: Int
+    } deriving (Show, Eq)
+
+{- PesiGeneri è una mappa che associa un genere musicale a un peso
+   che influenza la priorità delle raccomandazioni. -}
+type PesiGeneri = Map.Map String Double
+
+-- #########################################################
+-- Menu interattivo
+-- #########################################################
+
+{- Azione principale che avvia il menu interattivo. -}
+main :: IO ()
+main = menuLoop Nothing Map.empty
+
+{- Funzione che gestisce il menu principale, mantenendo lo stato del sistema:
+   - maybeCanzoni: un elenco opzionale delle canzoni caricate.
+   - pesi: i pesi dei generi preferiti, gestiti dall'utente. -}
+menuLoop :: Maybe [Canzone] -> PesiGeneri -> IO ()
+menuLoop maybeCanzoni pesi = do
+    putStrLn "\n--- Sistema di Raccomandazione Musicale ---"
+    putStrLn "1. Carica un file con le canzoni"
+    putStrLn "2. Gestisci i generi preferiti (aggiungi o modifica)"
+    putStrLn "3. Stampa la classifica delle canzoni"
+    putStrLn "4. Stampa i generi preferiti con il relativo punteggio"
+    putStrLn "5. Esci"
+    putStrLn "Seleziona un'opzione:"
+    scelta <- getLine
+    case scelta of
+        "1" -> caricaCanzoni >>= (`menuLoop` pesi) . Just
+        "2" -> selezionaGeneriPreferitiEImpostaPesi maybeCanzoni pesi >>= menuLoop maybeCanzoni
+        "3" -> raccomandaCanzoni maybeCanzoni pesi >> menuLoop maybeCanzoni pesi
+        "4" -> visualizzaGeneriPreferiti pesi >> menuLoop maybeCanzoni pesi
+        "5" -> putStrLn "Grazie per aver usato il sistema di raccomandazione. Arrivederci!"
+        _   -> putStrLn "Opzione non valida. Riprova." >> menuLoop maybeCanzoni pesi
+
+-- #########################################################
+-- Caricamento e gestione dei dati
+-- #########################################################
+
+{- Azione che permette di caricare un file di testo, legge i dati delle canzoni e li
+   trasforma in una lista di Canzone. -}
+caricaCanzoni :: IO [Canzone]
+caricaCanzoni = do
+    nomeFile <- chiediNomeFile
+    contenuto <- readFile nomeFile
+    let canzoni = mapMaybe analizzaCanzone (lines contenuto)
+    verificaCanzoni canzoni
+
+{- Funzione che verifica il contenuto del file per assicurarsi che sia
+   nel formato valido: Titolo,Artista,Genere,Punteggio. -}
+verificaCanzoni :: [Canzone] -> IO [Canzone]
+verificaCanzoni canzoni
+    | null canzoni = do
+        putStrLn "Errore: il file non contiene dati validi! Riprova."
+        caricaCanzoni
+    | otherwise = do
+        putStrLn "File caricato con successo!"
+        return canzoni
+
+{- Azione che richiede all'utente di inserire il nome del file con le canzoni
+   e ne effettua una validazione dell'input tramite la funzione validaFile. -}
+chiediNomeFile :: IO FilePath
+chiediNomeFile = do
+    putStrLn "Inserire il nome del file:"
+    nomeFile <- getLine
+    esito_lettura <- validaFile nomeFile
+    verificaEsito esito_lettura nomeFile
+   where
+        verificaEsito (Right ()) nomeFile = return nomeFile
+        verificaEsito (Left err) _ = do
+            putStrLn $ "Errore: " ++ err
+            chiediNomeFile
+
+{- Funzione che controlla se il nome del file è espresso
+   correttamente e se tale file esiste. -}
+validaFile :: FilePath -> IO (Either String ())
+validaFile nomeFile =
+        catch (readFile nomeFile >> return (Right ())) handler
+    where
+        handler e
+            | isDoesNotExistError e = return $ Left "File non trovato!"
+            | otherwise = return $ Left "Errore durante l'apertura del file."
+
+{- Funzione che permette all'utente di scegliere
+   i generi preferiti e assegnare un peso a ciascuno di essi. -}
+selezionaGeneriPreferitiEImpostaPesi :: Maybe [Canzone] -> PesiGeneri -> IO PesiGeneri
+selezionaGeneriPreferitiEImpostaPesi Nothing pesi = do
+    putStrLn "Errore: nessun file caricato. Carica un file prima di continuare."
+    return pesi
+selezionaGeneriPreferitiEImpostaPesi (Just canzoni) pesi = do
+    let generiDisponibili = nub $ map genere canzoni
+    putStrLn $ "Generi disponibili: " ++ intercalate ", " generiDisponibili
+    generiSelezionati <- raccogliGeneri generiDisponibili
+    aggiornaPesi generiSelezionati pesi
+
+{- Funzione che consente all'utente di inserire i generi
+   preferiti uno alla volta, terminando con "fine". -}
+raccogliGeneri :: [String] -> IO [String]
+raccogliGeneri generiDisponibili = do
+    putStrLn "Inserisci i generi preferiti uno alla volta. Scrivi 'fine' per terminare."
+    loop []
+  where
+    loop acc = do
+        putStrLn "Inserisci un genere preferito:"
+        input <- getLine
+        verificaInput input
+       where
+            verificaInput "fine" = return (nub acc)
+            verificaInput i
+                | i `elem` generiDisponibili = do
+                    putStrLn $ "Genere '" ++ i ++ "' aggiunto ai preferiti."
+                    loop (i : acc)
+                | otherwise = do
+                    putStrLn "Genere non valido. Riprova."
+                    loop acc
+
+{- Funzione che consente all'utente di modificare i pesi dei generi preferiti.
+   Se il genere ha già un peso, l'utente può scegliere di mantenerlo o aggiornarlo. -}
+aggiornaPesi :: [String] -> PesiGeneri -> IO PesiGeneri
+aggiornaPesi [] pesi = return pesi
+aggiornaPesi (g:gs) pesi = do
+    let pesoCorrente = Map.findWithDefault 1.0 g pesi
+    putStrLn $ "Peso corrente per il genere '" ++ g ++ "': " ++ show pesoCorrente
+    putStrLn "Vuoi aggiornare il peso? (s/N)"
+    risposta <- getLine
+    controllaRisposta risposta
+   where
+        controllaRisposta r
+            | r == "s" = do
                 putStrLn $ "Inserisci il nuovo peso per il genere '" ++ g ++ "':"
                 nuovoPeso <- leggiPesoValido
                 aggiornaPesi gs (Map.insert g nuovoPeso pesi)
-            else do
+            | otherwise = do
                 putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
                 aggiornaPesi gs pesi
-    
-    -- #########################################################
-    -- Raccomandazioni
-    -- #########################################################
-    
-    -- | Genera e stampa una lista di canzoni consigliate
-    -- basandosi sui pesi dei generi e sui punteggi delle canzoni.
-    raccomandaCanzoni :: Maybe [Canzone] -> PesiGeneri -> IO ()
-    raccomandaCanzoni Nothing _ = putStrLn "Errore: nessun file caricato. Carica un file prima di continuare."
-    raccomandaCanzoni (Just canzoni) pesi = do
-        let raccomandate = raccomanda pesi canzoni
-        if null raccomandate
-            then putStrLn "Nessuna canzone trovata con i pesi attuali."
-            else stampaClassifica raccomandate
-    
-    -- #########################################################
-    -- Funzioni ausiliarie
-    -- #########################################################
-    
-    -- | Converte una riga di testo in un oggetto Canzone.
-    -- Restituisce Nothing se la riga non è formattata correttamente.
-    analizzaCanzone :: String -> Maybe Canzone
-    analizzaCanzone riga =
-        case separaTaglia ',' riga of
-            [titolo, artista, genere, punteggioStr]
-                | "" `notElem` [titolo, artista, genere, punteggioStr]  -- Controlla che tutte le parti siano non vuote
-                , Just punteggio <- readMaybe punteggioStr  -- Prova a leggere il punteggio
-                , punteggio >= 1 && punteggio <= 10 -> Just (Canzone titolo artista genere punteggio)  -- Verifica che il punteggio sia valido
-            _ -> Nothing  -- Restituisce Nothing se la riga non è valida
-    
-    -- | Divide una stringa in una lista di stringhe, usando un delimitatore.
-    separa :: Char -> String -> [String]
-    separa _ "" = []
-    separa delimiter string =
-        let (primo, resto) = break (== delimiter) string
-        in primo : case resto of
-            [] -> []
-            x -> separa delimiter (dropWhile (== delimiter) (tail x))
-    
-    -- | Divide una stringa in campi separati, pulendo gli spazi.
-    separaTaglia :: Char -> String -> [String]
-    separaTaglia delimiter string = map (filter (/= ' ')) (separa delimiter string)
-    
-    -- | Legge un valore di peso valido inserito dall'utente.
-    leggiPesoValido :: IO Double
-    leggiPesoValido = do
-        input <- getLine
-        case readMaybe input of
-            Just peso | peso > 0 -> return peso
-            _ -> putStrLn "Peso non valido. Riprova." >> leggiPesoValido
-    
-    -- | Calcola il punteggio ponderato per ogni canzone e le ordina.
-    raccomanda :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
-    raccomanda pesi canzoni =
-        let arricchite = arricchisci pesi canzoni
-        in sortOn (Down . fst) arricchite
-    
-    -- | Calcola il punteggio ponderato per ogni canzone.
-    arricchisci :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
-    arricchisci pesi canzoni =
-        [ (fromIntegral (punteggio c) * Map.findWithDefault 1.0 (genere c) pesi, c) | c <- canzoni ]
-    
-    -- | Stampa le canzoni ordinate con il loro punteggio ponderato.
-    stampaClassifica :: [(Double, Canzone)] -> IO ()
-    stampaClassifica raccomandate =
-        mapM_ stampaConPosizione (zip [1..] raccomandate)
-        where
-            stampaConPosizione (pos, (punteggioPonderato, Canzone titolo artista genere _)) = do
-                putStrLn $ "#" ++ show pos ++ " - " ++ titolo
-                putStrLn $ "   Artista: " ++ artista
-                putStrLn $ "   Genere: " ++ genere
-                putStrLn $ "   Punteggio ponderato: " ++ show punteggioPonderato
-                putStrLn "-------------------------------------------"
-    
-    -- | Visualizza i generi preferiti e i pesi associati.
-    visualizzaGeneriPreferiti :: PesiGeneri -> IO ()
-    visualizzaGeneriPreferiti pesi
-        | Map.null pesi = putStrLn "Nessun genere ancora definito."
-        | otherwise = do
-            putStrLn "I tuoi generi preferiti e pesi associati sono:"
-            mapM_ stampaGenere (Map.toList pesi)
-    
-    -- | Stampa il genere, concatenato al peso suo relativo
-    stampaGenere :: (String, Double) -> IO ()
-    stampaGenere (genere, peso) = putStrLn $ genere ++ ": " ++ show peso
+
+-- #########################################################
+-- Raccomandazioni
+-- #########################################################
+
+{- Funzione che genera e stampa una lista di canzoni consigliate
+   basandosi sui pesi dei generi e sui punteggi delle canzoni. -}
+raccomandaCanzoni :: Maybe [Canzone] -> PesiGeneri -> IO ()
+raccomandaCanzoni Nothing _ = putStrLn "Errore: nessun file caricato. Carica un file prima di continuare."
+raccomandaCanzoni (Just canzoni) pesi = do
+    let raccomandate = raccomanda pesi canzoni
+    controllaRaccomandate raccomandate
+   where
+        controllaRaccomandate r
+            | null r = putStrLn "Nessuna canzone trovata con i pesi attuali."
+            | otherwise = stampaClassifica r
+
+-- #########################################################
+-- Funzioni ausiliarie
+-- #########################################################
+
+{- Funzione che converte una riga di testo in un oggetto Canzone.
+   restituisce Nothing se la riga non è formattata correttamente. -}
+analizzaCanzone :: String -> Maybe Canzone
+analizzaCanzone riga = match (separa ',' riga)
+   where
+    match [titolo, artista, genere, punteggioStr]
+        | not (null titolo) && not (null artista) && not (null genere) && not (null punteggioStr)
+        , Just punteggio <- readMaybe punteggioStr
+        , punteggio >= 1 && punteggio <= 10 = Just (Canzone titolo artista genere punteggio)
+    match _ = Nothing
+
+{- Funzione che divide una stringa in una lista di stringhe, usando un delimitatore. -}
+separa :: Char -> String -> [String]
+separa _ "" = []
+separa delimiter string =
+    let (primo, resto) = break (== delimiter) string
+    in primo : separaResto resto
+   where
+        separaResto [] = []
+        separaResto r
+            | null r = []
+            | otherwise = separa delimiter (dropWhile (== delimiter) (tail r))
+
+{- Funzione che divide una stringa in campi separati, pulendo gli spazi. -}
+separaTaglia :: Char -> String -> [String]
+separaTaglia delimiter string = map (filter (/= ' ')) (separa delimiter string)
+
+{- Funzione che legge un valore di peso valido inserito dall'utente. -}
+leggiPesoValido :: IO Double
+leggiPesoValido = do
+    input <- getLine
+    let peso = readMaybe input :: Maybe Double
+    controllaPeso peso
+   where
+        controllaPeso (Just p) | p > 0 = return p
+        controllaPeso _ = putStrLn "Peso non valido. Riprova." >> leggiPesoValido
+
+{- Funzione che calcola il punteggio ponderato per ogni canzone e le ordina. -}
+raccomanda :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
+raccomanda pesi canzoni =
+    let arricchite = arricchisci pesi canzoni
+    in sortOn (Down . fst) arricchite
+
+{- Funzione che calcola il punteggio ponderato per ogni canzone. -}
+arricchisci :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
+arricchisci pesi canzoni =
+    [ (fromIntegral (punteggio c) * Map.findWithDefault 1.0 (genere c) pesi, c) | c <- canzoni ]
+
+-- #########################################################
+-- Stampe
+-- #########################################################
+
+{- Funzione che stampa le canzoni ordinate con il loro punteggio ponderato. -}
+stampaClassifica :: [(Double, Canzone)] -> IO ()
+stampaClassifica raccomandate =
+    mapM_ stampaConPosizione (zip [1..] raccomandate)
+    where
+        stampaConPosizione (pos, (punteggioPonderato, Canzone titolo artista genere _)) = do
+            putStrLn $ show pos ++ "# " ++ titolo ++ "(Artista: " ++ artista ++ ", Genere: " ++ genere ++ ", Punteggio Ponderato: " ++ show punteggioPonderato
+
+{- Funzione che permette di visualizzare i generi preferiti e i pesi associati. -}
+visualizzaGeneriPreferiti :: PesiGeneri -> IO ()
+visualizzaGeneriPreferiti pesi
+    | Map.null pesi = putStrLn "Nessun genere ancora definito."
+    | otherwise = do
+        putStrLn "I tuoi generi preferiti e pesi associati sono:"
+        mapM_ stampaGenere (Map.toList pesi)
+
+{- Funzione che stampa il genere, concatenato al peso suo relativo -}
+stampaGenere :: (String, Double) -> IO ()
+stampaGenere (genere, peso) = putStrLn $ genere ++ ": " ++ show peso
+
 \end{lstlisting}
 
 \newpage
@@ -447,12 +448,22 @@ Il file \texttt{raccomandazioni.pl} implementa l'algoritmo in Prolog. Esempio di
 /* # Matricola: 314045, 314671                             # */
 /* ######################################################### */
 
+/*
+    Specifica: scrivere un programma Prolog per implementare un sistema di raccoandazione di canzoni.
+    Il programma legge le canzoni espresse in quattro attributi: titolo, artista,
+    genere musicale e punteggio; da un file con valori separati da virgole, il cui nome viene acquisito
+    da tastiera e le suggerisce all’utente basandosi sulle sue preferenze musicali, utilizzando un
+    punteggio di gradimento acquisito da tastiera e configurato su uno o più generi, per creare una
+    classifica con le canzoni ordinate secondo il punteggio ponderato da quello di gradimento del
+    o dei generi musicali.
+*/
+
 /* ================================================
    Predicati dinamici
    ================================================ */
 
 /* Predicato che 'canzone/4' memorizza informazioni relative
-   alle canzoni caricate. Ogni canzone è rappresentata 
+   alle canzoni caricate dal file. Ogni canzone è rappresentata 
    dai seguenti argomenti: Titolo, Artista, Genere e Punteggio. */
 :- dynamic(canzone/4).
 
@@ -461,137 +472,261 @@ Il file \texttt{raccomandazioni.pl} implementa l'algoritmo in Prolog. Esempio di
    il secondo è il Peso associato a quel genere. */
 :- dynamic(genere_preferito/2).
 
+/* Predicato che 'stringa/1' memorizzi una riga del file 
+   con le canzoni per poi operarvici di conseguenza con i
+   predicati di memorizzazione delle canzoni. */
+:- dynamic(stringa/1).
+
 /* ================================================
    Predicati principali
    ================================================ */
 
-/* Predicato che 'main' è il punto di ingresso principale.
+/* Predicato che funge da punto di ingresso principale.
    Inizializza il programma e avvia il menu interattivo
    per l'utente. */
-main :- 
-    nl,
-    write('Benvenuto nel sistema di raccomandazione musicale!'),
-    carica_canzoni,
+main :-
+    write('\n--- Sistema di Raccomandazione Musicale ---\n'),
     loop_menu.
 
-/* Predicato che 'loop_menu' gestisce la selezione delle azioni
-   da parte dell'utente nel menu principale. Ogni opzione del menu
-   chiama un predicato specifico per eseguire l'azione corrispondente. */
-loop_menu :- 
-    nl,
-    write('======================================'), nl,
-    write('Scegli un\'azione: '), nl,
-    write('1. Gestisci i generi preferiti (aggiungi o modifica)'), nl,
-    write('2. Stampa la classifica delle canzoni'), nl,
-    write('3. Stampa la lista dei generi preferiti'), nl,
-    write('4. Esci'), nl,
-    write('======================================'), nl,
-    write('Inserisci la tua scelta: '), nl,
+/* Predicato che gestisce la selezione delle azioni da parte 
+   dell'utente nel menu principale. Ogni opzione del menu chiama
+   un predicato specifico per eseguire l'azione corrispondente. */
+loop_menu :-
+    write('1. Carica un file con le canzoni\n'),
+    write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
+    write('3. Stampa la classifica delle canzoni\n'),
+    write('4. Stampa i generi preferiti con il relativo punteggio\n'),
+    write('5. Esci\n'),
+    write('Seleziona un\'opzione:\n'),
     read(Scelta),
-    (   Scelta = 1 -> gestisci_generi_preferiti
-    ;   Scelta = 2 -> stampa_classifica
-    ;   Scelta = 3 -> mostra_generi_preferiti
-    ;   Scelta = 4 -> write('Arrivederci!\n'), halt
+    (   Scelta = 1 -> carica_canzoni_interattivo
+    ;   Scelta = 2 -> gestisci_generi_preferiti
+    ;   Scelta = 3 -> stampa_classifica
+    ;   Scelta = 4 -> mostra_generi_preferiti
+    ;   Scelta = 5 -> write('Arrivederci!\n'), halt
     ;   write('Scelta non valida. Riprova.\n')
     ),
     loop_menu.
 
-carica_canzoni :- 
-    assertz(canzone('Despacito', 'Luis Fonsi', 'Reggaeton', 8)),
-    assertz(canzone('All Eyez On Me', 'Tupac', 'HipHop', 8)),
-    assertz(canzone('Danza Kuduro', 'Don Omar', 'Reggaeton', 9)),
-    assertz(canzone('Song 2', 'Blur', 'Alternative/Indie', 6)),
-    assertz(canzone('Bachata Rosa', 'Juan Luis Guerra', 'Bachata', 9)),
-    assertz(canzone('Notturno op 55 no 1', 'Chopin', 'Classica', 6)),
-    assertz(canzone('Free Bird', 'Lynyrd Skynyrd', 'Rock', 8)),
-    assertz(canzone('Thunderstruck', 'AC/DC', 'Rock', 7)),
-    assertz(canzone('Come As You Are', 'Nirvana', 'Rock', 8)),
-    assertz(canzone('La Gota Fria', 'Carlos Vives', 'Vallenato', 7)),
-    assertz(canzone('Stronger', 'Kanye West', 'HipHop', 9)),
-    assertz(canzone('Californication', 'Red Hot Chili Peppers', 'Alternative/Indie', 6)),
-    assertz(canzone('Upper Echelon', 'Travis Scott', 'Trap', 7)),
-    assertz(canzone('El Cantante', 'Hector Lavoe', 'Salsa', 9)),
-    assertz(canzone('Suavemente', 'Elvis Crespo', 'Merengue', 10)),
-    assertz(canzone('La Vaca', 'Los Toros Band', 'Merengue', 9)).
+/* ================================================
+   Predicati per il caricamento delle canzoni
+   ================================================ */
+
+/* Predicato che permette all'utente di inserire il nome del
+   file che contiene le canzoni.
+   Se il caricamento ha successo, stampa un messaggio di conferma. */
+carica_canzoni_interattivo :-
+    write('Inserire tra apici il nome del file contenente le canzoni: '), nl,
+    read(File),
+    (   catch(carica_canzoni(File), _, fail)
+    ->  write('\n\nCanzoni caricate con successo!\n')
+    ;   write('\nErrore nel caricamento del file. Riprova.\n')
+    ).
+
+/* Predicato che analizza il contenuto del file e ne
+   "processa" il contenuto. */
+carica_canzoni(File) :-
+    open(File, read, Stream),
+    leggi_righe(Stream, Lines),
+    close(Stream),
+    processa_righe(Lines).
+
+/* Predicato per leggere le  */
+leggi_righe(Stream,[]):-
+    at_end_of_stream(Stream).
+
+leggi_righe(Stream,[X|L]):-
+    \+ at_end_of_stream(Stream),
+    get_char(Stream,X),
+    leggi_righe(Stream,L).
+
+/* Predicato che processa e avvia il parsing delle righe. */
+processa_righe([]) :- !.
+
+processa_righe([Char | Rest]) :-
+    processa_riga_singola(Rest, [Char], Stringa, RestDopoLinea),
+    parsing_righe(Stringa),
+    processa_righe(RestDopoLinea).
+
+/* Predicato che provcessa una singola riga. */
+processa_riga_singola([], Accumulatore, Stringa, []) :-
+    atom_chars(Stringa, Accumulatore).
+
+processa_riga_singola(['\n' | Rest], Accumulatore, Stringa, Rest) :-
+    atom_chars(Stringa, Accumulatore).
+
+processa_riga_singola([Char | Rest], Accumulatore, Stringa, RestDopoLinea) :-
+    Char \= '\n',
+    append(Accumulatore, [Char], NuovoAccumulatore),
+    processa_riga_singola(Rest, NuovoAccumulatore, Stringa, RestDopoLinea).
+
+/* Predicato che effettua il parsing delle righe. */
+parsing_righe(Riga) :-
+    split_string(Riga, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
+        string_trim(PunteggioStr, TrimmedPunteggioStr),
+        (   number_string(Punteggio, TrimmedPunteggioStr)
+        ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
+        ;   format('Errore nella conversione del punteggio: ~w\n', [PunteggioStr])
+        ).
+    
+/* ================================================
+   Predicati ausiliari per la gestione delle stringhe
+   ================================================ */
+
+/* Predicato che permette di creare un numero a partire da una stringa.
+   Viene utilizzato quando il primo argomento (Number) è una variabile
+   e il predicato tenta di inferire il valore della variabile a partire dalla stringa. */
+number_string(Number, String) :-
+    var(Number), !,
+    atom_codes(String, Codes),
+    catch(number_codes(Number, Codes), _, fail).
+
+/* Predicato che consente di creare una stringa a partire da un numero.
+   Viene utilizzato quando il primo argomento (Number) è già un numero
+   e il predicato converte questo numero in una stringa. */
+number_string(Number, String) :-
+    number(Number), !,
+    number_codes(Number, Codes),
+    atom_codes(String, Codes).
+
+/* Predicato rimuove gli spazi da una stringa.*/
+string_trim(String, Trimmed) :-
+    split_string(String, '', ' \t\n\r', [Trimmed|_]).
+
+/* Predicato che divide una stringa in sottostringhe in base a un separatore e a un padding.
+   String: stringa di input da suddividere.
+   Separator: caratteri che fungono da separatori tra le sottostringhe.
+   Padding: caratteri da ignorare all'inizio e alla fine delle sottostringhe.
+   Substrings: lista delle sottostringhe risultanti dalla suddivisione. */
+split_string(String, Separator, Padding, Substrings) :-
+    atom_codes(String, StringCodes),
+    atom_codes(Separator, SeparatorCodes),
+    atom_codes(Padding, PaddingCodes),
+    split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, Substrings).
+
+/* Predicato che suddivide una stringa in sottostringhe, eliminando il padding
+   e utilizzando il separatore specificato.
+   Restituisce la lista di sottostringhe una alla volta. */
+split_string_codes([], _, _, []) :- !.
+
+split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substrings]) :-
+    split_string_codes_aux(StringCodes, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes),
+    atom_codes(Substring, SubstringCodes),
+    split_string_codes(RestCodes, SeparatorCodes, PaddingCodes, Substrings).
+
+/* Predicato ausiliario che rileva un separatore all'inizio della stringa.
+   Quando viene trovato un separatore, termina l'estrazione della sottostringa corrente
+   e restituisce i caratteri rimanenti per l'elaborazione successiva. */
+split_string_codes_aux([], _, _, [], []) :- !.
+
+split_string_codes_aux([C|Cs], SeparatorCodes, _, [], Cs) :-
+    member(C, SeparatorCodes), !.
+
+split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, [C|SubstringCodes], RestCodes) :-
+    \+ member(C, SeparatorCodes),
+    \+ member(C, PaddingCodes), !,
+    split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
+
+split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes) :-
+    member(C, PaddingCodes), !,
+    split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
 
 /* ================================================
    Predicati per la gestione dei generi preferiti
    ================================================ */
 
-/* Predicato che permette all'utente di selezionare 
-   e gestire i generi musicali preferiti. */
+/* Predicato che permette all'utente di selezionare e gestire i generi musicali preferiti. */
 gestisci_generi_preferiti :- 
-    mostra_generi_disponibili,
-    write('Inserisci i tuoi generi preferiti tra apici, uno per volta. Scrivi "fine" per terminare.\n'),
-    chiedi_generi_preferiti([]).
+    ottieni_generi_disponibili(GeneriDisponibili),
+    (   GeneriDisponibili == []
+    ->  write('Non ci sono generi disponibili. Impossibile inserire preferenze.\n')
+    ;   mostra_generi_disponibili,
+        write('Inserisci i tuoi generi preferiti, uno per volta. Scrivi "fine" per terminare.\n'),
+        chiedi_generi_preferiti([])
+    ).
 
-/* Predicato che raccoglie i generi preferiti inseriti
-   dall'utente e li aggiunge alla lista di preferiti. */
+/* Predicato che raccoglie i generi preferiti inseriti dall'utente e li aggiunge alla lista di preferiti. */
 chiedi_generi_preferiti(GeneriPreferiti) :- 
+    ottieni_generi_disponibili(GeneriDisponibili),
     write('Inserisci un genere preferito: '),
     read(Genere),
     (   Genere == fine
-    ->  chiedi_peso_generi(GeneriPreferiti)
-    ;   findall(GenereDisponibile, canzone(_, _, GenereDisponibile, _), GeneriDisponibili), 
-        elimina_duplicati(GeneriDisponibili, GeneriUnici),
-        (   membro(Genere, GeneriUnici)
-        ->  append(GeneriPreferiti, [Genere], NuoviGeneri),
-            chiedi_generi_preferiti(NuoviGeneri)
-        ;   write('Genere non valido. Ecco i generi disponibili:\n'),
-            scrivi_lista(GeneriUnici),
-            chiedi_generi_preferiti(GeneriPreferiti) 
+    ->  write('\nVuoi aggiornare i pesi? (\'s\'/\'n\')\n'),
+        read(Risposta),
+        (   Risposta == 's'
+        ->  chiedi_peso_generi(GeneriPreferiti)
+        ;   write('\nPeso invariato\n')
+        )
+    ;   normalizza_genere(Genere, GenereNormalizzato),
+        maplist(normalizza_genere, GeneriDisponibili, GeneriDisponibiliNormalizzati),
+        (   member(GenereNormalizzato, GeneriDisponibiliNormalizzati)
+        ->  (   member(GenereNormalizzato, GeneriPreferiti)
+            ->  write('Questo genere è già presente tra i tuoi preferiti.\n'),
+                chiedi_generi_preferiti(GeneriPreferiti)
+            ;   append(GeneriPreferiti, [GenereNormalizzato], NuoviGeneri),
+                write('Genere aggiunto con successo.\n'),
+                chiedi_generi_preferiti(NuoviGeneri)
+            )
+        ;   write('Genere non valido. Riprova.\n'),
+            chiedi_generi_preferiti(GeneriPreferiti)
         )
     ).
-
 
 /* Predicato che chiede all'utente di inserire
    un peso per ciascun genere musicale preferito. */
 chiedi_peso_generi([]).
+
 chiedi_peso_generi([Genere | Altri]) :- 
     format('Inserisci il peso per il genere ~w: ', [Genere]),
     read(Peso),
     (   number(Peso), Peso > 0
-    ->  assertz(genere_preferito(Genere, Peso)),
-        chiedi_peso_generi(Altri)
-    ;   write('Peso non valido. Riprova.\n'),
-        chiedi_peso_generi([Genere | Altri]) ).
-
+    ->  (    retract(genere_preferito(Genere, _))
+        -> true ; true
+        ),
+        assertz(genere_preferito(Genere, Peso)), chiedi_peso_generi(Altri)
+        ;   write('Peso non valido. Riprova.\n'), chiedi_peso_generi([Genere | Altri])
+    ).
+    
 /* ================================================
    Predicati per la raccomandazione e la classifica
    ================================================ */
-
-/* Predicato che calcola il punteggio ponderato per ogni canzone 
-   in base al suo genere e al suo punteggio originale.
-   Poi stampa la classifica ordinata delle canzoni. */
-stampa_classifica :- 
-    nl, write('Calcolando la classifica...'), nl,
-    findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),
-    (   Punteggi == []
-    ->  nl, write('Nessuna canzone trovata con punteggio ponderato.'), nl
-    ;   ordina_lista(Punteggi, PunteggiOrdinati),
-        nl, write('Ecco la classifica delle canzoni:'), nl,
-        stampa_canzoni_ordinate(PunteggiOrdinati, 1)
-    ).
 
 /* Predicato che stampa le canzoni ordinate in base al punteggio
    ponderato, elencandole con la posizione, il titolo,
    l'artista e il punteggio ponderato. */
 stampa_canzoni_ordinate([], _).
+
 stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :- 
     canzone(Titolo, Artista, Genere, _),
     format('~d# ~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n', 
-           [Posizione, Titolo, Artista, Genere, PunteggioPonderato]),
-    Posizione1 is Posizione + 1,
-    stampa_canzoni_ordinate(Rest, Posizione1).
+            [Posizione, Titolo, Artista, Genere, PunteggioPonderato]),
+    stampa_canzoni_ordinate(Rest, Posizione + 1).
+
+/* Predicato che calcola il punteggio ponderato per ogni canzone 
+   in base al suo genere e al suo punteggio originale.
+   Poi stampa la classifica ordinata delle canzoni. */
+stampa_classifica :-
+    findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), PunteggiModificati),
+    findall(Punteggio-Titolo, (canzone(Titolo, _, _, Punteggio), \+ member(_-Titolo, PunteggiModificati)), PunteggiInvariati),
+    append(PunteggiModificati, PunteggiInvariati, PunteggiTotali),
+    sort(PunteggiTotali, PunteggiOrdinatiAsc),
+    reverse(PunteggiOrdinatiAsc, PunteggiOrdinati),
+    (   PunteggiTotali == []
+    ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
+    ;   write('\nClassifica delle canzoni ordinate per punteggio:\n'),
+        stampa_canzoni_ordinate(PunteggiOrdinati, 1)
+    ).
 
 /* Predicato che calcola il punteggio ponderato
-   di una canzone in base al suo genere (e al peso preferito associato)
-   moltiplicato per il punteggio originale della canzone. */
+    di una canzone in base al suo genere (e al peso preferito associato)
+    moltiplicato per il punteggio originale della canzone. */
 calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :- 
     canzone(Titolo, _, Genere, Punteggio),
-    peso_genere(Genere, Peso),
+    normalizza_genere(Genere, GenereNormalizzato),
+    peso_genere(GenereNormalizzato, Peso),
+    Peso \= 1,
     PunteggioPonderato is Punteggio * Peso.
-
+    
 /* ================================================
    Predicati ausiliari
    ================================================ */
@@ -606,71 +741,65 @@ mostra_generi_preferiti :-
         stampa_generi(Generi)
     ).
 
-/* Predicato che restituisce una lista dei generi musicali 
-   presenti nel database delle canzoni, evitando duplicati. */
-mostra_generi_disponibili :- 
+/* Predicato che restituisce i generi disponibili */
+ottieni_generi_disponibili(GeneriDisponibili):-
     findall(Genere, canzone(_, _, Genere, _), Generi),
-    elimina_duplicati(Generi, GeneriUnici),
-    write('Generi disponibili:\n'),
-    scrivi_lista(GeneriUnici).
+    sort(Generi, GeneriOrdinati),
+    GeneriDisponibili = GeneriOrdinati.
 
-/* Predicato che elimina duplicati da una lista. */
-elimina_duplicati([], []).
-elimina_duplicati([H|T], [H|T1]) :- 
-    non_membro(H, T),
-    elimina_duplicati(T, T1).
-elimina_duplicati([H|T], T1) :- 
-    membro(H, T),
-    elimina_duplicati(T, T1).
-
-/* Predicato che verifica se un elemento è membro della lista. */
-membro(X, [X|_]).
-membro(X, [_|T]) :- 
-    membro(X, T).
-
-/* Predicato che verifica se un elemento NON è membro della lista. */
-non_membro(_, []).
-non_membro(X, [H|T]) :- 
-    X \= H,
-    non_membro(X, T).
-
-/* Scrive una lista elemento per elemento */
-scrivi_lista([]).
-scrivi_lista([H|T]) :- 
-    write('- '), write(H), nl,
-    scrivi_lista(T).
-
+/* Predicato che stampa a video una lista dei generi musicali 
+   univoci presenti nel database delle canzoni. */
+mostra_generi_disponibili :-
+    ottieni_generi_disponibili(GeneriOrdinati),
+    format('Generi disponibili: ~w\n', [GeneriOrdinati]).
+    
 /* Predicato che stampa la lista dei generi preferiti. */
 stampa_generi([]).
+
 stampa_generi([Genere-Peso | Rest]) :- 
     format('~w: ~w\n', [Genere, Peso]),
     stampa_generi(Rest).
+    
+/* Predicato che normalizza un genere, trasformandolo in minuscolo
+   e rimuovendo gli spazi. Questo permette di confrontare i generi
+   in modo case-insensitive e indipendentemente dalla formattazione. */
+normalizza_genere(Genere, GenereNormalizzato) :-
+    (atom(Genere) -> true ; atom_codes(Genere, Genere)),
+    downcase_atom(Genere, GenereLower),
+    atom_codes(GenereLower, Codici),
+    rimuovi_spazi(Codici, CodiciNormalizzati),
+    atom_codes(GenereNormalizzato, CodiciNormalizzati).
 
-/* Predicato che 'peso_genere' restituisce il peso di un genere.
-   Se non è specificato, viene utilizzato un peso di 1. */
-peso_genere(Genere, Peso) :-
-    (   genere_preferito(Genere, Peso) 
-    ->  true 
-    ;   Peso = 1 ).
+/* Predicato che converte tutti i caratteri di un atomo in minuscolo. */
+downcase_atom(Atom, LowercaseAtom) :-
+    atom_codes(Atom, Codes),
+    maplist(to_lower, Codes, LowercaseCodes),
+    atom_codes(LowercaseAtom, LowercaseCodes).
 
-/* Predicato che ordina una lista in ordine decrescente. */
-ordina_lista(Lista, Ordinata) :-
-    ordina_lista(Lista, [], Ordinata).
+/* Predicato che converte un singolo carattere in minuscolo. */
+to_lower(Code, LowerCode) :-
+    Code >= 65, Code =< 90,
+    LowerCode is Code + 32.
+to_lower(Code, Code).
 
-/* Predicato che ordina la lista ricorsivamente. */
-ordina_lista([], Acc, Acc).
-ordina_lista([X | Xs], Acc, Ordinata) :-
-    inserisci_decrescente(X, Acc, NuovoAcc),
-    ordina_lista(Xs, NuovoAcc, Ordinata).
+/* Predicato che restituisce il peso associato ad un genere. Se non è
+   stato definito un peso specifico, viene utilizzato un peso predefinito (1). */
+peso_genere(Genere, Peso) :- 
+    (   genere_preferito(Genere, Peso) -> true ; Peso = 1 ).
 
-/* Predicato che inserisce un elemento in una lista mantenendo
-   l'ordine decrescente. */
-inserisci_decrescente(Punteggio1-Titolo1, [], [Punteggio1-Titolo1]).
-inserisci_decrescente(Punteggio1-Titolo1, [Punteggio2-Titolo2 | Rest], [Punteggio1-Titolo1, Punteggio2-Titolo2 | Rest]) :-
-    Punteggio1 >= Punteggio2.
-inserisci_decrescente(Punteggio1-Titolo1, [Punteggio2-Titolo2 | Rest], [Punteggio2-Titolo2 | NewRest]) :-
-    Punteggio1 < Punteggio2,
-    inserisci_decrescente(Punteggio1-Titolo1, Rest, NewRest).   
+/* Predicato che rimuove tutti gli spazi da una stringa, sia che sia
+   rappresentata come atomo o come lista di codici ASCII. */
+rimuovi_spazi(Stringa, StringaRimossa) :-
+    (    atom(Stringa) -> atom_codes(Stringa, Codici) ; Codici = Stringa ),
+    rimuovi_spazi_codici(Codici, CodiciRimossi),
+    (    atom(Stringa) -> atom_codes(StringaRimossa, CodiciRimossi) ; StringaRimossa = CodiciRimossi ).
+
+/* Predicato ausiliario che rimuove gli spazi (codice ASCII 32)
+   da una lista di codici ASCII. */
+rimuovi_spazi_codici([], []).
+rimuovi_spazi_codici([32|T], R) :- rimuovi_spazi_codici(T, R).
+rimuovi_spazi_codici([H|T], [H|R]) :- H \= 32, rimuovi_spazi_codici(T, R).
+
 \end{lstlisting}
 
 \newpage
