@@ -32,19 +32,19 @@
    Inizializza il programma e avvia il menu interattivo
    per l'utente. */
 main :-
-    write('Benvenuto nel sistema di raccomandazione musicale!\n'),
+    write('\n--- Sistema di Raccomandazione Musicale ---\n'),
     loop_menu.
 
 /* Predicato che gestisce la selezione delle azioni da parte 
    dell'utente nel menu principale. Ogni opzione del menu chiama
    un predicato specifico per eseguire l'azione corrispondente. */
 loop_menu :-
-    write('\nScegli un\'azione:\n'),
     write('1. Carica un file con le canzoni\n'),
     write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
     write('3. Stampa la classifica delle canzoni\n'),
     write('4. Stampa la lista dei generi preferiti\n'),
     write('5. Esci\n'),
+    write('Seleziona un\'opzione:\n'),
     read(Scelta),
     (   Scelta = 1 -> carica_canzoni_interattivo
     ;   Scelta = 2 -> gestisci_generi_preferiti
@@ -145,6 +145,7 @@ split_string(String, Separator, Padding, Substrings) :-
 
 /* Predicato ... */
 split_string_codes([], _, _, []) :- !.
+
 split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substrings]) :-
     split_string_codes_aux(StringCodes, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes),
     atom_codes(Substring, SubstringCodes),
@@ -152,12 +153,15 @@ split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substri
 
 /* Predicato ... */
 split_string_codes_aux([], _, _, [], []) :- !.
+
 split_string_codes_aux([C|Cs], SeparatorCodes, _, [], Cs) :-
     member(C, SeparatorCodes), !.
+
 split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, [C|SubstringCodes], RestCodes) :-
     \+ member(C, SeparatorCodes),
     \+ member(C, PaddingCodes), !,
     split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
+
 split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes) :-
     member(C, PaddingCodes), !,
     split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
@@ -201,6 +205,7 @@ chiedi_generi_preferiti(GeneriPreferiti) :-
 /* Predicato che chiede all'utente di inserire
    un peso per ciascun genere musicale preferito. */
 chiedi_peso_generi([]).
+
 chiedi_peso_generi([Genere | Altri]) :- 
     format('Inserisci il peso per il genere ~w: ', [Genere]),
     read(Peso),
@@ -220,6 +225,7 @@ chiedi_peso_generi([Genere | Altri]) :-
    ponderato, elencandole con la posizione, il titolo,
    l'artista e il punteggio ponderato. */
 stampa_canzoni_ordinate([], _).
+
 stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :- 
     canzone(Titolo, Artista, Genere, _),
     format('~d# ~w (Artista: ~w, Genere: ~w, Punteggio ponderato: ~2f)\n', 
@@ -279,6 +285,7 @@ mostra_generi_disponibili :-
     
 /* Predicato che stampa la lista dei generi preferiti. */
 stampa_generi([]).
+
 stampa_generi([Genere-Peso | Rest]) :- 
     format('~w: ~w\n', [Genere, Peso]),
     stampa_generi(Rest).
