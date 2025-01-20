@@ -42,7 +42,7 @@ loop_menu :-
     write('1. Carica un file con le canzoni\n'),
     write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
     write('3. Stampa la classifica delle canzoni\n'),
-    write('4. Stampa la lista dei generi preferiti\n'),
+    write('4. Stampa i generi preferiti con il relativo punteggio\n'),
     write('5. Esci\n'),
     write('Seleziona un\'opzione:\n'),
     read(Scelta),
