@@ -251,7 +251,7 @@ stampaClassifica raccomandate =
     mapM_ stampaConPosizione (zip [1..] raccomandate)
     where
         stampaConPosizione (pos, (punteggioPonderato, Canzone titolo artista genere _)) = do
-            putStrLn $ show pos ++ "#" ++ titolo ++ " (Artista: " ++ artista ++ ", Genere: " ++ genere ++ ", Punteggio Ponderato: " ++ show punteggioPonderato
+            putStrLn $ show pos ++ "# " ++ titolo ++ "(Artista: " ++ artista ++ ", Genere: " ++ genere ++ ", Punteggio Ponderato: " ++ show punteggioPonderato
 
 -- | Visualizza i generi preferiti e i pesi associati.
 visualizzaGeneriPreferiti :: PesiGeneri -> IO ()
