@@ -208,10 +208,11 @@
        format('Inserisci il peso per il genere ~w: ', [Genere]),
        read(Peso),
        (   number(Peso), Peso > 0
-       ->  assertz(genere_preferito(Genere, Peso)),
-           chiedi_peso_generi(Altri)
-       ;   write('Peso non valido. Riprova.\n'),
-           chiedi_peso_generi([Genere | Altri]) ).
+       ->  (   retract(genere_preferito(Genere, _)) -> true ; true ),
+            assertz(genere_preferito(Genere, Peso)),
+            chiedi_peso_generi(Altri)
+        ;   write('Peso non valido. Riprova.\n'),
+            chiedi_peso_generi([Genere | Altri]) ).
    
    /* ================================================
       Predicati per la raccomandazione e la classifica
