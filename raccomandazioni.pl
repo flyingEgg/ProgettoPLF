@@ -175,31 +175,37 @@
       Predicati per la gestione dei generi preferiti
       ================================================ */
    
-   /* Predicato che permette all'utente di selezionare 
-      e gestire i generi musicali preferiti. */
-   gestisci_generi_preferiti :- 
-       mostra_generi_disponibili,
-       write('Inserisci i tuoi generi preferiti, uno per volta. Scrivi "fine" per terminare.\n'),
-       chiedi_generi_preferiti([]).
-   
-   /* Predicato che raccoglie i generi preferiti inseriti
-      dall'utente e li aggiunge alla lista di preferiti. */
-   chiedi_generi_preferiti(GeneriPreferiti) :- 
-       ottieni_generi_disponibili(GeneriDisponibili),
-       write('Inserisci un genere preferito: '),
-       read(Genere),
-       (   Genere == fine
-       ->  chiedi_peso_generi(GeneriPreferiti)
-       ;   normalizza_genere(Genere, GenereNormalizzato),
-           downcase_atom(GenereNormalizzato, GenereNormalizzatoMinuscolo),
-           maplist(downcase_atom, GeneriDisponibili, GeneriDisponibiliMinuscolo),
-           (   member(GenereNormalizzatoMinuscolo, GeneriDisponibiliMinuscolo)
-           ->  append(GeneriPreferiti, [GenereNormalizzato], NuoviGeneri),
-               chiedi_generi_preferiti(NuoviGeneri)
-           ;   write('Genere non valido. Riprova.\n'),
-               chiedi_generi_preferiti(GeneriPreferiti)
-           )
-       ).
+    /* Predicato che permette all'utente di selezionare e gestire i generi musicali preferiti. */
+    gestisci_generi_preferiti :- 
+        ottieni_generi_disponibili(GeneriDisponibili),
+        (   GeneriDisponibili == []
+        ->  write('Non ci sono generi disponibili. Impossibile inserire preferenze.\n')
+        ;   mostra_generi_disponibili,
+            write('Inserisci i tuoi generi preferiti, uno per volta. Scrivi "fine" per terminare.\n'),
+            chiedi_generi_preferiti([])
+        ).
+
+    /* Predicato che raccoglie i generi preferiti inseriti dall'utente e li aggiunge alla lista di preferiti. */
+    chiedi_generi_preferiti(GeneriPreferiti) :- 
+        ottieni_generi_disponibili(GeneriDisponibili),
+        write('Inserisci un genere preferito: '),
+        read(Genere),
+        (   Genere == fine
+        ->  chiedi_peso_generi(GeneriPreferiti)
+        ;   normalizza_genere(Genere, GenereNormalizzato),
+            maplist(normalizza_genere, GeneriDisponibili, GeneriDisponibiliNormalizzati),
+            (   member(GenereNormalizzato, GeneriDisponibiliNormalizzati)
+            ->  (   member(GenereNormalizzato, GeneriPreferiti)
+                ->  write('Questo genere è già presente tra i tuoi preferiti.\n'),
+                    chiedi_generi_preferiti(GeneriPreferiti)
+                ;   append(GeneriPreferiti, [GenereNormalizzato], NuoviGeneri),
+                    write('Genere aggiunto con successo.\n'),
+                    chiedi_generi_preferiti(NuoviGeneri)
+                )
+            ;   write('Genere non valido. Riprova.\n'),
+                chiedi_generi_preferiti(GeneriPreferiti)
+            )
+        ).
    
    /* Predicato che chiede all'utente di inserire
       un peso per ciascun genere musicale preferito. */
