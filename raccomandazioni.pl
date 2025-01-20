@@ -69,9 +69,7 @@
         ->  write('\n\nCanzoni caricate con successo!\n')
         ;   write('\nErrore nel caricamento del file. Riprova.\n')
         ).
-   
 
-% boh riprendi da qui
     carica_canzoni(File) :-
         open(File, read, Stream),
         leggi_righe(Stream, Lines),
@@ -103,7 +101,6 @@
          append(Accumulatore, [Char], NuovoAccumulatore),
          processa_riga_singola(Rest, NuovoAccumulatore, Stringa, RestDopoLinea).
 
-
     parsing_righe(Riga) :-
         split_string(Riga, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
             string_trim(PunteggioStr, TrimmedPunteggioStr),
@@ -128,11 +125,9 @@
     string_codes(String, Codes) :-
         String = Codes.
 
-    % Utilità per rimuovere spazi o padding
     string_trim(String, Trimmed) :-
         split_string(String, '', ' \t\n\r', [Trimmed|_]).
 
-    % Read a line of input and return it as a string
     read_line_to_string(Stream, String) :-
         read_line(Stream, Codes),
         atom_codes(Atom, Codes),
@@ -142,10 +137,9 @@
         atom_codes(Atom, Codes),
         string_codes(String, Codes).
 
-    % Read a line of input as a list of character codes
     read_line(Stream, Codes) :-
         get_code(Stream, Char),
-        ( Char == -1 -> % End of file
+        ( Char == -1 -> 
             Codes = []
         ; Char == 10 ->
             Codes = []
@@ -154,7 +148,6 @@
         ).
 
 
-       % Definisci il predicato split_string/4
     split_string(String, Separator, Padding, Substrings) :-
         atom_codes(String, StringCodes),
         atom_codes(Separator, SeparatorCodes),

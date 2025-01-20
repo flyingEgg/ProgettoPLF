@@ -164,12 +164,12 @@ aggiornaPesi [] pesi = return pesi
 aggiornaPesi (g:gs) pesi = do
     let pesoCorrente = Map.findWithDefault 1.0 g pesi
     putStrLn $ "Peso corrente per il genere '" ++ g ++ "': " ++ show pesoCorrente
-    putStrLn "Vuoi aggiornare il peso? (s/N)"
+    putStrLn "Vuoi aggiornare il peso? (scrivere 'si' per continuare)"
     risposta <- getLine
     controllaRisposta risposta
    where
         controllaRisposta r
-            | r == "s" = do
+            | r == "si" = do
                 putStrLn $ "Inserisci il nuovo peso per il genere '" ++ g ++ "':"
                 nuovoPeso <- leggiPesoValido
                 aggiornaPesi gs (Map.insert g nuovoPeso pesi)
@@ -251,11 +251,7 @@ stampaClassifica raccomandate =
     mapM_ stampaConPosizione (zip [1..] raccomandate)
     where
         stampaConPosizione (pos, (punteggioPonderato, Canzone titolo artista genere _)) = do
-            putStrLn $ "#" ++ show pos ++ " - " ++ titolo
-            putStrLn $ "   Artista: " ++ artista
-            putStrLn $ "   Genere: " ++ genere
-            putStrLn $ "   Punteggio ponderato: " ++ show punteggioPonderato
-            putStrLn "-------------------------------------------"
+            putStrLn $ show pos ++ "#" ++ titolo ++ " (Artista: " ++ artista ++ ", Genere: " ++ genere ++ ", Punteggio Ponderato: " ++ show punteggioPonderato
 
 -- | Visualizza i generi preferiti e i pesi associati.
 visualizzaGeneriPreferiti :: PesiGeneri -> IO ()
