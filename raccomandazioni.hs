@@ -100,7 +100,6 @@ verificaCanzoni canzoni
         putStrLn "File caricato con successo!"
         return canzoni
 
-
 {- Azione che richiede all'utente di inserire il nome del file con le canzoni
    e ne effettua una validazione dell'input tramite la funzione validaFile. -}
 chiediNomeFile :: IO FilePath
@@ -245,6 +244,10 @@ raccomanda pesi canzoni =
 arricchisci :: PesiGeneri -> [Canzone] -> [(Double, Canzone)]
 arricchisci pesi canzoni =
     [ (fromIntegral (punteggio c) * Map.findWithDefault 1.0 (genere c) pesi, c) | c <- canzoni ]
+
+-- #########################################################
+-- Stampe
+-- #########################################################
 
 {- Funzione che stampa le canzoni ordinate con il loro punteggio ponderato. -}
 stampaClassifica :: [(Double, Canzone)] -> IO ()

@@ -28,16 +28,16 @@
    Predicati principali
    ================================================ */
 
-/* Predicato che 'main' è il punto di ingresso principale.
+/* Predicato che funge da punto di ingresso principale.
    Inizializza il programma e avvia il menu interattivo
    per l'utente. */
 main :-
     write('Benvenuto nel sistema di raccomandazione musicale!\n'),
     loop_menu.
 
-/* Predicato che 'loop_menu' gestisce la selezione delle azioni
-   da parte dell'utente nel menu principale. Ogni opzione del menu
-   chiama un predicato specifico per eseguire l'azione corrispondente. */
+/* Predicato che gestisce la selezione delle azioni da parte 
+   dell'utente nel menu principale. Ogni opzione del menu chiama
+   un predicato specifico per eseguire l'azione corrispondente. */
 loop_menu :-
     write('\nScegli un\'azione:\n'),
     write('1. Carica un file con le canzoni\n'),
@@ -56,7 +56,7 @@ loop_menu :-
     loop_menu.
 
 /* ================================================
-   Predicati di caricamento delle canzoni
+   Predicati per il caricamento delle canzoni
    ================================================ */
 
 /* Predicato che permette all'utente di inserire il nome del
@@ -70,12 +70,15 @@ carica_canzoni_interattivo :-
     ;   write('\nErrore nel caricamento del file. Riprova.\n')
     ).
 
+/* Predicato che analizza il contenuto del file e ne
+   "processa" il contenuto. */
 carica_canzoni(File) :-
     open(File, read, Stream),
     leggi_righe(Stream, Lines),
     close(Stream),
     processa_righe(Lines).
 
+/* Predicato per leggere le  */
 leggi_righe(Stream,[]):-
     at_end_of_stream(Stream).
 
@@ -84,6 +87,7 @@ leggi_righe(Stream,[X|L]):-
     get_char(Stream,X),
     leggi_righe(Stream,L).
 
+/* Predicato che processa e avvia il parsing delle righe. */
 processa_righe([]) :- !.
 
 processa_righe([Char | Rest]) :-
@@ -91,6 +95,7 @@ processa_righe([Char | Rest]) :-
     parsing_righe(Stringa),
     processa_righe(RestDopoLinea).
 
+/* Predicato che provcessa una singola riga. */
 processa_riga_singola([], Accumulatore, Stringa, []) :-
     atom_chars(Stringa, Accumulatore).
 
@@ -102,6 +107,7 @@ processa_riga_singola([Char | Rest], Accumulatore, Stringa, RestDopoLinea) :-
     append(Accumulatore, [Char], NuovoAccumulatore),
     processa_riga_singola(Rest, NuovoAccumulatore, Stringa, RestDopoLinea).
 
+/* Predicato che effettua il parsing delle righe. */
 parsing_righe(Riga) :-
     split_string(Riga, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
         string_trim(PunteggioStr, TrimmedPunteggioStr),
@@ -109,35 +115,42 @@ parsing_righe(Riga) :-
         ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
         ;   format('Errore nella conversione del punteggio: ~w\n', [PunteggioStr])
         ).
+    
 /* ================================================
    Predicati ausiliari per la gestione delle stringhe
    ================================================ */
 
+/* Predicato ... */
 number_string(Number, String) :-
     var(Number), !,
     atom_codes(String, Codes),
     catch(number_codes(Number, Codes), _, fail).
 
+/* Predicato ... */
 number_string(Number, String) :-
     number(Number), !,
     number_codes(Number, Codes),
     atom_codes(String, Codes).
 
+/* Predicato ... */
 string_trim(String, Trimmed) :-
     split_string(String, '', ' \t\n\r', [Trimmed|_]).
 
+/* Predicato ... */
 split_string(String, Separator, Padding, Substrings) :-
     atom_codes(String, StringCodes),
     atom_codes(Separator, SeparatorCodes),
     atom_codes(Padding, PaddingCodes),
     split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, Substrings).
 
+/* Predicato ... */
 split_string_codes([], _, _, []) :- !.
 split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substrings]) :-
     split_string_codes_aux(StringCodes, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes),
     atom_codes(Substring, SubstringCodes),
     split_string_codes(RestCodes, SeparatorCodes, PaddingCodes, Substrings).
 
+/* Predicato ... */
 split_string_codes_aux([], _, _, [], []) :- !.
 split_string_codes_aux([C|Cs], SeparatorCodes, _, [], Cs) :-
     member(C, SeparatorCodes), !.
@@ -270,38 +283,42 @@ stampa_generi([Genere-Peso | Rest]) :-
     format('~w: ~w\n', [Genere, Peso]),
     stampa_generi(Rest).
     
-/* Predicato che normalizza il genere, 
-   trasformandolo in minuscolo e rimuovendo eventuali spazi. */
+/* Predicato che normalizza un genere, trasformandolo in minuscolo
+   e rimuovendo gli spazi. Questo permette di confrontare i generi
+   in modo case-insensitive e indipendentemente dalla formattazione. */
 normalizza_genere(Genere, GenereNormalizzato) :-
     (atom(Genere) -> true ; atom_codes(Genere, Genere)),
     downcase_atom(Genere, GenereLower),
     atom_codes(GenereLower, Codici),
     rimuovi_spazi(Codici, CodiciNormalizzati),
     atom_codes(GenereNormalizzato, CodiciNormalizzati).
-    
+
+/* Predicato che converte tutti i caratteri di un atomo in minuscolo. */
 downcase_atom(Atom, LowercaseAtom) :-
     atom_codes(Atom, Codes),
     maplist(to_lower, Codes, LowercaseCodes),
     atom_codes(LowercaseAtom, LowercaseCodes).
 
+/* Predicato che converte un singolo carattere in minuscolo. */
 to_lower(Code, LowerCode) :-
     Code >= 65, Code =< 90,
     LowerCode is Code + 32.
 to_lower(Code, Code).
 
-/* Predicato che 'peso_genere' restituisce il peso di un genere.
-   Se non è specificato, viene utilizzato un peso di 1. */
+/* Predicato che restituisce il peso associato ad un genere. Se non è
+   stato definito un peso specifico, viene utilizzato un peso predefinito (1). */
 peso_genere(Genere, Peso) :- 
     (   genere_preferito(Genere, Peso) -> true ; Peso = 1 ).
 
-/* Predicato che rimuove gli spazi da una stringa. */
+/* Predicato che rimuove tutti gli spazi da una stringa, sia che sia
+   rappresentata come atomo o come lista di codici ASCII. */
 rimuovi_spazi(Stringa, StringaRimossa) :-
     (    atom(Stringa) -> atom_codes(Stringa, Codici) ; Codici = Stringa ),
     rimuovi_spazi_codici(Codici, CodiciRimossi),
     (    atom(Stringa) -> atom_codes(StringaRimossa, CodiciRimossi) ; StringaRimossa = CodiciRimossi ).
 
-/* Predicato che rimuove gli spazi dalla lista
-   di codici ASCII di una stringa. */
+/* Predicato ausiliario che rimuove gli spazi (codice ASCII 32)
+   da una lista di codici ASCII. */
 rimuovi_spazi_codici([], []).
 rimuovi_spazi_codici([32|T], R) :- rimuovi_spazi_codici(T, R).
 rimuovi_spazi_codici([H|T], [H|R]) :- H \= 32, rimuovi_spazi_codici(T, R).
