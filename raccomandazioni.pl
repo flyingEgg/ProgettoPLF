@@ -239,14 +239,14 @@ stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :-
    in base al suo genere e al suo punteggio originale.
    Poi stampa la classifica ordinata delle canzoni. */
 stampa_classifica :-
-    findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), PunteggiModificati),   
+    findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), PunteggiModificati),
     findall(Punteggio-Titolo, (canzone(Titolo, _, _, Punteggio), \+ member(_-Titolo, PunteggiModificati)), PunteggiInvariati),
     append(PunteggiModificati, PunteggiInvariati, PunteggiTotali),
-    list_to_set(PunteggiTotali, PunteggiUnici),
-    sort_descending(PunteggiUnici, PunteggiOrdinati),
-    (   PunteggiUnici == []
+    msort(PunteggiTotali, PunteggiOrdinatiAsc),
+    reverse(PunteggiOrdinatiAsc, PunteggiOrdinati),
+    (   PunteggiTotali == []
     ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
-    ;   write('\n'),
+    ;   write('\nClassifica delle canzoni ordinate per punteggio:\n'),
         stampa_canzoni_ordinate(PunteggiOrdinati, 1)
     ).
 
