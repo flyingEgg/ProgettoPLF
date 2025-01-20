@@ -123,30 +123,8 @@ number_string(Number, String) :-
     number_codes(Number, Codes),
     atom_codes(String, Codes).
 
-string_codes(String, Codes) :-
-    String = Codes.
-
 string_trim(String, Trimmed) :-
     split_string(String, '', ' \t\n\r', [Trimmed|_]).
-
-read_line_to_string(Stream, String) :-
-    read_line(Stream, Codes),
-    atom_codes(Atom, Codes),
-    atom_string(Atom, String).
-
-atom_string(Atom, String) :-
-    atom_codes(Atom, Codes),
-    string_codes(String, Codes).
-
-read_line(Stream, Codes) :-
-    get_code(Stream, Char),
-    ( Char == -1 -> 
-        Codes = []
-    ; Char == 10 ->
-        Codes = []
-    ; Codes = [Char|Rest],
-        read_line(Stream, Rest)
-    ).
 
 split_string(String, Separator, Padding, Substrings) :-
     atom_codes(String, StringCodes),
@@ -264,33 +242,6 @@ calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :-
    Predicati ausiliari
    ================================================ */
 
-split_string(Input, Sep, Parts) :-
-    atom_codes(Input, Codes),
-    atom_codes(Sep, [SepCode]),
-    split_codes(Codes, SepCode, [], Parts).
-    
-split_codes([], _, Acc, [Part]) :-
-    atom_codes(Part, Acc).
-
-split_codes([Sep|Rest], Sep, Acc, [Part|Parts]) :-
-    atom_codes(Part, Acc),
-    split_codes(Rest, Sep, [], Parts).
-
-split_codes([C|Rest], Sep, Acc, Parts) :-
-    C \= Sep,
-    append(Acc, [C], NewAcc),
-    split_codes(Rest, Sep, NewAcc, Parts).
-    
-list_to_set([], []).
-
-list_to_set([Head|Tail], [Head|SetTail]) :-
-    \+ member(Head, Tail), 
-    list_to_set(Tail, SetTail).
-
-list_to_set([Head|Tail], Set) :-
-    member(Head, Tail),
-    list_to_set(Tail, Set).
-
 /* Predicato che mostra i generi preferiti associati
    con il rispettivo peso. */
 mostra_generi_preferiti :- 
@@ -312,31 +263,6 @@ ottieni_generi_disponibili(GeneriDisponibili):-
 mostra_generi_disponibili :-
     ottieni_generi_disponibili(GeneriOrdinati),
     format('Generi disponibili: ~w\n', [GeneriOrdinati]).
-
-/* Predicato che rimuove i duplicati da una lista */
-rimuovi_duplicati([], []).
-rimuovi_duplicati([H|T], [H|Rest]) :-
-    \+ member(H, T),
-    rimuovi_duplicati(T, Rest).
-rimuovi_duplicati([H|T], Rest) :-
-    member(H, T),
-    rimuovi_duplicati(T, Rest).
-
-/* Ordina i generi */
-ordina_generi([], []).
-ordina_generi([Genere], [Genere]).
-ordina_generi([Genere1, Genere2 | Rest], [Genere1 | RestOrdinato]) :-
-    ordina_generi([Genere2 | Rest], RestOrdinato),
-    ordina_lista(Genere1, RestOrdinato).
-    
-/* Predicato ausiliario per ordinare un genere */
-ordina_lista([], []).
-ordina_lista([H|T], [H|SortedT]) :-
-    ordina_lista(T, SortedT),
-    H @=< SortedT.
-ordina_lista([H|T], [SortedH|SortedT]) :-
-    ordina_lista(T, SortedT),
-    H @> SortedH.
     
 /* Predicato che stampa la lista dei generi preferiti. */
 stampa_generi([]).
@@ -357,33 +283,11 @@ downcase_atom(Atom, LowercaseAtom) :-
     atom_codes(Atom, Codes),
     maplist(to_lower, Codes, LowercaseCodes),
     atom_codes(LowercaseAtom, LowercaseCodes).
-    
+
 to_lower(Code, LowerCode) :-
     Code >= 65, Code =< 90,
     LowerCode is Code + 32.
 to_lower(Code, Code).
-
-sort_descending([], []).
-
-sort_descending([X], [X]).
-
-sort_descending([X, Y | Rest], [X | SortedRest]) :-
-    compare(>, X, Y), !,
-    sort_descending([Y | Rest], SortedRest).
-
-sort_descending([X, Y | Rest], [Y | SortedRest]) :-
-    sort_descending([X | Rest], SortedRest).
-
-invert_punteggio(-Punteggio-Titolo, Punteggio-Titolo) :- !.
-invert_punteggio(Punteggio-Titolo, -Punteggio-Titolo).
-
-compare_descending(Delta, X, Y) :-
-    compare(DeltaReverse, X, Y),
-    reverse_compare(DeltaReverse, Delta).
-
-reverse_compare(<, >).
-reverse_compare(=, =).
-reverse_compare(>, <).
 
 /* Predicato che 'peso_genere' restituisce il peso di un genere.
    Se non è specificato, viene utilizzato un peso di 1. */
