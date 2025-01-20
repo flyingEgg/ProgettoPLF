@@ -42,13 +42,13 @@
    Inizializza il programma e avvia il menu interattivo
    per l'utente. */
 main :-
-    write('\n--- Sistema di Raccomandazione Musicale ---\n'),
     loop_menu.
 
 /* Predicato che gestisce la selezione delle azioni da parte 
    dell'utente nel menu principale. Ogni opzione del menu chiama
    un predicato specifico per eseguire l'azione corrispondente. */
 loop_menu :-
+    write('\n--- Sistema di Raccomandazione Musicale ---\n'),
     write('1. Carica un file con le canzoni\n'),
     write('2. Gestisci i generi preferiti (aggiungi o modifica)\n'),
     write('3. Stampa la classifica delle canzoni\n'),
