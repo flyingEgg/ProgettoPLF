@@ -81,13 +81,13 @@
 
 \newpage
 \section{Specifica del problema}
-\textit{Scrivere un programma in Haskell e un programma in Prolog per implementare un sistema di raccomandazione di canzoni. Il sistema suggerisce canzoni a un utente basandosi sulle sue preferenze musicali e utilizza un punteggio di gradimento per ordinare le canzoni più popolari o rilevanti.}
+\textit{Scrivere un programma Haskell e un programma Prolog per implementare un sistema di raccomandazione di canzoni. Il programma legge le canzoni espresse in quattro attributi: titolo, artista, genere musicale e punteggio; da un file con valori separati da virgole, il cui nome viene acquisito da tastiera e le suggerisce all’utente basandosi sulle sue preferenze musicali, utilizzando un punteggio di gradimento acquisito da tastiera e configurato su uno o più generi, per creare una classifica con le canzoni ordinate secondo il punteggio ponderato da quello di gradimento del o dei generi musicali.}
 
 \newpage
 \section{Analisi del problema}
 \subsection{Dati in ingresso}
 \begin{itemize}
-    \item Le canzoni nel formato:
+    \item Un file di valori separati da virgole contenenti le canzoni nel formato:
     \begin{verbatim}
     Titolo,Artista,Genere,Punteggio
     \end{verbatim}
@@ -98,15 +98,33 @@
 \subsection{Dati in uscita}
 \begin{itemize}
     \item Una classifica ordinata di canzoni basata sui punteggi ponderati.
-    \item Eventuali messaggi di errore o conferma nelle interazioni utente.
+    \item Una lista dei generi impostati come preferiti con il rispettivo peso associato.
 \end{itemize}
 
-\subsection{Relazioni tra i dati}
-Ogni canzone è caratterizzata da un titolo, un artista, un genere, e un punteggio. Il punteggio ponderato è calcolato come:
-\[
-Punteggio\ Ponderato = Punteggio \times Peso\_{Genere}
-\]
-se il genere della canzone appartiene ai generi preferiti, altrimenti è uguale al punteggio originale.
+\subsection{Relazioni intercorrenti}
+Ogni canzone è definita da quattro attributi principali:
+\begin{itemize}
+    \item \textbf{Titolo}: la denominazione della canzone.  
+    \item \textbf{Artista}: l’autore o il gruppo musicale che l’ha prodotta.  
+    \item \textbf{Genere}: la categoria musicale di appartenenza (ad esempio, pop, rock, jazz).  
+    \item \textbf{Punteggio}: una valutazione numerica che rappresenta il grado di apprezzamento della canzone.  
+\end{itemize}
+
+Il \textbf{Punteggio Ponderato} viene calcolato secondo la seguente formula:
+\begin{center}
+    \textit{
+    \[
+    \text{Punteggio Ponderato} =
+    \begin{cases} 
+      \text{Punteggio} \times \text{Peso Genere}, & \text{se il genere è preferito dall’utente} \\
+      \text{Punteggio originale}, & \text{altrimenti}
+    \end{cases}
+    \]
+    }
+\end{center}
+
+\noindent
+Il \textbf{Peso Genere} rappresenta un coefficiente che riflette il livello di preferenza dell’utente verso un determinato genere musicale. Ciò consente di personalizzare la valutazione delle canzoni, attribuendo maggiore rilevanza ai generi di interesse senza tuttavia escludere le altre categorie, bilanciando così criteri oggettivi e preferenze soggettive.  
 
 \newpage
 \section{Progettazione dell'algoritmo}
