@@ -198,7 +198,12 @@ chiedi_generi_preferiti(GeneriPreferiti) :-
     write('Inserisci un genere preferito: '),
     read(Genere),
     (   Genere == fine
-    ->  chiedi_peso_generi(GeneriPreferiti)
+    ->  write('\nVuoi aggiornare i pesi? (\'s\'/\'n\')\n'),
+        read(Risposta),
+        (   Risposta == 's'
+        ->  chiedi_peso_generi(GeneriPreferiti)
+        ;   write('\nPeso invariato\n')
+        )
     ;   normalizza_genere(Genere, GenereNormalizzato),
         maplist(normalizza_genere, GeneriDisponibili, GeneriDisponibiliNormalizzati),
         (   member(GenereNormalizzato, GeneriDisponibiliNormalizzati)
