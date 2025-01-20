@@ -231,12 +231,16 @@
       in base al suo genere e al suo punteggio originale.
       Poi stampa la classifica ordinata delle canzoni. */
    stampa_classifica :-
-       findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), Punteggi),   
-       (   Punteggi == []
+       findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), PunteggiModificati),   /* calcolo dei punteggi */
+
+       findall(Punteggio-Titolo, (canzone(Titolo, _, _, Punteggio), \+ member(_-Titolo, PunteggiModificati)), PunteggiInvariati), /* ottenimento delle canzoni non modificate, escludendo quelle già ponderate */
+       append(PunteggiModificati, PunteggiInvariati, PunteggiTotali),
+       list_to_set(PunteggiTotali, PunteggiUnici),
+       sort_descending(PunteggiUnici, PunteggiOrdinati),
+
+       (   PunteggiUnici == []
        ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
-       ;   list_to_set(Punteggi, PunteggiUnici),
-           sort_descending(PunteggiUnici, PunteggiOrdinati),
-           write('\n'),
+       ;   write('\n'),
            stampa_canzoni_ordinate(PunteggiOrdinati, 1)
        ).
    
@@ -247,7 +251,10 @@
        canzone(Titolo, _, Genere, Punteggio),
        normalizza_genere(Genere, GenereNormalizzato),
        peso_genere(GenereNormalizzato, Peso),
+       Peso \= 1,
        PunteggioPonderato is Punteggio * Peso.
+
+
    
    /* ================================================
       Predicati ausiliari
