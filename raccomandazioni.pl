@@ -242,7 +242,7 @@ stampa_classifica :-
     findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), PunteggiModificati),
     findall(Punteggio-Titolo, (canzone(Titolo, _, _, Punteggio), \+ member(_-Titolo, PunteggiModificati)), PunteggiInvariati),
     append(PunteggiModificati, PunteggiInvariati, PunteggiTotali),
-    msort(PunteggiTotali, PunteggiOrdinatiAsc),
+    sort(PunteggiTotali, PunteggiOrdinatiAsc),
     reverse(PunteggiOrdinatiAsc, PunteggiOrdinati),
     (   PunteggiTotali == []
     ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
