@@ -120,30 +120,40 @@ parsing_righe(Riga) :-
    Predicati ausiliari per la gestione delle stringhe
    ================================================ */
 
-/* Predicato ... */
+/* Predicato che permette di creare un numero a partire da una stringa.
+   Viene utilizzato quando il primo argomento (Number) è una variabile
+   e il predicato tenta di inferire il valore della variabile a partire dalla stringa. */
 number_string(Number, String) :-
     var(Number), !,
     atom_codes(String, Codes),
     catch(number_codes(Number, Codes), _, fail).
 
-/* Predicato ... */
+/* Predicato che consente di creare una stringa a partire da un numero.
+   Viene utilizzato quando il primo argomento (Number) è già un numero
+   e il predicato converte questo numero in una stringa. */
 number_string(Number, String) :-
     number(Number), !,
     number_codes(Number, Codes),
     atom_codes(String, Codes).
 
-/* Predicato ... */
+/* Predicato rimuove gli spazi da una stringa.*/
 string_trim(String, Trimmed) :-
     split_string(String, '', ' \t\n\r', [Trimmed|_]).
 
-/* Predicato ... */
+/* Predicato che divide una stringa in sottostringhe in base a un separatore e a un padding.
+   String: stringa di input da suddividere.
+   Separator: caratteri che fungono da separatori tra le sottostringhe.
+   Padding: caratteri da ignorare all'inizio e alla fine delle sottostringhe.
+   Substrings: lista delle sottostringhe risultanti dalla suddivisione. */
 split_string(String, Separator, Padding, Substrings) :-
     atom_codes(String, StringCodes),
     atom_codes(Separator, SeparatorCodes),
     atom_codes(Padding, PaddingCodes),
     split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, Substrings).
 
-/* Predicato ... */
+/* Predicato che suddivide una stringa in sottostringhe, eliminando il padding
+   e utilizzando il separatore specificato.
+   Restituisce la lista di sottostringhe una alla volta. */
 split_string_codes([], _, _, []) :- !.
 
 split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substrings]) :-
@@ -151,7 +161,9 @@ split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substri
     atom_codes(Substring, SubstringCodes),
     split_string_codes(RestCodes, SeparatorCodes, PaddingCodes, Substrings).
 
-/* Predicato ... */
+/* Predicato ausiliario che rileva un separatore all'inizio della stringa.
+   Quando viene trovato un separatore, termina l'estrazione della sottostringa corrente
+   e restituisce i caratteri rimanenti per l'elaborazione successiva. */
 split_string_codes_aux([], _, _, [], []) :- !.
 
 split_string_codes_aux([C|Cs], SeparatorCodes, _, [], Cs) :-
