@@ -3,14 +3,16 @@
 /* # Progetto di raccomandazione di canzoni                # */
 /* # Studente: Giaconi Christian, Giacomo Rossi            # */
 /* # Matricola: 314045, 314671                             # */
-/* ######################################################### 
-Specifica: scrivere un programma Prolog per implementare un sistema di raccoandazione di canzoni.
-Il programma legge le canzoni espresse in quattro attributi: titolo, artista,
-genere musicale e punteggio; da un file con valori separati da virgole, il cui nome viene acquisito
-da tastiera e le suggerisce all’utente basandosi sulle sue preferenze musicali, utilizzando un
-punteggio di gradimento acquisito da tastiera e configurato su uno o più generi, per creare una
-classifica con le canzoni ordinate secondo il punteggio ponderato da quello di gradimento del
-o dei generi musicali.
+/* ######################################################### */
+
+/*
+    Specifica: scrivere un programma Prolog per implementare un sistema di raccoandazione di canzoni.
+    Il programma legge le canzoni espresse in quattro attributi: titolo, artista,
+    genere musicale e punteggio; da un file con valori separati da virgole, il cui nome viene acquisito
+    da tastiera e le suggerisce all’utente basandosi sulle sue preferenze musicali, utilizzando un
+    punteggio di gradimento acquisito da tastiera e configurato su uno o più generi, per creare una
+    classifica con le canzoni ordinate secondo il punteggio ponderato da quello di gradimento del
+    o dei generi musicali.
 */
 
 /* ================================================
