@@ -4,16 +4,13 @@
 -- # Studente: Giaconi Christian, Giacomo Rossi            #
 -- # Matricola: 314045, 314671                             #
 -- #########################################################
-
-{- Specifica:
-    Scrivere un programma in Haskell per implementare un sistema avanzato di raccomandazione di canzoni.
-    Il sistema suggerisce canzoni a un utente in base a:
-    - Preferenze per uno o più generi musicali specificati.
-    - Un sistema di punteggio ponderato per dare priorità a canzoni più rilevanti.
-    L'utente deve fornire un file di testo con le canzoni nel seguente formato:
-        Titolo,Artista,Genere,Punteggio
-    Dove "Punteggio" è un intero da 1 a 10.
-    Le canzoni saranno ordinate in base al punteggio ponderato e filtrate per genere.
+{-  Specifica: scrivere un programma Haskell per implementare un sistema di raccoandazione di canzoni.
+    Il programma legge le canzoni espresse in quattro attributi: titolo, artista,
+    genere musicale e punteggio; da un file con valori separati da virgole, il cui nome viene acquisito
+    da tastiera e le suggerisce all’utente basandosi sulle sue preferenze musicali, utilizzando un
+    punteggio di gradimento acquisito da tastiera e configurato su uno o più generi, per creare una
+    classifica con le canzoni ordinate secondo il punteggio ponderato da quello di gradimento del
+    o dei generi musicali.
 -}
 
 module Main where
