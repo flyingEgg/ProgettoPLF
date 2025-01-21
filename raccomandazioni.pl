@@ -76,19 +76,36 @@ carica_canzoni_interattivo :-
     write('Inserire tra apici il nome del file contenente le canzoni: '), nl,
     read(File),
     (   catch(carica_canzoni(File), _, fail)
-    ->  write('\n\nCanzoni caricate con successo!\n')
+    ->  write('\nFile caricato con successo!\n')
     ;   write('\nErrore nel caricamento del file. Riprova.\n')
     ).
 
 /* Predicato che analizza il contenuto del file e ne
-   "processa" il contenuto. */
+   "processa" il contenuto. 
+
+   Gli argomenti sono:
+     - Il percorso del file che contiene i dati delle canzoni.   
+*/
 carica_canzoni(File) :-
     open(File, read, Stream),
     leggi_righe(Stream, Lines),
     close(Stream),
     processa_righe(Lines).
 
-/* Predicato per leggere le  */
+/* 
+    Predicato per leggere le righe del file
+
+    Gli argomenti sono:
+     - Lo stream di lettura del file.
+     - La lista che conterrà le righe lette.
+
+    Caso base: Quando si raggiunge la fine del file,
+               il predicato termina e la lista risultante è vuota.
+
+    Caso generale: Se non si è ancora alla fine del file, 
+                   si legge un carattere dallo stream e lo si aggiunge alla lista, 
+                   continuando a leggere il resto del file ricorsivamente.
+*/
 leggi_righe(Stream,[]):-
     at_end_of_stream(Stream).
 
@@ -97,7 +114,19 @@ leggi_righe(Stream,[X|L]):-
     get_char(Stream,X),
     leggi_righe(Stream,L).
 
-/* Predicato che processa e avvia il parsing delle righe. */
+/* 
+    Predicato che processa e avvia il parsing delle righe.
+
+    Gli argomenti sono:
+     - La lista delle righe (una lista di caratteri).
+     
+    Caso base: Quando la lista è vuota, il predicato termina senza fare nulla.
+
+    Caso generale: Quando ci sono ancora righe da processare,
+                   il predicato estrae la prima riga dalla lista,
+                   la analizza, esegue il parsing della stringa risultante, 
+                   e poi ricorsivamente processa le righe rimanenti.    
+*/
 processa_righe([]) :- !.
 
 processa_righe([Char | Rest]) :-
@@ -105,7 +134,25 @@ processa_righe([Char | Rest]) :-
     parsing_righe(Stringa),
     processa_righe(RestDopoLinea).
 
-/* Predicato che provcessa una singola riga. */
+/* Predicato che processa una singola riga.
+
+   Gli argomenti sono:
+    - La lista di caratteri che rappresenta la riga da processare.
+    - Un accumulatore che tiene traccia dei caratteri letti finora.
+    - Una variabile `Stringa` che conterrà la riga completata una volta processata.
+    - Una lista di caratteri rimanenti dopo il trattamento della riga (questo viene usato per la ricorsione).
+
+    Caso base 1: Quando la lista di caratteri è vuota, significa che la riga è stata interamente letta.
+                 Viene quindi creato un atomo con l'accumulatore.
+
+    Caso base 2: Quando viene trovato un carattere di nuova linea, viene completata la riga
+                 e viene creato un atomo con l'accumulatore,
+                 mentre la lista di caratteri rimanenti è restituita come `Rest`.
+
+    Caso generale: Quando un carattere non è una nuova linea, il carattere viene
+                   aggiunto all'accumulatore, e il predicato ricorsivamente processa
+                   i caratteri rimanenti fino al termine della riga.
+*/
 processa_riga_singola([], Accumulatore, Stringa, []) :-
     atom_chars(Stringa, Accumulatore).
 
@@ -117,7 +164,12 @@ processa_riga_singola([Char | Rest], Accumulatore, Stringa, RestDopoLinea) :-
     append(Accumulatore, [Char], NuovoAccumulatore),
     processa_riga_singola(Rest, NuovoAccumulatore, Stringa, RestDopoLinea).
 
-/* Predicato che effettua il parsing delle righe. */
+/* 
+    Predicato che effettua il parsing delle righe.
+
+    Gli argomenti sono:
+     - La riga contenente i dati della canzone da analizzare.
+*/
 parsing_righe(Riga) :-
     split_string(Riga, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
         string_trim(PunteggioStr, TrimmedPunteggioStr),
@@ -130,40 +182,81 @@ parsing_righe(Riga) :-
    Predicati ausiliari per la gestione delle stringhe
    ================================================ */
 
-/* Predicato che permette di creare un numero a partire da una stringa.
-   Viene utilizzato quando il primo argomento (Number) è una variabile
-   e il predicato tenta di inferire il valore della variabile a partire dalla stringa. */
+/* 
+    Predicato che permette di creare un numero a partire da una stringa.
+    Viene utilizzato quando il primo argomento (Number) è una variabile
+    e il predicato tenta di inferire il valore della variabile a partire dalla stringa.
+
+    Gli argomenti sono:
+     - Il numero da ottenere o assegnare alla variabile.
+     - La stringa contenente la rappresentazione del numero.
+
+    Caso 1: Quando `Number` è una variabile, il predicato tenta di inferire il valore della variabile
+                 a partire dalla stringa `String` utilizzando il predicato `atom_codes` per convertire la stringa
+                 in una lista di codici e poi `number_codes` per ottenere il numero corrispondente.
+
+    Caso 2: Quando `Number` è già un numero, il predicato converte il numero in una lista di codici
+                 e poi utilizza `atom_codes` per ottenere la stringa corrispondente al numero.    
+*/
 number_string(Number, String) :-
     var(Number), !,
     atom_codes(String, Codes),
     catch(number_codes(Number, Codes), _, fail).
 
-/* Predicato che consente di creare una stringa a partire da un numero.
-   Viene utilizzato quando il primo argomento (Number) è già un numero
-   e il predicato converte questo numero in una stringa. */
 number_string(Number, String) :-
     number(Number), !,
     number_codes(Number, Codes),
     atom_codes(String, Codes).
 
-/* Predicato rimuove gli spazi da una stringa.*/
+/* 
+    Predicato rimuove gli spazi da una stringa.
+
+    Gli argomenti sono:
+     - La stringa di input dalla quale si vogliono rimuovere gli spazi.
+     - La stringa risultante, senza spazi bianchi, tabulazioni, nuove linee e ritorni a capo.
+*/
 string_trim(String, Trimmed) :-
     split_string(String, '', ' \t\n\r', [Trimmed|_]).
 
-/* Predicato che divide una stringa in sottostringhe in base a un separatore e a un padding.
-   String: stringa di input da suddividere.
-   Separator: caratteri che fungono da separatori tra le sottostringhe.
-   Padding: caratteri da ignorare all'inizio e alla fine delle sottostringhe.
-   Substrings: lista delle sottostringhe risultanti dalla suddivisione. */
+/* 
+    Predicato che divide una stringa in sottostringhe in base a un separatore e a un padding.
+    String: stringa di input da suddividere.
+    Separator: caratteri che fungono da separatori tra le sottostringhe.
+    Padding: caratteri da ignorare all'inizio e alla fine delle sottostringhe.
+    Substrings: lista delle sottostringhe risultanti dalla suddivisione.
+
+   Gli argomenti sono:
+     - La stringa di input da suddividere in sottostringhe.
+     - I caratteri che fungono da separatori tra le sottostringhe.
+     - I caratteri da ignorare all'inizio e alla fine delle sottostringhe.
+     - La lista delle sottostringhe risultanti dalla suddivisione.   
+*/
 split_string(String, Separator, Padding, Substrings) :-
     atom_codes(String, StringCodes),
     atom_codes(Separator, SeparatorCodes),
     atom_codes(Padding, PaddingCodes),
     split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, Substrings).
 
-/* Predicato che suddivide una stringa in sottostringhe, eliminando il padding
-   e utilizzando il separatore specificato.
-   Restituisce la lista di sottostringhe una alla volta. */
+/* 
+    Predicato che suddivide una stringa in sottostringhe, eliminando il padding
+    e utilizzando il separatore specificato.
+    Restituisce la lista di sottostringhe una alla volta.
+
+    Gli argomenti sono:
+     - La lista dei codici di caratteri della stringa di input.
+     - La lista dei codici di caratteri che fungono da separatori.
+     - La lista dei codici di caratteri che devono essere ignorati (padding).
+     - La lista risultante di sottostringhe (ogni sottostringa è una lista di codici di caratteri).
+
+    Caso base: Se la stringa di input è vuota, la lista di sottostringhe risultante è vuota.
+    
+    Caso generale: Il predicato chiama il predicato ausiliario `split_string_codes_aux`
+                   per separare la stringa in sottostringhe, 
+                   rimuovendo il padding e utilizzando il separatore specificato. 
+                   Ogni sottostringa viene poi convertita da una lista di codici di caratteri 
+                   in un atomo e aggiunta alla lista risultante.
+                   La funzione continua a chiamarsi ricorsivamente per il resto della stringa.
+*/
 split_string_codes([], _, _, []) :- !.
 
 split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substrings]) :-
@@ -171,9 +264,33 @@ split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substri
     atom_codes(Substring, SubstringCodes),
     split_string_codes(RestCodes, SeparatorCodes, PaddingCodes, Substrings).
 
-/* Predicato ausiliario che rileva un separatore all'inizio della stringa.
-   Quando viene trovato un separatore, termina l'estrazione della sottostringa corrente
-   e restituisce i caratteri rimanenti per l'elaborazione successiva. */
+/* 
+    Predicato ausiliario che rileva un separatore all'inizio della stringa.
+    Quando viene trovato un separatore, termina l'estrazione della sottostringa corrente
+    e restituisce i caratteri rimanenti per l'elaborazione successiva.
+
+    Gli argomenti sono:
+     - La lista dei codici di caratteri della stringa da elaborare.
+     - La lista dei codici di caratteri che fungono da separatori.
+     - La lista dei codici di caratteri da ignorare (padding).
+     - La lista di codici di caratteri che costituiscono la sottostringa estratta.
+     - La lista di codici di caratteri rimanenti da elaborare.
+
+    Caso base 1: Se la lista di codici di caratteri è vuota,
+                 restituisce una lista vuota per la sottostringa
+                 e una lista vuota per i caratteri rimanenti.
+    
+    Caso base 2: Se viene trovato un separatore all'inizio della stringa,
+                 la sottostringa viene completata (lista vuota) e il
+                 resto della stringa (senza il separatore) viene restituito.
+
+    Caso generale 1: Se il carattere non è né un separatore né un padding,
+                     viene aggiunto alla sottostringa e il predicato
+                     continua a processare i caratteri successivi.
+
+    Caso generale 2: Se il carattere è un padding, viene ignorato e
+                     il predicato continua a processare i caratteri successivi.
+*/
 split_string_codes_aux([], _, _, [], []) :- !.
 
 split_string_codes_aux([C|Cs], SeparatorCodes, _, [], Cs) :-
@@ -192,7 +309,9 @@ split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, SubstringCodes, Res
    Predicati per la gestione dei generi preferiti
    ================================================ */
 
-/* Predicato che permette all'utente di selezionare e gestire i generi musicali preferiti. */
+/* 
+    Predicato che permette all'utente di selezionare e gestire i generi musicali preferiti.    
+*/
 gestisci_generi_preferiti :- 
     ottieni_generi_disponibili(GeneriDisponibili),
     (   GeneriDisponibili == []
@@ -202,7 +321,12 @@ gestisci_generi_preferiti :-
         chiedi_generi_preferiti([])
     ).
 
-/* Predicato che raccoglie i generi preferiti inseriti dall'utente e li aggiunge alla lista di preferiti. */
+/* 
+    Predicato che raccoglie i generi preferiti inseriti dall'utente e li aggiunge alla lista di preferiti.
+
+    Gli argomenti sono:
+     - GeneriPreferiti: una lista che contiene i generi musicali preferiti dall'utente.
+*/
 chiedi_generi_preferiti(GeneriPreferiti) :- 
     ottieni_generi_disponibili(GeneriDisponibili),
     write('Inserisci un genere preferito: '),
@@ -229,8 +353,19 @@ chiedi_generi_preferiti(GeneriPreferiti) :-
         )
     ).
 
-/* Predicato che chiede all'utente di inserire
-   un peso per ciascun genere musicale preferito. */
+/* 
+    Predicato che chiede all'utente di inserire
+    un peso per ciascun genere musicale preferito.
+
+    li argomenti sono:
+     - La lista dei generi preferiti.
+
+    Caso base: Quando la lista dei generi è vuota, il predicato termina senza fare nulla.
+
+    Caso generale: Quando ci sono ancora generi da processare,
+                   il predicato chiede il peso per ogni genere, lo valida,
+                   aggiorna la conoscenza e poi ricorsivamente gestisce il prossimo genere.
+*/
 chiedi_peso_generi([]).
 
 chiedi_peso_generi([Genere | Altri]) :- 
@@ -248,9 +383,23 @@ chiedi_peso_generi([Genere | Altri]) :-
    Predicati per la raccomandazione e la classifica
    ================================================ */
 
-/* Predicato che stampa le canzoni ordinate in base al punteggio
-   ponderato, elencandole con la posizione, il titolo,
-   l'artista e il punteggio ponderato. */
+/* 
+    Predicato che stampa le canzoni ordinate in base al punteggio
+    ponderato, elencandole con la posizione, il titolo,
+    l'artista e il punteggio ponderato.
+
+    Gli argomenti sono:
+     - La lista delle canzoni ordinate (una lista di coppie formato
+       (PunteggioPonderato, Titolo)).
+     - La posizione corrente nella lista da stampare.
+
+    Caso base: Quando la lista è vuota, il predicato termina senza fare nulla.
+
+    Caso generale: Quando ci sono ancora canzoni da stampare,
+                   il predicato estrae la prima canzone dalla lista,
+                   recupera i suoi dettagli (titolo, artista, genere),
+                   e poi ricorsivamente stampa le canzoni rimanenti.
+*/
 stampa_canzoni_ordinate([], _).
 
 stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :- 
@@ -259,9 +408,11 @@ stampa_canzoni_ordinate([PunteggioPonderato-Titolo | Rest], Posizione) :-
             [Posizione, Titolo, Artista, Genere, PunteggioPonderato]),
     stampa_canzoni_ordinate(Rest, Posizione + 1).
 
-/* Predicato che calcola il punteggio ponderato per ogni canzone 
-   in base al suo genere e al suo punteggio originale.
-   Poi stampa la classifica ordinata delle canzoni. */
+/* 
+    Predicato che calcola il punteggio ponderato per ogni canzone 
+    in base al suo genere e al suo punteggio originale.
+    Poi stampa la classifica ordinata delle canzoni.
+*/
 stampa_classifica :-
     findall(PunteggioPonderato-Titolo, calcola_punteggio_ponderato(Titolo, PunteggioPonderato), PunteggiModificati),
     findall(Punteggio-Titolo, (canzone(Titolo, _, _, Punteggio), \+ member(_-Titolo, PunteggiModificati)), PunteggiInvariati),
@@ -274,9 +425,15 @@ stampa_classifica :-
         stampa_canzoni_ordinate(PunteggiOrdinati, 1)
     ).
 
-/* Predicato che calcola il punteggio ponderato
+/* 
+    Predicato che calcola il punteggio ponderato
     di una canzone in base al suo genere (e al peso preferito associato)
-    moltiplicato per il punteggio originale della canzone. */
+    moltiplicato per il punteggio originale della canzone.
+
+    Gli argomenti sono:
+     - Il titolo della canzone.
+     - Il punteggio della canzone dopo l'applicazione del peso.
+*/
 calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :- 
     canzone(Titolo, _, Genere, Punteggio),
     normalizza_genere(Genere, GenereNormalizzato),
@@ -288,8 +445,10 @@ calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :-
    Predicati ausiliari
    ================================================ */
 
-/* Predicato che mostra i generi preferiti associati
-   con il rispettivo peso. */
+/* 
+    Predicato che mostra i generi preferiti associati
+    con il rispettivo peso.
+*/
 mostra_generi_preferiti :- 
     findall(Genere-Peso, genere_preferito(Genere, Peso), Generi),
     (   Generi == []
@@ -298,28 +457,51 @@ mostra_generi_preferiti :-
         stampa_generi(Generi)
     ).
 
-/* Predicato che restituisce i generi disponibili */
+/* 
+    Predicato che restituisce i generi disponibili
+
+    Gli argomenti sono:
+     - GeneriDisponibili: lista dei generi musicali disponibili, ordinata senza duplicati.
+*/
 ottieni_generi_disponibili(GeneriDisponibili):-
     findall(Genere, canzone(_, _, Genere, _), Generi),
     sort(Generi, GeneriOrdinati),
     GeneriDisponibili = GeneriOrdinati.
 
-/* Predicato che stampa a video una lista dei generi musicali 
-   univoci presenti nel database delle canzoni. */
+/* 
+    Predicato che stampa a video una lista dei generi musicali 
+    univoci presenti nel database delle canzoni.
+*/
 mostra_generi_disponibili :-
     ottieni_generi_disponibili(GeneriOrdinati),
     format('Generi disponibili: ~w\n', [GeneriOrdinati]).
     
-/* Predicato che stampa la lista dei generi preferiti. */
+/* 
+    Predicato che stampa la lista dei generi preferiti.
+
+    Gli argomenti sono:
+     - La lista di generi musicali con il peso associato (Lista dei preferiti).
+    
+    Caso base: Quando la lista è vuota, il predicato termina senza fare nulla.
+    Caso generale: Quando ci sono ancora generi nella lista,
+                   il predicato stampa il genere e il suo peso,
+                   quindi chiama ricorsivamente se stesso per stampare i restanti.
+*/
 stampa_generi([]).
 
 stampa_generi([Genere-Peso | Rest]) :- 
     format('~w: ~w\n', [Genere, Peso]),
     stampa_generi(Rest).
     
-/* Predicato che normalizza un genere, trasformandolo in minuscolo
-   e rimuovendo gli spazi. Questo permette di confrontare i generi
-   in modo case-insensitive e indipendentemente dalla formattazione. */
+/* 
+    Predicato che normalizza un genere, trasformandolo in minuscolo
+    e rimuovendo gli spazi. Questo permette di confrontare i generi
+    in modo case-insensitive e indipendentemente dalla formattazione.
+
+    Gli argomenti sono:
+     - Il genere musicale in input.
+     - Il genere musicale normalizzato in output.
+*/
 normalizza_genere(Genere, GenereNormalizzato) :-
     (atom(Genere) -> true ; atom_codes(Genere, Genere)),
     downcase_atom(Genere, GenereLower),
@@ -327,32 +509,74 @@ normalizza_genere(Genere, GenereNormalizzato) :-
     rimuovi_spazi(Codici, CodiciNormalizzati),
     atom_codes(GenereNormalizzato, CodiciNormalizzati).
 
-/* Predicato che converte tutti i caratteri di un atomo in minuscolo. */
+/* 
+    Predicato che converte tutti i caratteri di un atomo in minuscolo.
+
+    Gli argomenti sono:
+     - L'atomo in ingresso.
+     - L'atomo in uscita, trasformato in minuscolo.
+*/
 downcase_atom(Atom, LowercaseAtom) :-
     atom_codes(Atom, Codes),
     maplist(to_lower, Codes, LowercaseCodes),
     atom_codes(LowercaseAtom, LowercaseCodes).
 
-/* Predicato che converte un singolo carattere in minuscolo. */
+/* 
+    Predicato che converte un singolo carattere in minuscolo.
+
+    Gli argomenti sono:
+     - Il codice del carattere in ingresso.
+     - Il codice del carattere in uscita, trasformato in minuscolo.
+    
+    Caso base: Quando il codice è già in minuscolo, viene restituito senza modifiche.
+    
+    Caso generale: Quando il codice corrisponde a una lettera maiuscola (tra 65 e 90 nel codice ASCII),
+                   viene convertito nel corrispondente codice di una lettera minuscola (aggiungendo 32).
+*/
 to_lower(Code, LowerCode) :-
     Code >= 65, Code =< 90,
     LowerCode is Code + 32.
+
 to_lower(Code, Code).
 
-/* Predicato che restituisce il peso associato ad un genere. Se non è
-   stato definito un peso specifico, viene utilizzato un peso predefinito (1). */
+/* 
+    Predicato che restituisce il peso associato ad un genere. Se non è
+    stato definito un peso specifico, viene utilizzato un peso predefinito (1).
+
+    Gli argomenti sono:
+     - Il genere musicale.
+     - Il peso associato al genere.
+*/
 peso_genere(Genere, Peso) :- 
     (   genere_preferito(Genere, Peso) -> true ; Peso = 1 ).
 
-/* Predicato che rimuove tutti gli spazi da una stringa, sia che sia
-   rappresentata come atomo o come lista di codici ASCII. */
+/* 
+    Predicato che rimuove tutti gli spazi da una stringa, sia che sia
+    rappresentata come atomo o come lista di codici ASCII.
+
+    Gli argomenti sono:
+     - La stringa di input, che può essere un atomo o una lista di codici ASCII.
+     - La stringa risultante, senza spazi.
+*/
 rimuovi_spazi(Stringa, StringaRimossa) :-
     (    atom(Stringa) -> atom_codes(Stringa, Codici) ; Codici = Stringa ),
     rimuovi_spazi_codici(Codici, CodiciRimossi),
     (    atom(Stringa) -> atom_codes(StringaRimossa, CodiciRimossi) ; StringaRimossa = CodiciRimossi ).
 
-/* Predicato ausiliario che rimuove gli spazi (codice ASCII 32)
-   da una lista di codici ASCII. */
+/* 
+    Predicato ausiliario che rimuove gli spazi (codice ASCII 32)
+    da una lista di codici ASCII.
+
+    Gli argomenti sono:
+     - La lista di codici ASCII da elaborare.
+     - La lista risultante, che sarà la stessa lista senza gli spazi.
+
+    Caso base: Quando la lista di input è vuota, la lista risultante è anch'essa vuota.
+    
+    Caso ricorsivo: Quando il primo elemento della lista è uno spazio (ASCII 32),
+                    viene ignorato e il predicato continua a processare il resto della lista.
+                    Se il primo elemento non è uno spazio, viene mantenuto nella lista risultante.
+*/
 rimuovi_spazi_codici([], []).
 rimuovi_spazi_codici([32|T], R) :- rimuovi_spazi_codici(T, R).
 rimuovi_spazi_codici([H|T], [H|R]) :- H \= 32, rimuovi_spazi_codici(T, R).
