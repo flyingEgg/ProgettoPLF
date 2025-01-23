@@ -171,9 +171,9 @@ processa_riga_singola([Char | Rest], Accumulatore, Stringa, RestDopoLinea) :-
      - La riga contenente i dati della canzone da analizzare.
 */
 parsing_righe(Riga) :-
-    split_string(Riga, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
-        string_trim(PunteggioStr, TrimmedPunteggioStr),
-        (   number_string(Punteggio, TrimmedPunteggioStr)
+    separa_stringa(Riga, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
+        rimuovi_spazi(PunteggioStr, TrimmedPunteggioStr),
+        (   numero_stringa(Punteggio, TrimmedPunteggioStr)
         ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
         ;   format('Errore nella conversione del punteggio: ~w\n', [PunteggioStr])
         ).
@@ -198,12 +198,12 @@ parsing_righe(Riga) :-
     Caso 2: Quando `Number` è già un numero, il predicato converte il numero in una lista di codici
                  e poi utilizza `atom_codes` per ottenere la stringa corrispondente al numero.    
 */
-number_string(Number, String) :-
+numero_stringa(Number, String) :-
     var(Number), !,
     atom_codes(String, Codes),
     catch(number_codes(Number, Codes), _, fail).
 
-number_string(Number, String) :-
+numero_stringa(Number, String) :-
     number(Number), !,
     number_codes(Number, Codes),
     atom_codes(String, Codes).
@@ -215,15 +215,11 @@ number_string(Number, String) :-
      - La stringa di input dalla quale si vogliono rimuovere gli spazi.
      - La stringa risultante, senza spazi bianchi, tabulazioni, nuove linee e ritorni a capo.
 */
-string_trim(String, Trimmed) :-
-    split_string(String, '', ' \t\n\r', [Trimmed|_]).
+rimuovi_spazi(String, Trimmed) :-
+    separa_stringa(String, '', ' \t\n\r', [Trimmed|_]).
 
 /* 
     Predicato che divide una stringa in sottostringhe in base a un separatore e a un padding.
-    String: stringa di input da suddividere.
-    Separator: caratteri che fungono da separatori tra le sottostringhe.
-    Padding: caratteri da ignorare all'inizio e alla fine delle sottostringhe.
-    Substrings: lista delle sottostringhe risultanti dalla suddivisione.
 
    Gli argomenti sono:
      - La stringa di input da suddividere in sottostringhe.
@@ -231,11 +227,11 @@ string_trim(String, Trimmed) :-
      - I caratteri da ignorare all'inizio e alla fine delle sottostringhe.
      - La lista delle sottostringhe risultanti dalla suddivisione.   
 */
-split_string(String, Separator, Padding, Substrings) :-
+separa_stringa(String, Separator, Padding, Substrings) :-
     atom_codes(String, StringCodes),
     atom_codes(Separator, SeparatorCodes),
     atom_codes(Padding, PaddingCodes),
-    split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, Substrings).
+    dividi_codici_stringa(StringCodes, SeparatorCodes, PaddingCodes, Substrings).
 
 /* 
     Predicato che suddivide una stringa in sottostringhe, eliminando il padding
@@ -257,12 +253,12 @@ split_string(String, Separator, Padding, Substrings) :-
                    in un atomo e aggiunta alla lista risultante.
                    La funzione continua a chiamarsi ricorsivamente per il resto della stringa.
 */
-split_string_codes([], _, _, []) :- !.
+dividi_codici_stringa([], _, _, []) :- !.
 
-split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substrings]) :-
-    split_string_codes_aux(StringCodes, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes),
+dividi_codici_stringa(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substrings]) :-
+    dividi_codici_stringa_aux(StringCodes, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes),
     atom_codes(Substring, SubstringCodes),
-    split_string_codes(RestCodes, SeparatorCodes, PaddingCodes, Substrings).
+    dividi_codici_stringa(RestCodes, SeparatorCodes, PaddingCodes, Substrings).
 
 /* 
     Predicato ausiliario che rileva un separatore all'inizio della stringa.
@@ -291,19 +287,19 @@ split_string_codes(StringCodes, SeparatorCodes, PaddingCodes, [Substring|Substri
     Caso generale 2: Se il carattere è un padding, viene ignorato e
                      il predicato continua a processare i caratteri successivi.
 */
-split_string_codes_aux([], _, _, [], []) :- !.
+dividi_codici_stringa_aux([], _, _, [], []) :- !.
 
-split_string_codes_aux([C|Cs], SeparatorCodes, _, [], Cs) :-
+dividi_codici_stringa_aux([C|Cs], SeparatorCodes, _, [], Cs) :-
     member(C, SeparatorCodes), !.
 
-split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, [C|SubstringCodes], RestCodes) :-
+dividi_codici_stringa_aux([C|Cs], SeparatorCodes, PaddingCodes, [C|SubstringCodes], RestCodes) :-
     \+ member(C, SeparatorCodes),
     \+ member(C, PaddingCodes), !,
-    split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
+    dividi_codici_stringa_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
 
-split_string_codes_aux([C|Cs], SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes) :-
+dividi_codici_stringa_aux([C|Cs], SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes) :-
     member(C, PaddingCodes), !,
-    split_string_codes_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
+    dividi_codici_stringa_aux(Cs, SeparatorCodes, PaddingCodes, SubstringCodes, RestCodes).
 
 /* ================================================
    Predicati per la gestione dei generi preferiti
@@ -504,7 +500,7 @@ stampa_generi([Genere-Peso | Rest]) :-
 */
 normalizza_genere(Genere, GenereNormalizzato) :-
     (atom(Genere) -> true ; atom_codes(Genere, Genere)),
-    downcase_atom(Genere, GenereLower),
+    minuscola_atomo(Genere, GenereLower),
     atom_codes(GenereLower, Codici),
     rimuovi_spazi(Codici, CodiciNormalizzati),
     atom_codes(GenereNormalizzato, CodiciNormalizzati).
@@ -516,7 +512,7 @@ normalizza_genere(Genere, GenereNormalizzato) :-
      - L'atomo in ingresso.
      - L'atomo in uscita, trasformato in minuscolo.
 */
-downcase_atom(Atom, LowercaseAtom) :-
+minuscola_atomo(Atom, LowercaseAtom) :-
     atom_codes(Atom, Codes),
     maplist(to_lower, Codes, LowercaseCodes),
     atom_codes(LowercaseAtom, LowercaseCodes).
