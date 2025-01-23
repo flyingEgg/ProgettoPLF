@@ -81,7 +81,17 @@
 
 \newpage
 \section{Specifica del problema}
-\textit{Scrivere un programma Haskell e un programma Prolog per implementare un sistema di raccomandazione di canzoni. Il programma legge le canzoni espresse in quattro attributi: titolo, artista, genere musicale e punteggio; da un file con valori separati da virgole, il cui nome viene acquisito da tastiera e le suggerisce all’utente basandosi sulle sue preferenze musicali, utilizzando un punteggio di gradimento acquisito da tastiera e configurato su uno o più generi, per creare una classifica con le canzoni ordinate secondo il punteggio ponderato da quello di gradimento del o dei generi musicali.}
+\textit{
+\noindent
+Scrivere un programma Haskell e un programma Prolog per implementare un sistema di raccomandazione
+di canzoni. Il programma legge le canzoni espresse in quattro attributi: titolo, artista,
+genere musicale e punteggio; da un file con valori separati da virgole, il cui nome viene acquisito
+da tastiera e le suggerisce all’utente basandosi sulle sue preferenze musicali, utilizzando un
+punteggio di gradimento acquisito da tastiera e configurato su uno o piu generi, per creare una
+classifica con le canzoni ordinate secondo il punteggio ponderato da quello di gradimento del o
+dei generi musicali.
+
+}
 
 \newpage
 \section{Analisi del problema}
@@ -150,17 +160,6 @@ I passi principali dell'algoritmo, indipendentemente dal linguaggio di implement
     \item \textbf{Fornire le raccomandazioni:} 
     L'algoritmo restituisce una lista ordinata delle canzoni con i relativi punteggi, permettendo all'utente di identificare facilmente le raccomandazioni più rilevanti.
 \end{enumerate}
-
-  La ricorsione ci permette di affrontare il problema in maniera naturale e modulare, dividendo l'algoritmo in parti più piccole e indipendenti che vengono gestite separatamente, ma in modo sequenziale e ben organizzato.
-
-La struttura modulare dell'algoritmo è una delle sue principali caratteristiche. Ogni funzione è progettata per risolvere un sottoproblema specifico del problema, mantenendo chiara e definita la logica delle operazioni. In questo modo, l'algoritmo non solo risulta facilmente comprensibile, ma anche manutenibile.
-
- Questa struttura garantisce che i sottoproblemi vengano trattati in modo sistematico, fino a ottenere una soluzione globale per il problema principale. La ricorsione consente così di elaborare i dati in modo efficiente, riducendo al minimo la complessità e assicurando un processo di calcolo preciso e ordinato.
-
-  Si specifica che la funzione è indipendente da qualsiasi linguaggio usato per la sua implementazio
-ne. L’implementazione effettiva differirà nella sintassi (ma non nel contenuto e nella semantica)
- leggermente in Haskell e Prolog per via della sintassi stessa dei due linguaggi in questione.
-
 \newpage
 \section{Implementazione dell'algoritmo}
 \subsection{Implementazione in Haskell}
