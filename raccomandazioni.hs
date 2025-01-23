@@ -215,7 +215,7 @@ aggiornaPesi [] pesi = return pesi
 aggiornaPesi (g:gs) pesi = do
     let pesoCorrente = Map.findWithDefault 1.0 g pesi
     putStrLn $ "Peso corrente per il genere '" ++ g ++ "': " ++ show pesoCorrente
-    putStrLn "Vuoi aggiornare il peso? (s/N)"
+    putStrLn "Vuoi aggiornare il peso? (s/n)"
     risposta <- getLine
     controllaRisposta risposta
    where
@@ -224,9 +224,12 @@ aggiornaPesi (g:gs) pesi = do
                 putStrLn $ "Inserisci il nuovo peso per il genere '" ++ g ++ "':"
                 nuovoPeso <- leggiPesoValido
                 aggiornaPesi gs (Map.insert g nuovoPeso pesi)
-            | otherwise = do
+            | r == "n" = do
                 putStrLn $ "Peso per il genere '" ++ g ++ "' invariato."
                 aggiornaPesi gs pesi
+            | otherwise = do
+                putStrLn $ "Scelta non valida. Riprovare"
+                aggiornaPesi (g:gs) pesi
 
 -- #########################################################
 -- Raccomandazioni
