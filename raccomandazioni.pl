@@ -90,7 +90,7 @@ carica_canzoni(File) :-
     open(File, read, Stream),
     leggi_righe(Stream, Lines),
     close(Stream),
-    processa_righe(Lines).
+    elabora_righe(Lines).
 
 /* 
     Predicato per leggere le righe del file
@@ -127,12 +127,12 @@ leggi_righe(Stream,[X|L]):-
                    la analizza, esegue il parsing della stringa risultante, 
                    e poi ricorsivamente processa le righe rimanenti.    
 */
-processa_righe([]) :- !.
+elabora_righe([]) :- !.
 
-processa_righe([Char | Rest]) :-
+elabora_righe([Char | Rest]) :-
     processa_riga_singola(Rest, [Char], Stringa, RestDopoLinea),
     parsing_righe(Stringa),
-    processa_righe(RestDopoLinea).
+    elabora_righe(RestDopoLinea).
 
 /* Predicato che processa una singola riga.
 
