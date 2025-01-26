@@ -73,12 +73,25 @@ loop_menu :-
    file che contiene le canzoni.
    Se il caricamento ha successo, stampa un messaggio di conferma. */
 carica_canzoni_interattivo :-
+    chiedi_nome_file(File),
+    carica_file(File).
+
+chiedi_nome_file(File) :-
     write('Inserire tra apici il nome del file contenente le canzoni: '), nl,
-    read(File),
-    (   catch(carica_canzoni(File), _, fail)
-    ->  write('\nFile caricato con successo!\n')
-    ;   write('\nErrore nel caricamento del file. Riprova.\n')
-    ).
+    read(File).
+
+carica_file(File) :-
+    catch(carica_canzoni(File), _, fallimento_caricamento),
+    successo_caricamento.
+
+successo_caricamento :-
+    write('\nFile caricato con successo!\n').
+
+fallimento_caricamento :-
+    write('\nErrore nel caricamento del file. Riprova.\n'),
+    carica_canzoni_interattivo.
+
+
 
 /* Predicato che analizza il contenuto del file e ne
    "processa" il contenuto. 
