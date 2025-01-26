@@ -185,11 +185,25 @@ elabora_riga_singola([Char | Rest], Accumulatore, Stringa, RestDopoLinea) :-
 */
 parsing_righe(Riga) :-
     separa_stringa(Riga, ',', '', [Titolo, Artista, Genere, PunteggioStr]),
-        string_trim(PunteggioStr, TrimmedPunteggioStr),
-        (   number_string(Punteggio, TrimmedPunteggioStr)
-        ->  assertz(canzone(Titolo, Artista, Genere, Punteggio))
-        ;   format('Errore nella conversione del punteggio: ~w\n', [PunteggioStr])
-        ).
+    string_trim(PunteggioStr, TrimmedPunteggioStr),
+    valida_e_inserisci(Titolo, Artista, Genere, TrimmedPunteggioStr).
+
+/*
+    Predicato che valida il punteggio della canzone e la salva
+    in un nuovo record se la validazine ha esito positivo o
+    lancia un errore con relativo messaggio altrimenti.
+
+    Gli argomenti sono:
+    - Titolo, artista e genere musicale della canzone
+    - ???
+*/
+valida_e_inserisci(Titolo, Artista, Genere, TrimmedPunteggioStr) :-
+    number_string(Punteggio, TrimmedPunteggioStr),
+    assertz(canzone(Titolo, Artista, Genere, Punteggio)).
+valida_e_inserisci(_, _, _, PunteggioStr) :-
+    format('Errore nella conversione del punteggio: ~w\n', [PunteggioStr]),
+    fail.
+
     
 /* ================================================
    Predicati ausiliari per la gestione delle stringhe
