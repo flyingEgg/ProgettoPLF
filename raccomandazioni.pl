@@ -341,12 +341,14 @@ separa_codici_stringa_aux([C|Cs], SeparatorCodes, PaddingCodes, SubstringCodes, 
 */
 gestisci_generi_preferiti :- 
     ottieni_generi_disponibili(GeneriDisponibili),
-    (   GeneriDisponibili == []
-    ->  write('Non ci sono generi disponibili. Impossibile inserire preferenze.\n')
-    ;   mostra_generi_disponibili,
-        write('Inserisci i tuoi generi preferiti, uno per volta. Scrivi "fine" per terminare.\n'),
-        chiedi_generi_preferiti([])
-    ).
+    controllo_generi_disponibili(GeneriDisponibili).
+
+controllo_generi_disponibili([]) :-
+    write('Non ci sono generi disponibili. Impossibile inserire preferenze.\n').
+controllo_generi_disponibili(GeneriDisponibili) :-
+    mostra_generi_disponibili(GeneriDisponibili),
+    write('Inserisci i tuoi generi preferiti, uno per volta. Scrivi "fine" per terminare.\n'),
+    chiedi_generi_preferiti([]).
 
 /* 
     Predicato che raccoglie i generi preferiti inseriti dall'utente e li aggiunge alla lista di preferiti.
@@ -499,8 +501,7 @@ ottieni_generi_disponibili(GeneriDisponibili):-
     Predicato che stampa a video una lista dei generi musicali 
     univoci presenti nel database delle canzoni.
 */
-mostra_generi_disponibili :-
-    ottieni_generi_disponibili(GeneriOrdinati),
+mostra_generi_disponibili(GeneriOrdinati):-
     format('Generi disponibili: ~w\n', [GeneriOrdinati]).
     
 /* 
