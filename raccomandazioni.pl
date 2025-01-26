@@ -448,12 +448,13 @@ stampa_classifica :-
     append(PunteggiModificati, PunteggiInvariati, PunteggiTotali),
     sort(PunteggiTotali, PunteggiOrdinatiAsc),
     reverse(PunteggiOrdinatiAsc, PunteggiOrdinati),
-    (   PunteggiTotali == []
-    ->  write('Nessuna canzone trovata con punteggio ponderato.\n')
-    ;   write('\nClassifica delle canzoni ordinate per punteggio:\n'),
-        stampa_canzoni_ordinate(PunteggiOrdinati, 1)
-    ).
+    controllo_punteggi_totali(PunteggiTotali, PunteggiOrdinati).
 
+controllo_punteggi_totali([], _) :-
+    write('Nessuna canzone trovata con punteggio ponderato.\n').
+controllo_punteggi_totali(PunteggiOrdinati, _) :-
+    write('\nClassifica delle canzoni ordinate per punteggio:\n'),
+    stampa_canzoni_ordinate(PunteggiOrdinati, 1).
 /* 
     Predicato che calcola il punteggio ponderato
     di una canzone in base al suo genere (e al peso preferito associato)
