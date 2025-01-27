@@ -481,11 +481,13 @@ calcola_punteggio_ponderato(Titolo, PunteggioPonderato) :-
 */
 mostra_generi_preferiti :- 
     findall(Genere-Peso, genere_preferito(Genere, Peso), Generi),
-    (   Generi == []
-    ->  write('Non è stato definito alcun genere preferito.\n')
-    ;   write('I tuoi generi preferiti e i loro pesi:\n'),
-        stampa_generi(Generi)
-    ).
+    controllo_generi(Generi).
+
+    controllo_generi([]) :-
+        write('Non è stato definito alcun genere preferito.\n').
+    controllo_generi(Generi) :-
+        write('I tuoi generi preferiti e i loro pesi:\n'),
+        stampa_generi(Generi).
 
 /* 
     Predicato che restituisce i generi disponibili
